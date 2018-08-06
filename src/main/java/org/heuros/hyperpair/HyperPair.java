@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import org.heuros.conf.HeurosConfFactory;
 import org.heuros.core.base.Loader;
+import org.heuros.core.base.Optimizer;
 import org.heuros.core.model.Leg;
+import org.heuros.core.model.Pair;
 import org.heuros.loader.legs.LegsLoader;
 
 /**
@@ -29,6 +31,8 @@ public class HyperPair {
 		if (conf != null) {
 
 			Loader<Leg> loader = new LegsLoader(conf.getLegs());
+
+			Optimizer<Leg, Pair> optimizer = new HyperPairOptimizer();
 
 //			Reporter<Leg> reporter = new LegCsvReporter(conf.getOutput());
 //

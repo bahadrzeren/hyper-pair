@@ -25,7 +25,7 @@ public class HyperPairOptimizer implements Optimizer<Leg, Pair> {
 	}
 
 	@Override
-	public List<Pair> optimize(DataContext<Leg, Pair> dataContext) {
+	public List<Pair> optimize() {
 		return null;
 	}
 }
