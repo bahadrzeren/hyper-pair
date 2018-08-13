@@ -3,11 +3,6 @@ package org.heuros.hyperpair;
 import java.io.IOException;
 
 import org.heuros.conf.HeurosConfFactory;
-import org.heuros.core.base.Loader;
-import org.heuros.core.base.Processor;
-import org.heuros.core.data.model.Leg;
-import org.heuros.core.data.model.Pair;
-import org.heuros.loader.legs.LegsLoader;
 
 /**
  * The main class that is used to start process.
@@ -30,9 +25,15 @@ public class HyperPair {
 
 		if (conf != null) {
 
-			Loader<Leg> loader = new LegsLoader(conf.getLegs());
+//			/**
+//			 * Read LEG data from CSV file.
+//			 */
+//			List<LegImpl> legs = new LegsLoader().setLegsFileName(conf.getLegs())
+//														.extractData();
 
-			Processor<Leg, Pair> optimizer = new HyperPairOptimizer();
+//			RuleContext<LegWrapper, Leg> RuleContext
+
+//			Processor<LegImpl, PairImpl> optimizer = new HyperPairOptimizer();
 
 //			Reporter<Leg> reporter = new LegCsvReporter(conf.getOutput());
 //

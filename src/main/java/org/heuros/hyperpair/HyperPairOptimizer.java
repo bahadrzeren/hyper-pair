@@ -1,30 +1,18 @@
 package org.heuros.hyperpair;
 
-import java.util.List;
+public class HyperPairOptimizer {
 
-import org.heuros.core.base.Processor;
-import org.heuros.core.data.model.Duty;
-import org.heuros.core.data.model.Leg;
-import org.heuros.core.data.model.Pair;
-import org.heuros.core.rule.ExtendedRuleContext;
-import org.heuros.core.rule.RuleContext;
-import org.heuros.rule.DutyRuleContext;
-import org.heuros.rule.LegRuleContext;
-import org.heuros.rule.PairRuleContext;
-
-public class HyperPairOptimizer implements Processor<Pair> {
-
-	private RuleContext<Leg> legRuleContext = new LegRuleContext();
-	private ExtendedRuleContext<Duty, Leg> dutyRuleContext = new DutyRuleContext();
-	private ExtendedRuleContext<Pair, Duty> pairRuleContext = new PairRuleContext();
+//	private RuleContext<LegImpl> legRuleContext = new LegRuleContext();
+//	private ExtendedRuleContext<DutyImpl, LegImpl> dutyRuleContext = new DutyRuleContext();
+//	private ExtendedRuleContext<PairImpl, DutyImpl> pairRuleContext = new PairRuleContext();
 
 //	private DataContext<Leg, Pair> dataContext = new DataContext<Leg, Pair>();
 
 	public HyperPairOptimizer() {
 	}
 
-	@Override
-	public List<Pair> startProcess() {
-		return null;
-	}
+//	@Override
+//	public List<PairImpl> startProcess() {
+//		return null;
+//	}
 }
