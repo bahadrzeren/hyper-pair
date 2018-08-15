@@ -5,22 +5,16 @@ import java.util.List;
 
 import org.heuros.conf.HeurosConfFactory;
 import org.heuros.core.base.Processor;
-import org.heuros.core.data.base.Wrapper;
-import org.heuros.data.model.DutyExtensionFactory;
-import org.heuros.data.model.DutyWrapperFactory;
-import org.heuros.data.model.LegExtension;
-import org.heuros.data.model.LegExtensionFactory;
-import org.heuros.data.model.LegModel;
-import org.heuros.data.model.LegWrapper;
-import org.heuros.data.model.LegWrapperFactory;
-import org.heuros.data.model.PairExtension;
-import org.heuros.data.model.PairExtensionFactory;
-import org.heuros.data.model.PairModel;
-import org.heuros.data.model.PairWrapper;
-import org.heuros.data.model.PairWrapperFactory;
+import org.heuros.data.model.Duty;
+import org.heuros.data.model.DutyFactory;
+import org.heuros.data.model.Leg;
+import org.heuros.data.model.LegFactory;
+import org.heuros.data.model.LegView;
+import org.heuros.data.model.PairFactory;
+import org.heuros.data.model.PairView;
+import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
 import org.heuros.loader.legs.LegsLoader;
-import org.heuros.processor.leg.LegProcessor;
 import org.heuros.rule.DutyRuleContext;
 import org.heuros.rule.LegRuleContext;
 import org.heuros.rule.PairRuleContext;
@@ -49,11 +43,11 @@ public class HyperPair {
 			/*
 			 * Load LEG data from CSV file.
 			 */
-			List<LegModel> legs = new LegsLoader().setLegsFileName(conf.getLegs())
+			List<Leg> legs = new LegsLoader().setLegsFileName(conf.getLegs())
 														.extractData();
 
 			/*
-			 * Prepare rule engine and factories.
+			 * Prepare rule engine.
 			 */
 
 			LegRuleContext legRuleContext = new LegRuleContext();
@@ -63,32 +57,39 @@ public class HyperPair {
 			PairRuleContext pairRuleContext = new PairRuleContext();
 //			pairRuleContext.registerRule();
 
-			LegExtensionFactory legExtensionFactory = new LegExtensionFactory();
-			DutyExtensionFactory dutyExtensionFactory = new DutyExtensionFactory();
-			PairExtensionFactory pairExtensionFactory = new PairExtensionFactory();
+			/*
+			 * Prepare factories.
+			 */
+			LegFactory legFactory = new LegFactory(legRuleContext);
+			DutyFactory dutyFactory = new DutyFactory(dutyRuleContext);
+			PairFactory pairFactory = new PairFactory(pairRuleContext);
 
-			LegWrapperFactory legWrapperFactory = new LegWrapperFactory(legRuleContext, legExtensionFactory);
-			DutyWrapperFactory dutyWrapperFactory = new DutyWrapperFactory(dutyRuleContext, dutyExtensionFactory);
-			PairWrapperFactory pairWrapperFactory = new PairWrapperFactory(pairRuleContext, pairExtensionFactory);
+			/*
+			 * Add legs to repository.
+			 */
+			LegRepository legRepo = new LegRepository();
+			legs.forEach(legRepo::addToRepo);
+
+			/*
+			 * Generate duties.
+			 */
+			DutyRepository dutyRepo = new DutyRepository();
+
 
 			/*
 			 * Map Leg list to LegWrapper list
 			 */
-			List<LegWrapper> legWrappers = new LegProcessor().setRuleContext(legRuleContext)
-																					.setExtensionFactory(legExtensionFactory)
-																					.setWrapperFactory(legWrapperFactory)
-																					.proceed(legs);
 
-			LegRepository legRepo = new LegRepository(legWrapperFactory);
-			legWrappers.forEach(legRepo::addWrapperToRepo);
 
-			Processor<LegWrapper, PairWrapper, PairModel, PairExtension> optimizer = new HyperPairOptimizer();
-			List<PairWrapper> pairs = optimizer.proceed(legWrappers);
+			/*
+			 * Prepare and run the optimizer.
+			 */
+			Processor<Duty, PairView> optimizer = new HyperPairOptimizer();
+			List<PairView> pairs = optimizer.proceed(dutyRepo);
 
 			/*
 			 * Report solution.
 			 */
-//			Reporter<PairWrapper> reporter = new LegCsvReporter(conf.getOutput());
 			
 		}
     }
