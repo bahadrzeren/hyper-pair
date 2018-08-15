@@ -9,7 +9,6 @@ import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyFactory;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegFactory;
-import org.heuros.data.model.LegView;
 import org.heuros.data.model.PairFactory;
 import org.heuros.data.model.PairView;
 import org.heuros.data.repo.DutyRepository;
