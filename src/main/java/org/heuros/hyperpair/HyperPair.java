@@ -3,10 +3,13 @@ package org.heuros.hyperpair;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
 import org.heuros.core.base.Processor;
+import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyFactory;
+import org.heuros.data.model.DutyLegFactory;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegFactory;
 import org.heuros.data.model.PairFactory;
@@ -14,6 +17,7 @@ import org.heuros.data.model.PairView;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
 import org.heuros.loader.legs.LegsLoader;
+import org.heuros.rule.AirportRuleContext;
 import org.heuros.rule.DutyRuleContext;
 import org.heuros.rule.LegRuleContext;
 import org.heuros.rule.PairRuleContext;
@@ -24,6 +28,8 @@ import org.heuros.rule.PairRuleContext;
  * @author bahadrzeren
  */
 public class HyperPair {
+
+	private static Logger logger = Logger.getLogger(HyperPair.class);
 
 	public static void main(String[] args) throws IOException {
     	/*
@@ -43,12 +49,14 @@ public class HyperPair {
 			 * Load LEG data from CSV file.
 			 */
 			List<Leg> legs = new LegsLoader().setLegsFileName(conf.getLegs())
-														.extractData();
+												.setModelFactory(new LegFactory())
+												.extractData();
 
 			/*
 			 * Prepare rule engine.
 			 */
-
+			AirportRuleContext airportRuleContext = new AirportRuleContext();
+//			airportRuleContext.registerRule();
 			LegRuleContext legRuleContext = new LegRuleContext();
 //			legRuleContext.registerRule();
 			DutyRuleContext dutyRuleContext = new DutyRuleContext();
@@ -59,9 +67,11 @@ public class HyperPair {
 			/*
 			 * Prepare factories.
 			 */
-			LegFactory legFactory = new LegFactory(legRuleContext);
-			DutyFactory dutyFactory = new DutyFactory(dutyRuleContext);
-			PairFactory pairFactory = new PairFactory(pairRuleContext);
+			AirportFactory airportFactory = new AirportFactory();
+			LegFactory legFactory = new LegFactory();
+			DutyLegFactory dutyLegFactory = new DutyLegFactory();
+			DutyFactory dutyFactory = new DutyFactory();
+			PairFactory pairFactory = new PairFactory();
 
 			/*
 			 * Add legs to repository.
