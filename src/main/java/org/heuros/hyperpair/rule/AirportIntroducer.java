@@ -4,15 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.heuros.core.rule.inf.AbstractRule;
 import org.heuros.core.rule.inf.Introducer;
+import org.heuros.core.rule.inf.RuleImplementation;
 import org.heuros.data.model.Airport;
 
-public class AirportIntroducer implements Introducer<Airport> {
+@RuleImplementation(ruleName = "Airport introducer", 
+					violationMessage = "Airport introducer failed", 
+					description = "Airport model initializer.")
+public class AirportIntroducer extends AbstractRule implements Introducer<Airport> {
 
 	/*
 	 * Homebase airports. For now the problem is a single based one.
 	 */
-	private static String[] homebases = {"IST"};
+	private static String[] homebases = {"IST", "SAW"};
 
 	/*
 	 * Domestic airports. All of the others are going to be flagged as international.
@@ -152,20 +157,6 @@ public class AirportIntroducer implements Introducer<Airport> {
 
 	@Override
 	public boolean introduce(Airport m) {
-		/*
-		 * Set flags that will indicate whether airport is domestic or international.
-		 */
-//		m.setDomestic(false);
-//		m.setInternational(true);
-//		for (String airport: AirportIntroducer.domesticAirports) {
-//			if (m.getCode().toUpperCase().equals(airport.toUpperCase())) {
-//				m.setDomestic(true);
-//				m.setInternational(false);
-//				break;
-//			}
-//		}
-		m.setDomestic(ArrayUtils.indexOf(AirportIntroducer.domesticAirports, m.getCode()) >= 0);
-		m.setInternational(!m.isDomestic());
 
 		/*
 		 * Set homebase flags.
@@ -180,7 +171,22 @@ public class AirportIntroducer implements Introducer<Airport> {
 //			}
 //		}
 		m.setHb(ArrayUtils.indexOf(AirportIntroducer.homebases, m.getCode()) >= 0);
-		m.setNonHB(!m.isHb());
+		m.setNonHb(!m.isHb());
+
+		/*
+		 * Set flags that will indicate whether airport is domestic or international.
+		 */
+//		m.setDomestic(false);
+//		m.setInternational(true);
+//		for (String airport: AirportIntroducer.domesticAirports) {
+//			if (m.getCode().toUpperCase().equals(airport.toUpperCase())) {
+//				m.setDomestic(true);
+//				m.setInternational(false);
+//				break;
+//			}
+//		}
+		m.setDomestic(ArrayUtils.indexOf(AirportIntroducer.domesticAirports, m.getCode()) >= 0);
+		m.setInternational(!m.isDomestic());
 
 		/*
 		 * Check stations that are not allowed to be deadhead if it departs from or arrives to the homebase.
@@ -203,9 +209,11 @@ public class AirportIntroducer implements Introducer<Airport> {
 		m.setOneDutyStation(ArrayUtils.indexOf(AirportIntroducer.oneDutyStations, m.getCode()) >= 0);
 
 		/*
-		 * Check ac change allowed stations.
+		 * Check ac change allowed international stations.
 		 */
-		m.setAcChangeAllowed(ArrayUtils.indexOf(AirportIntroducer.acChangeAllowedInternationaStations, m.getCode()) >= 0);
+		m.setAcChangeAllowed(m.isDomestic());
+		if (m.isInternational())
+			m.setAcChangeAllowed(ArrayUtils.indexOf(AirportIntroducer.acChangeAllowedInternationaStations, m.getCode()) >= 0);
 
 		/*
 		 * Check special european stations.
