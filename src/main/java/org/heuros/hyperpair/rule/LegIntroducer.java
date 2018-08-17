@@ -55,6 +55,9 @@ public class LegIntroducer extends AbstractRule implements Introducer<Leg> {
 	@Override
 	public boolean introduce(Leg m) {
 
+		if (HeurosDatasetParam.optPeriodStartInc.isAfter(m.getSobt()))
+			return false;
+
 		if (m.getFlightNo() > LegIntroducer.maxFlightNumberToConsider)
 			return false;
 
@@ -94,20 +97,16 @@ public class LegIntroducer extends AbstractRule implements Introducer<Leg> {
 		}
 
 		/*
-		 * Set inOptimizationPeriod flag.
-		 */
-		m.setInOptimizationPeriod(true);
-		if (HeurosDatasetParam.optPeriodStartInc.isAfter(m.getSobt()))
-			m.setInOptimizationPeriod(false);
-
-		/*
 		 * Check max flight number to cover.
 		 */
-		m.setCover(m.isInFleet() && m.isNeedsCockpitCrew() && m.isInOptimizationPeriod());
+		m.setCover(m.isInFleet() && m.isNeedsCockpitCrew());
 
 		if (m.getFlightNo() >= LegIntroducer.maxFlightNumberToCover)
 			m.setCover(false);
 
-		return true;
+		if (m.isCover() || m.isDeadheadable())
+			return true;
+		else
+			return false;
 	}
 }
