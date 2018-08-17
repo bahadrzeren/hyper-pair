@@ -2,6 +2,7 @@ package org.heuros.hyperpair;
 
 import org.heuros.core.rule.inf.Rule;
 import org.heuros.data.model.Airport;
+import org.heuros.data.model.AirportFactory;
 import org.heuros.hyperpair.rule.AirportIntroducer;
 import org.heuros.rule.AirportRuleContext;
 
@@ -37,19 +38,20 @@ public class AirportIntroducerTest extends TestCase {
      */
     public void testAirportInitialization()
     {
-    	AirportRuleContext apContext = new AirportRuleContext();
+    	AirportFactory apFactory = new AirportFactory();
+    	AirportRuleContext apRuleContext = new AirportRuleContext();
 
     	Rule apIntroducer = new AirportIntroducer();
 
     	try {
-    		apContext.registerRule(apIntroducer);
+    		apRuleContext.registerRule(apIntroducer);
     	} catch (Exception ex) {
     		ex.printStackTrace();
     		assertTrue(false);
     	}
 
-    	Airport ap1 = new Airport();
-    	Airport ap2 = new Airport();
+    	Airport ap1 = apFactory.generateModel();
+    	Airport ap2 = apFactory.generateModel();
 
     	/*
     	 * Homebase
@@ -57,8 +59,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("SAW");
     	ap2.setCode("ESB");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isHb());
 		assertFalse(ap1.isNonHb());
@@ -71,8 +73,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("EZS");
     	ap2.setCode("JFK");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isDomestic());
 		assertFalse(ap1.isInternational());
@@ -85,8 +87,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("JED");
     	ap2.setCode("BRE");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isDhNotAllowedIfHBDepOrArr());
 		assertFalse(ap2.isDhNotAllowedIfHBDepOrArr());
@@ -97,8 +99,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("VAN");
     	ap2.setCode("BHX");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isCritical());
 		assertFalse(ap2.isCritical());
@@ -109,8 +111,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("ECN");
     	ap2.setCode("TLV");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isAgDg());
 		assertFalse(ap2.isAgDg());
@@ -121,8 +123,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("AJI");
     	ap2.setCode("AYT");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isOneDutyStation());
 		assertFalse(ap2.isOneDutyStation());
@@ -133,8 +135,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("SSH");
     	ap2.setCode("LHR");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isAcChangeAllowed());
 		assertFalse(ap2.isAcChangeAllowed());
@@ -145,8 +147,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("BRU");
     	ap2.setCode("HAM");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isSpecialEuroStation());
 		assertFalse(ap2.isSpecialEuroStation());
@@ -157,8 +159,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("ADA");
     	ap2.setCode("IST");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isLayoverAllowed());
 		assertFalse(ap2.isLayoverAllowed());
@@ -169,8 +171,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("ALA");
     	ap2.setCode("SAW");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isEndDutyIfTouches());
 		assertFalse(ap2.isEndDutyIfTouches());
@@ -181,8 +183,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("LHR");
     	ap2.setCode("CDG");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isMandatoryFirstLayover());
 		assertFalse(ap2.isMandatoryFirstLayover());
@@ -193,8 +195,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("TLV");
     	ap2.setCode("CAI");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.isLegConnectionExceptionStation());
 		assertFalse(ap2.isLegConnectionExceptionStation());
@@ -205,8 +207,8 @@ public class AirportIntroducerTest extends TestCase {
     	ap1.setCode("ORY");
     	ap2.setCode("HOU");
 
-    	apContext.getIntroducerProxy().introduce(ap1);
-    	apContext.getIntroducerProxy().introduce(ap2);
+    	apRuleContext.getIntroducerProxy().introduce(ap1);
+    	apRuleContext.getIntroducerProxy().introduce(ap2);
 
     	assertTrue(ap1.getGroupId() == 1);
 		assertTrue(ap2.getGroupId() == 0);
