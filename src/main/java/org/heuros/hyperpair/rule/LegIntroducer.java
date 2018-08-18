@@ -9,7 +9,7 @@ import org.heuros.hyperpair.HeurosDatasetParam;
 
 @RuleImplementation(ruleName = "Leg introducer", 
 					violationMessage = "Leg introducer failed", 
-					description = "Leg model initialized.")
+					description = "Leg model initializer.")
 public class LegIntroducer extends AbstractRule implements Introducer<Leg> {
 
 	/*
