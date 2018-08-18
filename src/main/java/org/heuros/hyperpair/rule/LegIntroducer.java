@@ -1,5 +1,7 @@
 package org.heuros.hyperpair.rule;
 
+import java.time.temporal.ChronoUnit;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.heuros.core.rule.inf.AbstractRule;
 import org.heuros.core.rule.inf.Introducer;
@@ -60,6 +62,11 @@ public class LegIntroducer extends AbstractRule implements Introducer<Leg> {
 
 		if (m.getFlightNo() > LegIntroducer.maxFlightNumberToConsider)
 			return false;
+
+		/*
+		 * Calculate block time.
+		 */
+		m.setBlockTimeInMins((int) ChronoUnit.MINUTES.between(m.getSobt(), m.getSibt()));
 
 		/*
 		 * Check aircraft numbers.

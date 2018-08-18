@@ -97,11 +97,13 @@ public class LegIntroducerTest extends TestCase {
     	legInFleetHb.setDepAirport(apIST);
     	legInFleetHb.setArrAirport(apADA);
     	legInFleetHb.setSobt(LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0));
+    	legInFleetHb.setSibt(LocalDateTime.of(2014, Month.JANUARY, 1, 11, 13));
 
     	legNonFleetNonHb.setFlightNo(200);
     	legNonFleetNonHb.setDepAirport(apADA);
     	legNonFleetNonHb.setArrAirport(apIST);
     	legNonFleetNonHb.setSobt(LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0));
+    	legNonFleetNonHb.setSibt(LocalDateTime.of(2014, Month.JANUARY, 2, 0, 1));
 
     	/*
     	 * Flight number not to consider.
@@ -110,6 +112,14 @@ public class LegIntroducerTest extends TestCase {
     	legInFleetHb.setFlightNo(9000);
 		assertFalse(legRuleContext.getIntroducerProxy().introduce(legInFleetHb));
     	legInFleetHb.setFlightNo(flightNo);
+
+    	/*
+    	 * Block time.
+    	 */
+    	legRuleContext.getIntroducerProxy().introduce(legInFleetHb);
+    	legRuleContext.getIntroducerProxy().introduce(legNonFleetNonHb);
+    	assertTrue(legInFleetHb.getBlockTimeInMins() == 73);
+    	assertTrue(legNonFleetNonHb.getBlockTimeInMins() == 241);
 
     	/*
     	 * Fleets.
