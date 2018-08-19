@@ -66,11 +66,15 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 	/*
 	 * Briefing durations.
 	 */
-	private int briefPeriodBeforeDuty = 60;
+	private int briefPeriodBeforeDutyHb = 60;
+	private int briefPeriodBeforeDutyNonHb = 60;
 	private int debriefPeriodAfterDuty = 30;
 
-	private int getBriefPeriod(Duty d) {
-		return briefPeriodBeforeDuty;
+	private int getBriefPeriod(boolean hb) {
+		if (hb)
+			return briefPeriodBeforeDutyHb;
+		else
+			return briefPeriodBeforeDutyNonHb;
 	}
 
 	private int getDebriefPeriod(Duty d) {
@@ -476,7 +480,6 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		d.getDutyLegs().add(dutyLeg);
 
 		this.setTotalizers(d, l, connLeg, 1);
-
 		this.setStateVariables(d);
 
 		/*
@@ -497,14 +500,17 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		LegView l = dutyLeg.getLeg();
 		LegView connLeg = d.getLastLeg();
 
-		this.setTotalizers(d, l, connLeg, -1);
+		if (connLeg == null)
+			this.reset(d);
+		else {
+			this.setTotalizers(d, l, connLeg, -1);
+			this.setStateVariables(d);
 
-		this.setStateVariables(d);
-
-		/*
-		 * Max blocktime
-		 */
-       	d.setLongestBlockTimeInMins(d.getLongestBlockTimesInMins()[d.getNumOfLegs()]);
+			/*
+			 * Max blocktime
+			 */
+	       	d.setLongestBlockTimeInMins(d.getLongestBlockTimesInMins()[d.getNumOfLegs()]);
+		}
 
        	return l;
 	}
@@ -561,8 +567,8 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		/*
 		 * States
 		 */
-		d.setBriefDurationInMinsHb(this.getBriefPeriod(d));
-		d.setBriefDurationInMinsNonHb(this.getBriefPeriod(d));
+		d.setBriefDurationInMinsHb(this.getBriefPeriod(true));
+		d.setBriefDurationInMinsNonHb(this.getBriefPeriod(false));
 		d.setDebriefDurationInMins(this.getDebriefPeriod(d));
 
 		d.setBriefTimeHb(d.getFirstLeg().getSobt().minusMinutes(d.getBriefDurationInMinsHb()));
@@ -580,8 +586,8 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		d.setDutyDurationInMinsHb((int) ChronoUnit.MINUTES.between(d.getBriefTimeHb(), d.getDebriefTime()));
 		d.setDutyDurationInMinsNonHb((int) ChronoUnit.MINUTES.between(d.getBriefTimeNonHb(), d.getDebriefTime()));
 
-		d.setNumOfDaysTouchedHb((int) ChronoUnit.DAYS.between(d.getBriefDayHb(), d.getDebriefDay()));
-		d.setNumOfDaysTouchedNonHb((int) ChronoUnit.DAYS.between(d.getBriefDayNonHb(), d.getDebriefDay()));
+		d.setNumOfDaysTouchedHb((int) ChronoUnit.DAYS.between(d.getBriefDayHb(), d.getDebriefDay()) + 1);
+		d.setNumOfDaysTouchedNonHb((int) ChronoUnit.DAYS.between(d.getBriefDayNonHb(), d.getDebriefDay()) + 1);
 
 		d.setEr(this.isDutyAnER(d));
 
