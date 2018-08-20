@@ -185,7 +185,7 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
         	LegView fl = d.getFirstLeg();
 
         	/*
-        	 * Local hour calculation. Winter and Summer season difference also must be considered!!!
+        	 * TODO: Local hour calculation. Winter and Summer season difference also must be considered!!!
         	 */
         	LocalDateTime lcl = briefTime.plusMinutes(fl.getDepOffset());
         	double localHour = lcl.getHour() + lcl.getMinute() / 60.0; 
@@ -428,6 +428,7 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 
 
 	/*
+	 * TODO
 	 * Decides whether a duty is Early.
 	 * Current implementation does not consider LOCAL time!!!
 	 */

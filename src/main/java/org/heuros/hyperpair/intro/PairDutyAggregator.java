@@ -1,5 +1,7 @@
 package org.heuros.hyperpair.intro;
 
+import java.time.temporal.ChronoUnit;
+
 import org.heuros.core.rule.inf.AbstractRule;
 import org.heuros.core.rule.inf.Aggregator;
 import org.heuros.core.rule.inf.RuleImplementation;
@@ -48,14 +50,15 @@ public class PairDutyAggregator extends AbstractRule implements Aggregator<Pair,
 		p.incNumOfLegsIntToDom(incAmount * d.getNumOfLegsIntToDom());
 		p.incNumOfLegsDomToInt(incAmount * d.getNumOfLegsDomToInt());
 
-		if (p.getNumOfDuties() == 1) {
+		p.setNumOfDaysTouched((int) ChronoUnit.DAYS.between(p.getFirstDuty().getBriefDayHb(), p.getLastDuty().getDebriefDay()) + 1);
+
+		if ((p.getNumOfDuties() == 1) && (incAmount > 0)) {
 			p.incBriefDurationInMins(incAmount * d.getBriefDurationInMinsHb());
 			p.incDutyDurationInMins(incAmount * d.getDutyDurationInMinsHb());
-			if (p.getFirstDepAirport() == p.getLastArrAirport())
+			if (p.getFirstDepAirport() == d.getLastArrAirport())
 				p.incRestDurationInMins(incAmount * d.getRestDurationInMinsHbToHb());
 			else
 				p.incRestDurationInMins(incAmount * d.getRestDurationInMinsHbToNonHb());
-			p.incNumOfDaysTouched(incAmount * d.getNumOfDaysTouchedHb());
 			if (d.isEarlyHb())
 				p.incNumOfEarlyDuties(incAmount);
 			if (d.isHardHb())
@@ -65,11 +68,10 @@ public class PairDutyAggregator extends AbstractRule implements Aggregator<Pair,
 		} else {
 			p.incBriefDurationInMins(incAmount * d.getBriefDurationInMinsNonHb());
 			p.incDutyDurationInMins(incAmount * d.getDutyDurationInMinsNonHb());
-			if (p.getFirstDepAirport() == p.getLastArrAirport())
+			if (p.getFirstDepAirport() == d.getLastArrAirport())
 				p.incRestDurationInMins(incAmount * d.getRestDurationInMinsNonHbToHb());
 			else
 				p.incRestDurationInMins(incAmount * d.getRestDurationInMinsNonHbToNonHb());
-			p.incNumOfDaysTouched(incAmount * d.getNumOfDaysTouchedNonHb());
 			if (d.isEarlyNonHb())
 				p.incNumOfEarlyDuties(incAmount);
 			if (d.isHardNonHb())
