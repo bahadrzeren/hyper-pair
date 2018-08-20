@@ -16,6 +16,10 @@ public class PairDutyAggregator extends AbstractRule implements Aggregator<Pair,
 	@Override
 	public void append(Pair p, DutyView d) {
 		p.append(d);
+		this.appendInternal(p, d);
+	}
+
+	private void appendInternal(Pair p, DutyView d) {
 		incTotalizers(p, d, 1);
 	}
 
@@ -25,9 +29,13 @@ public class PairDutyAggregator extends AbstractRule implements Aggregator<Pair,
 		if (d == null)
 			return null;
 
-		incTotalizers(p, d, -1);
+		this.removeLast(p, d);
 
 		return d;
+	}
+
+	private void removeLast(Pair p, DutyView d) {
+		incTotalizers(p, d, -1);
 	}
 
 	public void incTotalizers(Pair p, DutyView d, int incAmount) {
@@ -86,6 +94,12 @@ public class PairDutyAggregator extends AbstractRule implements Aggregator<Pair,
 			p.incNumOfInternationalDuties(incAmount);
 		if (d.isEr())
 			p.incNumOfErDuties(incAmount);
+	}
+
+	@Override
+	public void reCalculate(Pair p) {
+		this.reset(p);
+		p.getDuties().forEach((d) -> this.appendInternal(p, d));
 	}
 
 	@Override

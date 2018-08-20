@@ -480,6 +480,11 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		dutyLeg.setActive(l.isCover());
 		d.append(dutyLeg);
 
+		this.append(d, l, connLeg);
+	}
+
+	private void append(Duty d, LegView l, LegView connLeg) {
+		d.incNumOfLegs(1);
 		this.incTotalizers(d, l, connLeg, 1);
 		this.setStateVariables(d);
 
@@ -489,7 +494,6 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		if (d.getLongestBlockTimeInMins() < l.getBlockTimeInMins())
         	d.setLongestBlockTimeInMins(l.getBlockTimeInMins());
 		d.getLongestBlockTimesInMins()[d.getNumOfLegs()] = l.getBlockTimeInMins();
-
 	}
 
 	@Override
@@ -497,8 +501,16 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		DutyLegView dutyLeg = d.removeLast();
 		if (dutyLeg == null)
 			return null;
-
 		LegView l = dutyLeg.getLeg();
+
+		this.removeLast(d, l);
+
+       	return l;
+	}
+
+	private void removeLast(Duty d, LegView l) {
+		d.incNumOfLegs(-1);
+
 		LegView connLeg = d.getLastLeg();
 
 		if (connLeg == null)
@@ -506,14 +518,11 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		else {
 			this.incTotalizers(d, l, connLeg, -1);
 			this.setStateVariables(d);
-
 			/*
 			 * Max blocktime
 			 */
 	       	d.setLongestBlockTimeInMins(d.getLongestBlockTimesInMins()[d.getNumOfLegs()]);
 		}
-
-       	return l;
 	}
 
 	private void incTotalizers(Duty d, LegView l, LegView connLeg,
@@ -521,7 +530,6 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		/*
 		 * Totalizers
 		 */
-		d.incNumOfLegs(incAmount);
 		d.incBlockTimeInMins(incAmount * l.getBlockTimeInMins());
 		if (l.isCover()) {
 			d.incNumOfLegsActive(incAmount);
@@ -613,8 +621,15 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 	}
 
 	@Override
+	public void reCalculate(Duty d) {
+		this.reset(d);
+		this.append(d, d.getDutyLegs().get(0).getLeg(), null);
+		for (int i = 1; i < d.getDutyLegs().size(); i++)
+			this.append(d, d.getDutyLegs().get(i).getLeg(), d.getDutyLegs().get(i - 1).getLeg());
+	}
+
+	@Override
 	public void reset(Duty d) {
-		d.getDutyLegs().clear();
 
 		d.setBlockTimeInMins(0);
 		d.setBlockTimeInMinsActive(0);

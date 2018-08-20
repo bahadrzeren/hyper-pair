@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 
 import org.heuros.core.rule.inf.Rule;
-import org.heuros.core.rule.inf.ValidationStatus;
 import org.heuros.data.model.Airport;
 import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
@@ -18,7 +17,6 @@ import org.heuros.hyperpair.intro.AirportIntroducer;
 import org.heuros.hyperpair.intro.DutyLegAggregator;
 import org.heuros.hyperpair.intro.LegIntroducer;
 import org.heuros.hyperpair.intro.PairDutyAggregator;
-import org.heuros.hyperpair.rule.PairPeriodLength;
 import org.heuros.rule.AirportRuleContext;
 import org.heuros.rule.DutyRuleContext;
 import org.heuros.rule.LegRuleContext;
@@ -503,26 +501,61 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		assertTrue(p.getNumOfAugmentedDuties() == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
-		/*
-		 * PairPeriodLength rule test.
-		 */
-		PairPeriodLength pairPeriodLengthRule = new PairPeriodLength();
-
-		try {
-			pairRuleContext.registerRule(pairPeriodLengthRule);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		assertTrue(false);
-    	}
-
-		int maxPairingLengthInDays = HeurosSystemParam.maxPairingLengthInDays;
-		assertTrue(pairRuleContext.getValidatorProxy().isValid(p) == ValidationStatus.valid);
-		HeurosSystemParam.maxPairingLengthInDays = 3;
-		assertTrue(pairRuleContext.getValidatorProxy().isValid(p) == ValidationStatus.valid);
-		HeurosSystemParam.maxPairingLengthInDays = 2;
-		assertTrue(pairRuleContext.getValidatorProxy().isValid(p) == ValidationStatus.invalid);
-		HeurosSystemParam.maxPairingLengthInDays = maxPairingLengthInDays;
-
+//		/*
+//		 * PairPeriodLength rule test.
+//		 */
+//		PairPeriodLength pairPeriodLengthRule = new PairPeriodLength();
+//
+//		try {
+//			pairRuleContext.registerRule(pairPeriodLengthRule);
+//    	} catch (Exception ex) {
+//    		ex.printStackTrace();
+//    		assertTrue(false);
+//    	}
+//
+//		int maxPairingLengthInDays = HeurosSystemParam.maxPairingLengthInDays;
+//		assertTrue(pairRuleContext.getValidatorProxy().isValid(p) == ValidationStatus.valid);
+//		HeurosSystemParam.maxPairingLengthInDays = 3;
+//		assertTrue(pairRuleContext.getValidatorProxy().isValid(p) == ValidationStatus.valid);
+//		HeurosSystemParam.maxPairingLengthInDays = 2;
+//		assertTrue(pairRuleContext.getValidatorProxy().isValid(p) == ValidationStatus.invalid);
+//		HeurosSystemParam.maxPairingLengthInDays = maxPairingLengthInDays;
+//
+//		pairRuleContext.removeRule(pairPeriodLengthRule);
+//
+//		/*
+//		 * PairMaxNumberOfPassiveLegs rule test.
+//		 */
+//		PairNumOfPassiveLegsLimit pairNumOfPassiveLegsLimit = new PairNumOfPassiveLegsLimit();
+//
+//		try {
+//			dutyRuleContext.registerRule(pairNumOfPassiveLegsLimit);
+//			pairRuleContext.registerRule(pairNumOfPassiveLegsLimit);
+//    	} catch (Exception ex) {
+//    		ex.printStackTrace();
+//    		assertTrue(false);
+//    	}
+//
+//		assertTrue(pairRuleContext.getValidatorProxy().isValid(p) == ValidationStatus.valid);
+//		assertTrue(dutyRuleContext.getConnectionCheckerProxy().areConnectable(d, d2));
+//
+//		legAct12DomToDom.setCover(false);
+//		legAct13DomToInt.setCover(false);
+//		legAct21IntToDom.setCover(false);
+//		legAct22DomToHb.setCover(false);
+//
+//		/*
+//		 * TODO Here pairing reCalculate method must cover duty methods as well!
+//		 */
+//		dutyRuleContext.getAggregatorImpl().reCalculate(d);
+//		dutyRuleContext.getAggregatorImpl().reCalculate(d2);
+//		pairRuleContext.getAggregatorImpl().reCalculate(p);
+//
+//		assertTrue(pairRuleContext.getValidatorProxy().isValid(p) == ValidationStatus.invalid);
+//		assertFalse(dutyRuleContext.getConnectionCheckerProxy().areConnectable(d, d2));
+//
+//		dutyRuleContext.removeRule(pairNumOfPassiveLegsLimit);
+//		pairRuleContext.removeRule(pairNumOfPassiveLegsLimit);
 
 		/*
 		 * Remove second duty from pair.
