@@ -1,4 +1,4 @@
-package org.heuros.hyperpair.rule;
+package org.heuros.hyperpair.intro;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -477,9 +477,9 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		dutyLeg.setDuty(d);
 		dutyLeg.setLeg(l);
 		dutyLeg.setActive(l.isCover());
-		d.getDutyLegs().add(dutyLeg);
+		d.append(dutyLeg);
 
-		this.setTotalizers(d, l, connLeg, 1);
+		this.incTotalizers(d, l, connLeg, 1);
 		this.setStateVariables(d);
 
 		/*
@@ -503,7 +503,7 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		if (connLeg == null)
 			this.reset(d);
 		else {
-			this.setTotalizers(d, l, connLeg, -1);
+			this.incTotalizers(d, l, connLeg, -1);
 			this.setStateVariables(d);
 
 			/*
@@ -515,19 +515,19 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
        	return l;
 	}
 
-	private void setTotalizers(Duty d, LegView l, LegView connLeg,
+	private void incTotalizers(Duty d, LegView l, LegView connLeg,
 								int incAmount) {
 		/*
 		 * Totalizers
 		 */
-		d.incBlockTimeInMins(incAmount * l.getBlockTimeInMins());
 		d.incNumOfLegs(incAmount);
+		d.incBlockTimeInMins(incAmount * l.getBlockTimeInMins());
 		if (l.isCover()) {
-			d.incBlockTimeInMinsActive(incAmount * l.getBlockTimeInMins());
 			d.incNumOfLegsActive(incAmount);
+			d.incBlockTimeInMinsActive(incAmount * l.getBlockTimeInMins());
 		} else {
-			d.incBlockTimeInMinsPassive(incAmount * l.getBlockTimeInMins());
 			d.incNumOfLegsPassive(incAmount);
+			d.incBlockTimeInMinsPassive(incAmount * l.getBlockTimeInMins());
 		}
 
 		if (l.getDepAirport().isDomestic() && l.getArrAirport().isInternational())
@@ -604,6 +604,7 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		d.setAugmentedHb(this.getDutyCrewModel(d, d.getDutyDurationInMinsHb(), d.getBriefTimeHb()));
 		d.setAugmentedNonHb(this.getDutyCrewModel(d, d.getDutyDurationInMinsNonHb(), d.getBriefTimeNonHb()));
 
+		d.setInternational(d.getLastLeg().getArrAirport().isInternational());
 		d.setEarlyHb(this.isDutyEarly(d.getBriefTimeHb()));
 		d.setEarlyNonHb(this.isDutyEarly(d.getBriefTimeNonHb()));
 		d.setHardHb(this.isDutyHard(d, d.getBriefDayBeginningHb(), d.getBriefTimeHb(), d.getDebriefTime()));
@@ -673,6 +674,7 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		d.setAugmentedHb(0);
 		d.setAugmentedNonHb(0);
 
+		d.setInternational(false);
 		d.setEarlyHb(false);
 		d.setEarlyNonHb(false);
 		d.setHardHb(false);

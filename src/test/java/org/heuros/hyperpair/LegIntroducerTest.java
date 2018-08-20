@@ -8,8 +8,8 @@ import org.heuros.data.model.Airport;
 import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegFactory;
-import org.heuros.hyperpair.rule.AirportIntroducer;
-import org.heuros.hyperpair.rule.LegIntroducer;
+import org.heuros.hyperpair.intro.AirportIntroducer;
+import org.heuros.hyperpair.intro.LegIntroducer;
 import org.heuros.rule.AirportRuleContext;
 import org.heuros.rule.LegRuleContext;
 

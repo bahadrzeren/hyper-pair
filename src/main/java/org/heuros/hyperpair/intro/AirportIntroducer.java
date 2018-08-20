@@ -1,4 +1,4 @@
-package org.heuros.hyperpair.rule;
+package org.heuros.hyperpair.intro;
 
 import java.util.HashMap;
 import java.util.Map;

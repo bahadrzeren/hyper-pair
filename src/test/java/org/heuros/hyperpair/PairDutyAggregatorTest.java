@@ -25,14 +25,14 @@ import junit.framework.TestSuite;
 /**
  * Airport Introducer test.
  */
-public class DutyLegAggregatorTest extends TestCase {
+public class PairDutyAggregatorTest extends TestCase {
 
 	/**
      * Create the test case
      *
      * @param testName name of the test case
      */
-    public DutyLegAggregatorTest( String testName )
+    public PairDutyAggregatorTest( String testName )
     {
         super( testName );
     }
@@ -42,11 +42,11 @@ public class DutyLegAggregatorTest extends TestCase {
      */
     public static Test suite()
     {
-        return new TestSuite( DutyLegAggregatorTest.class );
+        return new TestSuite( PairDutyAggregatorTest.class );
     }
 
     /**
-     * Test Duty Leg append/remove.
+     * Test Pair Duty append/remove.
      */
     public void testDutyLegAggregation()
     {
@@ -139,23 +139,23 @@ public class DutyLegAggregatorTest extends TestCase {
     	Leg legPss32IntToHb = legFactory.generateModel();
     	Leg legPss41HbToHb = legFactory.generateModel();
 
-    	DutyLegAggregatorTest.setLegFields(legAct11HbToDom, 101, apIST, apAYT, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "320");	//	90
-    	DutyLegAggregatorTest.setLegFields(legAct12DomToDom, 102, apAYT, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 15, 0), "320");	//	120
-    	DutyLegAggregatorTest.setLegFields(legAct13DomToInt, 103, apEZS, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 16, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "320");	//	180
-    	DutyLegAggregatorTest.setLegFields(legAct21IntToDom, 104, apCDG, apADA, LocalDateTime.of(2014, Month.JANUARY, 2, 20, 30), LocalDateTime.of(2014, Month.JANUARY, 2, 22, 15), "320");	//	105
-    	DutyLegAggregatorTest.setLegFields(legAct22DomToHb, 105, apADA, apIST, LocalDateTime.of(2014, Month.JANUARY, 2, 23, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 1, 50), "320");		//	170
-    	DutyLegAggregatorTest.setLegFields(legAct31HbToInt, 106, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 3, 14, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 15, 50), "320");		//	110
-    	DutyLegAggregatorTest.setLegFields(legAct32IntToHb, 107, apLHR, apSAW, LocalDateTime.of(2014, Month.JANUARY, 3, 17, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 20, 10), "320");		//	190
-    	DutyLegAggregatorTest.setLegFields(legAct41HbToHb, 108, apIST, apSAW, LocalDateTime.of(2014, Month.JANUARY, 4, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 5, 4, 0), "320");			//	480
+    	PairDutyAggregatorTest.setLegFields(legAct11HbToDom, 101, apIST, apAYT, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "320");	//	90
+    	PairDutyAggregatorTest.setLegFields(legAct12DomToDom, 102, apAYT, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 15, 0), "320");	//	120
+    	PairDutyAggregatorTest.setLegFields(legAct13DomToInt, 103, apEZS, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 16, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "320");	//	180
+    	PairDutyAggregatorTest.setLegFields(legAct21IntToDom, 104, apCDG, apADA, LocalDateTime.of(2014, Month.JANUARY, 2, 20, 30), LocalDateTime.of(2014, Month.JANUARY, 2, 22, 15), "320");	//	105
+    	PairDutyAggregatorTest.setLegFields(legAct22DomToHb, 105, apADA, apIST, LocalDateTime.of(2014, Month.JANUARY, 2, 23, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 1, 50), "320");		//	170
+    	PairDutyAggregatorTest.setLegFields(legAct31HbToInt, 106, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 3, 14, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 15, 50), "320");		//	110
+    	PairDutyAggregatorTest.setLegFields(legAct32IntToHb, 107, apLHR, apSAW, LocalDateTime.of(2014, Month.JANUARY, 3, 17, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 20, 10), "320");		//	190
+    	PairDutyAggregatorTest.setLegFields(legAct41HbToHb, 108, apIST, apSAW, LocalDateTime.of(2014, Month.JANUARY, 4, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 5, 4, 0), "320");			//	480
 
-    	DutyLegAggregatorTest.setLegFields(legPss11HbToDom, 101, apIST, apAYT, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "737");
-    	DutyLegAggregatorTest.setLegFields(legPss12DomToDom, 102, apAYT, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 15, 0), "737");
-    	DutyLegAggregatorTest.setLegFields(legPss13DomToInt, 103, apEZS, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 16, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "737");
-    	DutyLegAggregatorTest.setLegFields(legPss21IntToDom, 104, apCDG, apADA, LocalDateTime.of(2014, Month.JANUARY, 2, 20, 30), LocalDateTime.of(2014, Month.JANUARY, 2, 22, 15), "737");
-    	DutyLegAggregatorTest.setLegFields(legPss22DomToHb, 105, apADA, apIST, LocalDateTime.of(2014, Month.JANUARY, 2, 23, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 1, 50), "737");
-    	DutyLegAggregatorTest.setLegFields(legPss31HbToInt, 106, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 3, 14, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 15, 50), "737");
-    	DutyLegAggregatorTest.setLegFields(legPss32IntToHb, 107, apLHR, apSAW, LocalDateTime.of(2014, Month.JANUARY, 3, 17, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 20, 10), "737");
-    	DutyLegAggregatorTest.setLegFields(legPss41HbToHb, 108, apIST, apSAW, LocalDateTime.of(2014, Month.JANUARY, 4, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 5, 4, 0), "737");
+    	PairDutyAggregatorTest.setLegFields(legPss11HbToDom, 101, apIST, apAYT, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "737");
+    	PairDutyAggregatorTest.setLegFields(legPss12DomToDom, 102, apAYT, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 15, 0), "737");
+    	PairDutyAggregatorTest.setLegFields(legPss13DomToInt, 103, apEZS, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 16, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "737");
+    	PairDutyAggregatorTest.setLegFields(legPss21IntToDom, 104, apCDG, apADA, LocalDateTime.of(2014, Month.JANUARY, 2, 20, 30), LocalDateTime.of(2014, Month.JANUARY, 2, 22, 15), "737");
+    	PairDutyAggregatorTest.setLegFields(legPss22DomToHb, 105, apADA, apIST, LocalDateTime.of(2014, Month.JANUARY, 2, 23, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 1, 50), "737");
+    	PairDutyAggregatorTest.setLegFields(legPss31HbToInt, 106, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 3, 14, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 15, 50), "737");
+    	PairDutyAggregatorTest.setLegFields(legPss32IntToHb, 107, apLHR, apSAW, LocalDateTime.of(2014, Month.JANUARY, 3, 17, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 20, 10), "737");
+    	PairDutyAggregatorTest.setLegFields(legPss41HbToHb, 108, apIST, apSAW, LocalDateTime.of(2014, Month.JANUARY, 4, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 5, 4, 0), "737");
 
     	legRuleContext.getIntroducerProxy().introduce(legAct11HbToDom);
     	legRuleContext.getIntroducerProxy().introduce(legAct12DomToDom);

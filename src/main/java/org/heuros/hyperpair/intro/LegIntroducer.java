@@ -1,4 +1,4 @@
-package org.heuros.hyperpair.rule;
+package org.heuros.hyperpair.intro;
 
 import java.time.temporal.ChronoUnit;
 
@@ -57,9 +57,14 @@ public class LegIntroducer extends AbstractRule implements Introducer<Leg> {
 	@Override
 	public boolean introduce(Leg m) {
 
-		if (HeurosDatasetParam.optPeriodStartInc.isAfter(m.getSobt()))
+		if (m.getDepAirport().getCode().equals(m.getArrAirport().getCode()))
+   			return false;
+		if ((m.getDepAirport().getCode().equals("IST") && m.getDepAirport().getCode().equals("SAW"))
+				|| (m.getDepAirport().getCode().equals("SAW") && m.getDepAirport().getCode().equals("IST")))
 			return false;
 
+		if (HeurosDatasetParam.optPeriodStartInc.isAfter(m.getSobt()))
+			return false;
 		if (m.getFlightNo() > LegIntroducer.maxFlightNumberToConsider)
 			return false;
 
