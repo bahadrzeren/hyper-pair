@@ -2,7 +2,6 @@ package org.heuros.hyperpair.rule;
 
 import org.heuros.core.rule.inf.AbstractRule;
 import org.heuros.core.rule.inf.RuleImplementation;
-import org.heuros.core.rule.inf.ValidationStatus;
 import org.heuros.core.rule.inf.Validator;
 import org.heuros.data.model.PairView;
 import org.heuros.hyperpair.HeurosSystemParam;
@@ -20,9 +19,9 @@ public class PairPeriodLength extends AbstractRule implements Validator<PairView
 //	}
 
 	@Override
-	public ValidationStatus isValid(PairView p) {
+	public boolean isValid(PairView p) {
         if (p.getNumOfDaysTouched() > HeurosSystemParam.maxPairingLengthInDays)
-        	return ValidationStatus.invalid;
-		return ValidationStatus.valid;
+        	return false;
+		return true;
 	}
 }

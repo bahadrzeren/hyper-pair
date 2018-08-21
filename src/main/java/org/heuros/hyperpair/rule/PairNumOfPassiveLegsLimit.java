@@ -2,9 +2,8 @@ package org.heuros.hyperpair.rule;
 
 import org.heuros.core.rule.inf.AbstractRule;
 import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.ExtensibilityChecker;
+import org.heuros.core.rule.inf.AppendabilityChecker;
 import org.heuros.core.rule.inf.RuleImplementation;
-import org.heuros.core.rule.inf.ValidationStatus;
 import org.heuros.core.rule.inf.Validator;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.PairView;
@@ -12,7 +11,7 @@ import org.heuros.data.model.PairView;
 @RuleImplementation(ruleName="PairNumOfPassiveLegsLimit", 
 					description="Checks total number of passive legs in a trip.", 
 					violationMessage="Total number of passive legs exceeded!")
-public class PairNumOfPassiveLegsLimit extends AbstractRule implements ExtensibilityChecker<PairView, DutyView>, 
+public class PairNumOfPassiveLegsLimit extends AbstractRule implements AppendabilityChecker<PairView, DutyView>, 
 																		ConnectionChecker<DutyView>,
 																		Validator<PairView> {
 
@@ -44,21 +43,21 @@ public class PairNumOfPassiveLegsLimit extends AbstractRule implements Extensibi
 //	}
 
 	@Override
-	public ValidationStatus isValid(PairView p) {
+	public boolean isValid(PairView p) {
 		if (p.getNumOfLegsPassive() > maxNumOfPassiveLegsInPair)
-			return ValidationStatus.invalid;
-		return ValidationStatus.valid;
-	}
-
-	@Override
-	public boolean areConnectable(DutyView prevModel, DutyView nextModel) {
-		if (prevModel.getNumOfLegsPassive() + nextModel.getNumOfLegsPassive() > maxNumOfPassiveLegsInPair)
 			return false;
 		return true;
 	}
 
 	@Override
-	public boolean isExtensible(PairView p, DutyView d) {
+	public boolean areConnectable(DutyView pd, DutyView nd) {
+		if (pd.getNumOfLegsPassive() + nd.getNumOfLegsPassive() > maxNumOfPassiveLegsInPair)
+			return false;
+		return true;
+	}
+
+	@Override
+	public boolean isAppendable(PairView p, DutyView d) {
 		if ((p.getNumOfLegsPassive() + d.getNumOfLegsPassive() > maxNumOfPassiveLegsInPair))
 			return false;
 		return true;
