@@ -9,7 +9,6 @@ import org.heuros.core.base.Processor;
 import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyFactory;
-import org.heuros.data.model.DutyLegFactory;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegFactory;
 import org.heuros.data.model.PairFactory;
@@ -69,7 +68,6 @@ public class HyperPair {
 			 */
 			AirportFactory airportFactory = new AirportFactory();
 			LegFactory legFactory = new LegFactory();
-			DutyLegFactory dutyLegFactory = new DutyLegFactory();
 			DutyFactory dutyFactory = new DutyFactory();
 			PairFactory pairFactory = new PairFactory();
 

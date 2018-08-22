@@ -7,9 +7,6 @@ import org.heuros.core.rule.inf.AbstractRule;
 import org.heuros.core.rule.inf.Aggregator;
 import org.heuros.core.rule.inf.RuleImplementation;
 import org.heuros.data.model.Duty;
-import org.heuros.data.model.DutyLeg;
-import org.heuros.data.model.DutyLegFactory;
-import org.heuros.data.model.DutyLegView;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName = "Duty Leg aggregator", 
@@ -45,8 +42,8 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
         	if (d.getNumOfLegsActive() > 1) {
 		        if (d.getBlockTimeInMinsActive() >= minFP_ER_3) {
 		        	for (int i = 0; i < d.getNumOfLegs(); i++) {
-		        		if (d.getDutyLegs().get(i).getLeg().isCover())
-			                if (isFlightAMultiLandER(d.getDutyLegs().get(i).getLeg()))
+		        		if (d.getLegs().get(i).isCover())
+			                if (isFlightAMultiLandER(d.getLegs().get(i)))
 			                    return true;
 		            }
 		        }
@@ -466,19 +463,13 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 		return false;
 	}
 
-	private DutyLegFactory dutyLegFactory = new DutyLegFactory();
-
 	@Override
 	public void append(Duty d, LegView l) {
 		/*
 		 * Append leg to the duty.
 		 */
 		LegView connLeg = d.getLastLeg();
-		DutyLeg dutyLeg = this.dutyLegFactory.generateModel();
-		dutyLeg.setDuty(d);
-		dutyLeg.setLeg(l);
-		dutyLeg.setActive(l.isCover());
-		d.append(dutyLeg);
+		d.append(l);
 
 		this.append(d, l, connLeg);
 	}
@@ -498,10 +489,9 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 
 	@Override
 	public LegView removeLast(Duty d) {
-		DutyLegView dutyLeg = d.removeLast();
-		if (dutyLeg == null)
+		LegView l = d.removeLast();
+		if (l == null)
 			return null;
-		LegView l = dutyLeg.getLeg();
 
 		this.removeLast(d, l);
 
@@ -623,9 +613,9 @@ public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, 
 	@Override
 	public void reCalculate(Duty d) {
 		this.reset(d);
-		this.append(d, d.getDutyLegs().get(0).getLeg(), null);
-		for (int i = 1; i < d.getDutyLegs().size(); i++)
-			this.append(d, d.getDutyLegs().get(i).getLeg(), d.getDutyLegs().get(i - 1).getLeg());
+		this.append(d, d.getLegs().get(0), null);
+		for (int i = 1; i < d.getLegs().size(); i++)
+			this.append(d, d.getLegs().get(i), d.getLegs().get(i - 1));
 	}
 
 	@Override
