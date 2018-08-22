@@ -3,7 +3,7 @@ package org.heuros.hyperpair;
 import java.util.List;
 
 import org.heuros.core.base.Processor;
-import org.heuros.core.data.context.repo.DataRepository;
+import org.heuros.core.entity.context.repo.DataRepository;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.PairView;
 import org.heuros.rule.DutyRuleContext;

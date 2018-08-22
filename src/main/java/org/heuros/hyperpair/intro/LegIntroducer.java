@@ -89,12 +89,15 @@ public class LegIntroducer implements Introducer<Leg> {
 		if (m.isDeadheadable()) {
 			if ((m.getFlightNo() >= dhRangeStart1) && (m.getFlightNo() <= dhRangeEnd1))
 				m.setDeadheadable(false);
-			if ((m.getFlightNo() >= dhRangeStart2) && (m.getFlightNo() <= dhRangeEnd2))
-				m.setDeadheadable(false);
-			if ((m.getFlightNo() >= dhRangeStart3) && (m.getFlightNo() <= dhRangeEnd3))
-				m.setDeadheadable(false);
-			if ((m.getFlightNo() >= dhRangeStart4) && (m.getFlightNo() <= dhRangeEnd4))
-				m.setDeadheadable(false);
+			else
+				if ((m.getFlightNo() >= dhRangeStart2) && (m.getFlightNo() <= dhRangeEnd2))
+					m.setDeadheadable(false);
+				else
+					if ((m.getFlightNo() >= dhRangeStart3) && (m.getFlightNo() <= dhRangeEnd3))
+						m.setDeadheadable(false);
+					else
+						if ((m.getFlightNo() >= dhRangeStart4) && (m.getFlightNo() <= dhRangeEnd4))
+							m.setDeadheadable(false);
 		}
 		if (m.isDeadheadable()) {
 			if (m.getDepAirport().isHb()

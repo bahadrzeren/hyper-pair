@@ -6,17 +6,21 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
-import org.heuros.core.base.Processor;
+import org.heuros.context.AirportContext;
+import org.heuros.context.DutyContext;
+import org.heuros.context.LegContext;
+import org.heuros.context.PairContext;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.AirportFactory;
-import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyFactory;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegFactory;
 import org.heuros.data.model.PairFactory;
-import org.heuros.data.model.PairView;
+import org.heuros.data.repo.AirportRepository;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
+import org.heuros.exception.RuleAnnotationIsMissing;
+import org.heuros.exception.RuleRegistrationMatchingException;
 import org.heuros.hyperpair.intro.AirportIntroducer;
 import org.heuros.hyperpair.intro.DutyLegAggregator;
 import org.heuros.hyperpair.intro.LegIntroducer;
@@ -97,7 +101,7 @@ public class HyperPair {
 		HyperPair.rules.add(new PairPeriodLength());
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, RuleAnnotationIsMissing, RuleRegistrationMatchingException {
     	/*
     	 * Load configuration file.
     	 */
@@ -118,38 +122,78 @@ public class HyperPair {
 												.setModelFactory(new LegFactory())
 												.extractData();
 
-			/*
-			 * Prepare factories.
-			 */
-			AirportFactory airportFactory = new AirportFactory();
-			LegFactory legFactory = new LegFactory();
-			DutyFactory dutyFactory = new DutyFactory();
-			PairFactory pairFactory = new PairFactory();
+//			System.out.println(legs.get(0).getSobt());
+//			System.out.println(legs.get(0).getSobt().truncatedTo(ChronoUnit.SECONDS));
+//			System.out.println(legs.get(0).getSobt().truncatedTo(ChronoUnit.MINUTES));
+//			System.out.println(legs.get(0).getSobt().truncatedTo(ChronoUnit.HOURS));
+//			System.out.println(legs.get(0).getSobt().truncatedTo(ChronoUnit.DAYS));
+
+			HeurosDatasetParam.dataPeriodStartInc = legs.get(0).getSobt().withDayOfMonth(1).toLocalDate().plusMonths(1).atStartOfDay();
+			logger.info("Data period start: " + HeurosDatasetParam.dataPeriodStartInc);
+			HeurosDatasetParam.dataPeriodEndExc = legs.get(legs.size() - 1).getSibt();
+			logger.info("Data period end: " + HeurosDatasetParam.dataPeriodEndExc);
+
+			HeurosDatasetParam.optPeriodStartInc = legs.get(0).getSobt().withDayOfMonth(1).toLocalDate().plusMonths(1).atStartOfDay();
+			logger.info("Opt period start: " + HeurosDatasetParam.dataPeriodStartInc);
+			HeurosDatasetParam.optPeriodEndExc = legs.get(legs.size() - 1).getSibt().withDayOfMonth(1).toLocalDate().atStartOfDay();
+			logger.info("Opt period end: " + HeurosDatasetParam.dataPeriodEndExc);
 
 			/*
-			 * Prepare rule contexts.
+			 * Generate contexts.
 			 */
-			AirportRuleContext airportRuleContext = new AirportRuleContext();
-			LegRuleContext legRuleContext = new LegRuleContext();
-			DutyRuleContext dutyRuleContext = new DutyRuleContext();
-			PairRuleContext pairRuleContext = new PairRuleContext();
+			AirportContext airportContext = (AirportContext) new AirportContext().setModelFactory(new AirportFactory())
+																					.setRuleContext(new AirportRuleContext())
+																					.setDataRepository(new AirportRepository());
+
+			LegContext legContext = (LegContext) new LegContext().setModelFactory(new LegFactory())
+																	.setRuleContext(new LegRuleContext())
+																	.setDataRepository(new LegRepository());
+
+			DutyContext dutyContext = (DutyContext) new DutyContext().setModelFactory(new DutyFactory())
+																		.setRuleContext(new DutyRuleContext())
+																		.setDataRepository(new DutyRepository());
+
+			PairContext pairContext = (PairContext) new PairContext().setModelFactory(new PairFactory())
+																		.setRuleContext(new PairRuleContext());
 
 			/*
 			 * Register rules.
 			 */
-//			rules.for-> airportRuleContext.registerRule(r));
+			for (Rule r : HyperPair.rules) {
+				try {
+					int numOfRegistrations = 0;
+					numOfRegistrations += airportContext.getRuleContext().registerRule(r);
+					numOfRegistrations += legContext.getRuleContext().registerRule(r);
+					numOfRegistrations += dutyContext.getRuleContext().registerRule(r);
+					numOfRegistrations += pairContext.getRuleContext().registerRule(r);
+					if (numOfRegistrations != r.getClass().getGenericInterfaces().length)
+						throw new RuleRegistrationMatchingException("Rule imlementations and number of registrations do not match!");
+				} catch (RuleRegistrationMatchingException ex) {
+					logger.error(ex);
+					throw ex;
+				} catch (RuleAnnotationIsMissing ex) {
+					logger.error("RuleImplementation annotation is missing for " + r.getClass().getName() + ".");
+					logger.error(ex);
+					throw ex;
+				}
+			}
 
 			/*
-			 * Add legs to repository.
+			 * Add airports and legs to repositories.
 			 */
-			LegRepository legRepo = new LegRepository();
-			legs.forEach((l) -> { legRepo.addToRepo(l);});
+			legs.forEach((l) -> {
+				l.setDepAirport(airportContext.getAirport(l.getDep()));
+				l.setArrAirport(airportContext.getAirport(l.getArr()));
+				if (!legContext.registerLeg(l)) {
+					if (l.getSobt().isAfter(HeurosDatasetParam.dataPeriodStartInc))
+						logger.warn("Leg " + l + " is not registered!");
+				}
+			});
 
 			/*
 			 * Generate duties.
 			 */
-			DutyRepository dutyRepo = new DutyRepository();
-
+			
 
 			/*
 			 * Map Leg list to LegWrapper list
@@ -159,8 +203,8 @@ public class HyperPair {
 			/*
 			 * Prepare and run the optimizer.
 			 */
-			Processor<Duty, PairView> optimizer = new HyperPairOptimizer();
-			List<PairView> pairs = optimizer.proceed(dutyRepo);
+//			Processor<Duty, PairView> optimizer = new HyperPairOptimizer();
+//			List<PairView> pairs = optimizer.proceed(dutyRepo);
 
 			/*
 			 * Report solution.
