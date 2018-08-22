@@ -2,15 +2,14 @@ package org.heuros.hyperpair.rule;
 
 import java.time.temporal.ChronoUnit;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.ConnectionChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 
 @RuleImplementation(ruleName="PairLayoverCheck", 
 					description="Max layover length check.", 
 							violationMessage="Max layover length limit violation!")
-public class PairLayoverCheck extends AbstractRule implements ConnectionChecker<DutyView> {
+public class PairLayoverCheck implements ConnectionChecker<DutyView> {
 
 	private Integer maxIntLay = 60 * 60; // 56;
 	private Integer maxDomLay = 30 * 60; // 56;

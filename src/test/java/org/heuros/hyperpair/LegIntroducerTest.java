@@ -3,7 +3,7 @@ package org.heuros.hyperpair;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-import org.heuros.core.rule.inf.Rule;
+import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.Airport;
 import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Leg;

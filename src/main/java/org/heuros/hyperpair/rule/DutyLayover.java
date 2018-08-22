@@ -1,16 +1,15 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.RuleImplementation;
-import org.heuros.core.rule.inf.StarterChecker;
-import org.heuros.core.rule.inf.Validator;
+import org.heuros.core.rule.intf.RuleImplementation;
+import org.heuros.core.rule.intf.StarterChecker;
+import org.heuros.core.rule.intf.Validator;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyLayover", 
 					description="Layover stations rule.", 
 					violationMessage="No layover permission!")
-public class DutyLayover extends AbstractRule implements StarterChecker<DutyView, LegView>,
+public class DutyLayover implements StarterChecker<DutyView, LegView>,
 															Validator<DutyView> {
 
 //	@Override

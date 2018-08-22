@@ -1,14 +1,13 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ExtensibilityChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.ExtensibilityChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 
 @RuleImplementation(ruleName="DutyEndIfStatIsTouched", 
 					description="Mandatory layover stations.", 
 					violationMessage="Layover is mandatory!")
-public class DutyEndIfStatIsTouched extends AbstractRule implements ExtensibilityChecker<DutyView> {
+public class DutyEndIfStatIsTouched implements ExtensibilityChecker<DutyView> {
 
 //	@Override
 //	public boolean _canDutyContinue(Duty d) {

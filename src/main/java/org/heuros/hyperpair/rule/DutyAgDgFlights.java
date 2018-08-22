@@ -1,15 +1,14 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.AppendabilityChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.AppendabilityChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyAgDgFlights", 
 					description="Agdg stations rule.", 
 					violationMessage="Duty that touches agdg station can not have international connection flight!")
-public class DutyAgDgFlights extends AbstractRule implements AppendabilityChecker<DutyView, LegView> {
+public class DutyAgDgFlights implements AppendabilityChecker<DutyView, LegView> {
 
 //	@Override
 //	public boolean _isFlightAddable(Duty d, Flight nf, boolean isActive) {

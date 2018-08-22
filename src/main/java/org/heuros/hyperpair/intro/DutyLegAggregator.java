@@ -3,16 +3,15 @@ package org.heuros.hyperpair.intro;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.Aggregator;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.Aggregator;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName = "Duty Leg aggregator", 
 					violationMessage = "Duty Leg aggregator failed", 
 					description = "Leg aggregator for duties.")
-public class DutyLegAggregator extends AbstractRule implements Aggregator<Duty, LegView> {
+public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 
 	/*
 	 * ER - Extended range logic.

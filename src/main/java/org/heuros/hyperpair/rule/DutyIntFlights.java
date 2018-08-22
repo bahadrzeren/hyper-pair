@@ -1,15 +1,14 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.AppendabilityChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.AppendabilityChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyIntFlights", 
 					description="Max number of International legs.", 
 					violationMessage="Max number of International legs exceeded!")
-public class DutyIntFlights extends AbstractRule implements AppendabilityChecker<DutyView, LegView> {
+public class DutyIntFlights implements AppendabilityChecker<DutyView, LegView> {
 
 	private Integer maxNumOfIntToFromDomLegsInDuty = 2;
 

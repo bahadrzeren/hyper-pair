@@ -2,16 +2,15 @@ package org.heuros.hyperpair.intro;
 
 import java.time.temporal.ChronoUnit;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.Aggregator;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.Aggregator;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Pair;
 
 @RuleImplementation(ruleName = "Pair duty aggregator", 
 					violationMessage = "Pair duty aggregator failed", 
 					description = "Duty aggregator for pairs.")
-public class PairDutyAggregator extends AbstractRule implements Aggregator<Pair, DutyView> {
+public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 
 	@Override
 	public void append(Pair p, DutyView d) {

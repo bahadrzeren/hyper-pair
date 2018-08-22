@@ -1,14 +1,13 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.ConnectionChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyCriticalStations",
 					description="Critical stations rule.", 
 					violationMessage="Critical station!")
-public class CriticalStations1 extends AbstractRule implements ConnectionChecker<LegView> {
+public class CriticalStations1 implements ConnectionChecker<LegView> {
 
 	private Integer maxBlockTimeBeforeCATC = 60 * 3;
 

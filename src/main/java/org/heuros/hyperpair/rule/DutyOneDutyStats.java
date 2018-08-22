@@ -1,16 +1,15 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.AppendabilityChecker;
-import org.heuros.core.rule.inf.ExtensibilityChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.AppendabilityChecker;
+import org.heuros.core.rule.intf.ExtensibilityChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyOneDutyStats", 
 					description="One duty stations rule.", 
 					violationMessage="One duty station!")
-public class DutyOneDutyStats extends AbstractRule implements AppendabilityChecker<DutyView, LegView>,
+public class DutyOneDutyStats implements AppendabilityChecker<DutyView, LegView>,
 																ExtensibilityChecker<DutyView> {
 
 //	@Override

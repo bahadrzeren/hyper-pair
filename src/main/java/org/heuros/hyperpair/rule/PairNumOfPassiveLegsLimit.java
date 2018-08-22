@@ -1,17 +1,16 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.AppendabilityChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
-import org.heuros.core.rule.inf.Validator;
+import org.heuros.core.rule.intf.AppendabilityChecker;
+import org.heuros.core.rule.intf.ConnectionChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
+import org.heuros.core.rule.intf.Validator;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.PairView;
 
 @RuleImplementation(ruleName="PairNumOfPassiveLegsLimit", 
 					description="Checks total number of passive legs in a trip.", 
 					violationMessage="Total number of passive legs exceeded!")
-public class PairNumOfPassiveLegsLimit extends AbstractRule implements AppendabilityChecker<PairView, DutyView>, 
+public class PairNumOfPassiveLegsLimit implements AppendabilityChecker<PairView, DutyView>, 
 																		ConnectionChecker<DutyView>,
 																		Validator<PairView> {
 

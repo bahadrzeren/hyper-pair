@@ -2,15 +2,14 @@ package org.heuros.hyperpair.rule;
 
 import java.time.temporal.ChronoUnit;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.ConnectionChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyFlightConnectionTime", 
 					description="Leg connection time check.", 
 					violationMessage="Connection time limit violation!")
-public class DutyFlightConnectionTime extends AbstractRule implements ConnectionChecker<LegView> {
+public class DutyFlightConnectionTime implements ConnectionChecker<LegView> {
 
 	private int minLegConnTime30 = 30;
 	private int minLegConnTime40 = 40;

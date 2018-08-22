@@ -2,15 +2,14 @@ package org.heuros.hyperpair.rule;
 
 import java.time.temporal.ChronoUnit;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.ConnectionChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 
 @RuleImplementation(ruleName="PairDutyRestCheck", 
 					description="Rest period control.", 
 					violationMessage="Rest period violation!")
-public class PairDutyRestCheck extends AbstractRule implements ConnectionChecker<DutyView> {
+public class PairDutyRestCheck implements ConnectionChecker<DutyView> {
 
 //	@Override
 //	public boolean _areDutiesConnectable(Duty pd, Duty nd) {

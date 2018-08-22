@@ -1,17 +1,16 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.AppendabilityChecker;
-import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
-import org.heuros.core.rule.inf.Validator;
+import org.heuros.core.rule.intf.AppendabilityChecker;
+import org.heuros.core.rule.intf.ConnectionChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
+import org.heuros.core.rule.intf.Validator;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyCriticalStations",
 					description="Critical stations rule.", 
 					violationMessage="Critical station!")
-public class CriticalStations2 extends AbstractRule implements AppendabilityChecker<DutyView, LegView>,
+public class CriticalStations2 implements AppendabilityChecker<DutyView, LegView>,
 																Validator<DutyView>,
 																ConnectionChecker<DutyView> {
 

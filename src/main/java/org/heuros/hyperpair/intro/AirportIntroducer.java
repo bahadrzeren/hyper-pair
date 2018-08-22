@@ -4,15 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.Introducer;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.Introducer;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.Airport;
 
 @RuleImplementation(ruleName = "Airport introducer", 
 					violationMessage = "Airport introducer failed", 
 					description = "Airport model initializer.")
-public class AirportIntroducer extends AbstractRule implements Introducer<Airport> {
+public class AirportIntroducer implements Introducer<Airport> {
 
 	/*
 	 * Homebase airports. For now the problem is a single based one.

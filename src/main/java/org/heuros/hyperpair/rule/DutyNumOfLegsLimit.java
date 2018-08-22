@@ -2,16 +2,15 @@ package org.heuros.hyperpair.rule;
 
 import java.time.temporal.ChronoUnit;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ExtensibilityChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
-import org.heuros.core.rule.inf.Validator;
+import org.heuros.core.rule.intf.ExtensibilityChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
+import org.heuros.core.rule.intf.Validator;
 import org.heuros.data.model.DutyView;
 
 @RuleImplementation(ruleName="DutyNumOfLegsLimit", 
 					description="Max number of legs in a duty check.",
 					violationMessage="Max number of legs exceeded!")
-public class DutyNumOfLegsLimit extends AbstractRule implements ExtensibilityChecker<DutyView>,
+public class DutyNumOfLegsLimit implements ExtensibilityChecker<DutyView>,
 																	Validator<DutyView> {
 
 	private Integer maxNumOfActiveLegsInDuty = 4;

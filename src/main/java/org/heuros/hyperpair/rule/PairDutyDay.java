@@ -1,14 +1,13 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.ConnectionChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 
 @RuleImplementation(ruleName="PairOneDutyPerDay", 
 					description="Duty day rule.",
 					violationMessage="Duty day violation!")
-public class PairDutyDay extends AbstractRule implements ConnectionChecker<DutyView> {
+public class PairDutyDay implements ConnectionChecker<DutyView> {
 
 //	@Override
 //	public boolean _areDutiesConnectable(Duty pd, Duty nd) {

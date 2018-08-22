@@ -1,15 +1,14 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.RuleImplementation;
-import org.heuros.core.rule.inf.Validator;
+import org.heuros.core.rule.intf.RuleImplementation;
+import org.heuros.core.rule.intf.Validator;
 import org.heuros.data.model.PairView;
 import org.heuros.hyperpair.HeurosSystemParam;
 
 @RuleImplementation(ruleName="PairPeriodLength", 
 					description="Checks length of the trip.", 
 					violationMessage="Trip length limit violation!")
-public class PairPeriodLength extends AbstractRule implements Validator<PairView> {
+public class PairPeriodLength implements Validator<PairView> {
 
 //	@Override
 //	public boolean _isPairValid(Pair p) {

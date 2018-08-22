@@ -1,14 +1,13 @@
 package org.heuros.hyperpair.rule;
 
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.ConnectionChecker;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.ConnectionChecker;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyMaxBlockTimeForIntLayovers", 
 					description="Max blocktime for international flights rule.", 
 					violationMessage="Max blocktime violation for international flight!")
-public class DutyMaxBlockTimeForIntLayovers extends AbstractRule implements ConnectionChecker<LegView> {
+public class DutyMaxBlockTimeForIntLayovers implements ConnectionChecker<LegView> {
 
 	private Integer maxBlockTimeInDutyForIntLayovers = 300;
 

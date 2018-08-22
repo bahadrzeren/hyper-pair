@@ -3,16 +3,15 @@ package org.heuros.hyperpair.intro;
 import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.heuros.core.rule.inf.AbstractRule;
-import org.heuros.core.rule.inf.Introducer;
-import org.heuros.core.rule.inf.RuleImplementation;
+import org.heuros.core.rule.intf.Introducer;
+import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.Leg;
 import org.heuros.hyperpair.HeurosDatasetParam;
 
 @RuleImplementation(ruleName = "Leg introducer", 
 					violationMessage = "Leg introducer failed", 
 					description = "Leg model initializer.")
-public class LegIntroducer extends AbstractRule implements Introducer<Leg> {
+public class LegIntroducer implements Introducer<Leg> {
 
 	/*
 	 * Aircraft types to to consider during the optimization.
