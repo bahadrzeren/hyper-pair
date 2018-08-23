@@ -122,12 +122,6 @@ public class HyperPair {
 												.setModelFactory(new LegFactory())
 												.extractData();
 
-//			System.out.println(legs.get(0).getSobt());
-//			System.out.println(legs.get(0).getSobt().truncatedTo(ChronoUnit.SECONDS));
-//			System.out.println(legs.get(0).getSobt().truncatedTo(ChronoUnit.MINUTES));
-//			System.out.println(legs.get(0).getSobt().truncatedTo(ChronoUnit.HOURS));
-//			System.out.println(legs.get(0).getSobt().truncatedTo(ChronoUnit.DAYS));
-
 			HeurosDatasetParam.dataPeriodStartInc = legs.get(0).getSobt().withDayOfMonth(1).toLocalDate().plusMonths(1).atStartOfDay();
 			logger.info("Data period start: " + HeurosDatasetParam.dataPeriodStartInc);
 			HeurosDatasetParam.dataPeriodEndExc = legs.get(legs.size() - 1).getSibt();
@@ -186,14 +180,16 @@ public class HyperPair {
 				l.setArrAirport(airportContext.getAirport(l.getArr()));
 				if (!legContext.registerLeg(l)) {
 					if (l.getSobt().isAfter(HeurosDatasetParam.dataPeriodStartInc))
-						logger.warn("Leg " + l + " is not registered!");
+						logger.warn("Leg " + l + " is not registered!");	//	Flight legs that are not going to be used.
 				}
 			});
+
+			legContext.buildLegIndexes(HeurosSystemParam.maxLegConnectionTimeInMins);
 
 			/*
 			 * Generate duties.
 			 */
-			
+System.out.println();
 
 			/*
 			 * Map Leg list to LegWrapper list
