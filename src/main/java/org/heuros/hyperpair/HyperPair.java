@@ -6,9 +6,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
-import org.heuros.context.AirportContext;
-import org.heuros.context.DutyContext;
-import org.heuros.context.LegContext;
 import org.heuros.context.PairContext;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.AirportFactory;
@@ -135,89 +132,73 @@ public class HyperPair {
 			logger.info("Opt period end: " + HeurosDatasetParam.dataPeriodEndExc);
 
 			/*
-			 * Generate contexts.
+			 * Generate context.
 			 */
-			AirportContext airportContext = (AirportContext) new AirportContext().setModelFactory(new AirportFactory())
-																					.setRuleContext(new AirportRuleContext())
-																					.setDataRepository(new AirportRepository());
-
-			LegContext legContext = (LegContext) new LegContext().setModelFactory(new LegFactory())
-																	.setRuleContext(new LegRuleContext())
-																	.setDataRepository(new LegRepository());
-
-			DutyContext dutyContext = (DutyContext) new DutyContext().setModelFactory(new DutyFactory())
-																		.setRuleContext(new DutyRuleContext())
-																		.setDataRepository(new DutyRepository());
-
-			PairContext pairContext = (PairContext) new PairContext().setModelFactory(new PairFactory())
-																		.setRuleContext(new PairRuleContext());
+			PairContext pairContext = new PairContext().setAirportFactory(new AirportFactory())
+														.setAirportRuleContext(new AirportRuleContext())
+														.setAirportRepository(new AirportRepository())
+														.setLegFactory(new LegFactory())
+														.setLegRuleContext(new LegRuleContext())
+														.setLegRepository(new LegRepository())
+														.setDutyFactory(new DutyFactory())
+														.setDutyRuleContext(new DutyRuleContext())
+														.setDutyRepository(new DutyRepository())
+														.setPairFactory(new PairFactory())
+														.setPairRuleContext(new PairRuleContext());
 
 			/*
 			 * Register rules.
 			 */
-			for (Rule r : HyperPair.rules) {
-				try {
-					int numOfRegistrations = 0;
-					numOfRegistrations += airportContext.getRuleContext().registerRule(r);
-					numOfRegistrations += legContext.getRuleContext().registerRule(r);
-					numOfRegistrations += dutyContext.getRuleContext().registerRule(r);
-					numOfRegistrations += pairContext.getRuleContext().registerRule(r);
-					if (numOfRegistrations != r.getClass().getGenericInterfaces().length)
-						throw new RuleRegistrationMatchingException("Rule imlementations and number of registrations do not match!");
-				} catch (RuleRegistrationMatchingException ex) {
-					logger.error(ex);
-					throw ex;
-				} catch (RuleAnnotationIsMissing ex) {
-					logger.error("RuleImplementation annotation is missing for " + r.getClass().getName() + ".");
-					logger.error(ex);
-					throw ex;
-				}
-			}
+			pairContext.registerRules(HyperPair.rules);
 
 			/*
 			 * Add airports and legs to repositories.
 			 */
-			legs.forEach((l) -> {
-				l.setDepAirport(airportContext.getAirport(l.getDep()));
-				l.setArrAirport(airportContext.getAirport(l.getArr()));
-				if (!legContext.registerLeg(l)) {
-					if (l.getSobt().isAfter(HeurosDatasetParam.dataPeriodStartInc))
-						logger.warn("Leg " + l + " is not registered!");	//	Flight legs that are not going to be used.
-				}
-			});
-
-			legContext.buildLegIndexes(HeurosSystemParam.maxLegConnectionTimeInMins);
+			pairContext.registerAirportsAndLegs(legs, HeurosDatasetParam.dataPeriodStartInc);
+			
+			/*
+			 * Generate leg connection index.
+			 */
+			pairContext.buildLegConnectionIndex(HeurosSystemParam.maxLegConnectionTimeInMins);
 
 			/*
 			 * Generate duties.
 			 */
-			DutyGenerator dutyGenerator = new DutyGenerator().setDutyFactory((DutyFactory) dutyContext.getModelFactory())
-																.setDutyRuleContext((DutyRuleContext) dutyContext.getRuleContext())
-																.setLegConnectionIndex(legContext.getConnectionLegsIndex())
-																.setLegRepository((LegRepository) legContext.getDataRepository());
+			DutyGenerator dutyGenerator = new DutyGenerator().setDutyFactory(pairContext.getDutyFactory())
+																.setDutyRuleContext(pairContext.getDutyRuleContext())
+																.setLegConnectionIndex(pairContext.getConnectionLegsIndex())
+																.setLegRepository(pairContext.getLegRepository());
 			List<Duty> duties = dutyGenerator.proceed();
+
+			/*
+			 * Revalidate duties!
+			 */
+//			duties.forEach((d) -> {
+//				if (!pairContext.reValidateDuty(d))
+//					logger.error("Duty " + d + " is not valid!");
+//			});
 
 			/*
 			 * Add duties to dutyRepository.
 			 */
 
-			duties.forEach((d) -> {
-				d.getLegs().forEach((l) -> {
-					Leg leg = (Leg) l;
-					leg.incNumOfDutiesIncludes();
-					/*
-					 * TODO HB impl will be changed!
-					 */
-					if (d.getFirstDepAirport().isHb())
-						leg.incNumOfDutiesIncludesHbDep();
-					else
-						leg.incNumOfDutiesIncludesNonHbDep();
-					if (d.getLastArrAirport().isHb())
-						leg.incNumOfDutiesIncludesHbArr();
-					else
-						leg.incNumOfDutiesIncludesNonHbArr();
-				});
-			}); 
+//			duties.forEach((d) -> {
+//				d.getLegs().forEach((l) -> {
+//					Leg leg = (Leg) l;
+//					leg.incNumOfDutiesIncludes();
+//					/*
+//					 * TODO HB impl will be changed!
+//					 */
+//					if (d.getFirstDepAirport().isHb())
+//						leg.incNumOfDutiesIncludesHbDep();
+//					else
+//						leg.incNumOfDutiesIncludesNonHbDep();
+//					if (d.getLastArrAirport().isHb())
+//						leg.incNumOfDutiesIncludesHbArr();
+//					else
+//						leg.incNumOfDutiesIncludesNonHbArr();
+//				});
+//			}); 
 System.out.println();
 
 			/*

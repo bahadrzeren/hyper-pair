@@ -18,7 +18,8 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 		this.softAppend(p, d);
 	}
 
-	private void softAppend(Pair p, DutyView d) {
+	@Override
+	public void softAppend(Pair p, DutyView d) {
 		incTotalizers(p, d, 1);
 	}
 

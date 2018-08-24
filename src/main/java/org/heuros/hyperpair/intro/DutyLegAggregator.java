@@ -468,7 +468,8 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		this.softAppend(d, l);
 	}
 
-	private void softAppend(Duty d, LegView l) {
+	@Override
+	public void softAppend(Duty d, LegView l) {
 		d.incNumOfLegs(1);
 
 		LegView connLeg = d.getSecondToLastLeg();
