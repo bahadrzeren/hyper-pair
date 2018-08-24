@@ -464,17 +464,15 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 
 	@Override
 	public void append(Duty d, LegView l) {
-		/*
-		 * Append leg to the duty.
-		 */
-		LegView connLeg = d.getLastLeg();
 		d.append(l);
-
-		this.append(d, l, connLeg);
+		this.softAppend(d, l);
 	}
 
-	private void append(Duty d, LegView l, LegView connLeg) {
+	private void softAppend(Duty d, LegView l) {
 		d.incNumOfLegs(1);
+
+		LegView connLeg = d.getSecondToLastLeg();
+
 		this.incTotalizers(d, l, connLeg, 1);
 		this.setStateVariables(d);
 
@@ -610,14 +608,6 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	}
 
 	@Override
-	public void reCalculate(Duty d) {
-		this.reset(d);
-		this.append(d, d.getLegs().get(0), null);
-		for (int i = 1; i < d.getLegs().size(); i++)
-			this.append(d, d.getLegs().get(i), d.getLegs().get(i - 1));
-	}
-
-	@Override
 	public void reset(Duty d) {
 
 		d.setBlockTimeInMins(0);
@@ -694,4 +684,11 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		d.setValidNonHb(true);
 	}
 
+	@Override
+	public void reCalculate(Duty d) {
+		this.reset(d);
+		this.softAppend(d, d.getLegs().get(0));
+		for (int i = 1; i < d.getLegs().size(); i++)
+			this.softAppend(d, d.getLegs().get(i));
+	}
 }

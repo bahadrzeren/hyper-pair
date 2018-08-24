@@ -12,6 +12,7 @@ import org.heuros.context.LegContext;
 import org.heuros.context.PairContext;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.AirportFactory;
+import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyFactory;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegFactory;
@@ -194,12 +195,29 @@ public class HyperPair {
 																.setDutyRuleContext((DutyRuleContext) dutyContext.getRuleContext())
 																.setLegConnectionIndex(legContext.getConnectionLegsIndex())
 																.setLegRepository((LegRepository) legContext.getDataRepository());
-			dutyGenerator.proceed();
+			List<Duty> duties = dutyGenerator.proceed();
 
 			/*
-			 * Generate duties.
+			 * Add duties to dutyRepository.
 			 */
 
+			duties.forEach((d) -> {
+				d.getLegs().forEach((l) -> {
+					Leg leg = (Leg) l;
+					leg.incNumOfDutiesIncludes();
+					/*
+					 * TODO HB impl will be changed!
+					 */
+					if (d.getFirstDepAirport().isHb())
+						leg.incNumOfDutiesIncludesHbDep();
+					else
+						leg.incNumOfDutiesIncludesNonHbDep();
+					if (d.getLastArrAirport().isHb())
+						leg.incNumOfDutiesIncludesHbArr();
+					else
+						leg.incNumOfDutiesIncludesNonHbArr();
+				});
+			}); 
 System.out.println();
 
 			/*

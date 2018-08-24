@@ -15,10 +15,10 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 	@Override
 	public void append(Pair p, DutyView d) {
 		p.append(d);
-		this.appendInternal(p, d);
+		this.softAppend(p, d);
 	}
 
-	private void appendInternal(Pair p, DutyView d) {
+	private void softAppend(Pair p, DutyView d) {
 		incTotalizers(p, d, 1);
 	}
 
@@ -96,12 +96,6 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 	}
 
 	@Override
-	public void reCalculate(Pair p) {
-		this.reset(p);
-		p.getDuties().forEach((d) -> this.appendInternal(p, d));
-	}
-
-	@Override
 	public void reset(Pair p) {
 		p.setNumOfDuties(0);
 		p.setHomeBase(null);
@@ -123,6 +117,12 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 		p.setDebriefDurationInMins(0);
 		p.setNumOfInternationalDuties(0);
 		p.setNumOfErDuties(0);
+	}
+
+	@Override
+	public void reCalculate(Pair p) {
+		this.reset(p);
+		p.getDuties().forEach((d) -> this.softAppend(p, d));
 	}
 
 }

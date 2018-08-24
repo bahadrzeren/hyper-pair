@@ -3,12 +3,12 @@ package org.heuros.hyperpair;
 import java.util.List;
 
 import org.heuros.core.base.Processor;
-import org.heuros.data.model.Duty;
-import org.heuros.data.model.PairView;
+import org.heuros.data.model.DutyView;
+import org.heuros.data.model.Pair;
 import org.heuros.rule.DutyRuleContext;
 import org.heuros.rule.PairRuleContext;
 
-public class HyperPairOptimizer implements Processor<Duty, PairView> {
+public class HyperPairOptimizer implements Processor<DutyView, Pair> {
 
 	protected DutyRuleContext dutyRuleContext;
 
@@ -25,7 +25,7 @@ public class HyperPairOptimizer implements Processor<Duty, PairView> {
 	}
 
 	@Override
-	public List<PairView> proceed() {
+	public List<Pair> proceed() {
 
 		return null;
 	}
