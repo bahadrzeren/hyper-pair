@@ -16,6 +16,7 @@ import org.heuros.data.model.DutyFactory;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegFactory;
 import org.heuros.data.model.PairFactory;
+import org.heuros.data.processor.DutyGenerator;
 import org.heuros.data.repo.AirportRepository;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
@@ -189,6 +190,16 @@ public class HyperPair {
 			/*
 			 * Generate duties.
 			 */
+			DutyGenerator dutyGenerator = new DutyGenerator().setDutyFactory((DutyFactory) dutyContext.getModelFactory())
+																.setDutyRuleContext((DutyRuleContext) dutyContext.getRuleContext())
+																.setLegConnectionIndex(legContext.getConnectionLegsIndex())
+																.setLegRepository((LegRepository) legContext.getDataRepository());
+			dutyGenerator.proceed();
+
+			/*
+			 * Generate duties.
+			 */
+
 System.out.println();
 
 			/*
