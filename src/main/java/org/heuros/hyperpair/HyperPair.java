@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
 import org.heuros.context.PairOptimizationContext;
+import org.heuros.core.ga.GeneticOptimizer;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
@@ -20,6 +21,7 @@ import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
 import org.heuros.exception.RuleAnnotationIsMissing;
 import org.heuros.exception.RuleRegistrationMatchingException;
+import org.heuros.hyperpair.ga.PairOptimizer;
 import org.heuros.hyperpair.intro.AirportIntroducer;
 import org.heuros.hyperpair.intro.DutyLegAggregator;
 import org.heuros.hyperpair.intro.LegIntroducer;
@@ -152,14 +154,9 @@ public class HyperPair {
 			pairOptimizationContext.registerRules(HyperPair.rules);
 
 			/*
-			 * Add airports and legs to repositories.
+			 * Add airports and legs to repositories and generate necessary indexes.
 			 */
-			pairOptimizationContext.registerAirportsAndLegs(legs, HeurosDatasetParam.dataPeriodStartInc);
-			
-			/*
-			 * Generate leg connection index.
-			 */
-			pairOptimizationContext.buildLegConnectionIndex(HeurosSystemParam.maxLegConnectionTimeInMins);
+			pairOptimizationContext.registerAirportsAndLegs(legs, HeurosDatasetParam.dataPeriodStartInc, HeurosSystemParam.maxLegConnectionTimeInMins);
 
 			/*
 			 * Generate duties.
@@ -181,11 +178,25 @@ public class HyperPair {
 //			});
 
 			/*
-			 * Add duties to dutyRepository.
+			 * Add duties to dutyRepository and generate necessary indexes.
 			 */
-
 			pairOptimizationContext.registerDuties(duties);
 
+			PairOptimizer pairOptimizer = new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
+																.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
+																.setMaxNumOfIterations(HeurosGaParameters.maxNumOfIterations)
+																.setMaxNumOfIterationsWOProgress(HeurosGaParameters.maxNumOfIterationsWOProgress)
+																.setMinNumOfChildren(HeurosGaParameters.minNumOfChildren)
+																.setMutationRate(HeurosGaParameters.mutationRate)
+																.setNumOfEliteChromosomes(HeurosGaParameters.numOfEliteChromosomes)
+																.setPopulationSize(HeurosGaParameters.populationSize)
+																.setSelector(selector)
+																.setMutator(mutator)
+																.setGeneticIterationListener(geneticIterationListener)
+																.setDecoder(decoder)
+																.setCrossoverOperator(crossoverOperator)
+																.setChromosomeFactory(chromosomeFactory);
+			
 System.out.println();
 
 

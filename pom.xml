@@ -38,6 +38,11 @@
     	<artifactId>heuros-core</artifactId>
     	<version>0.0.1-SNAPSHOT</version>
     </dependency>
+    <dependency>
+    	<groupId>org.heuros</groupId>
+    	<artifactId>heuros-ga-core</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 	<build>
 		<plugins>

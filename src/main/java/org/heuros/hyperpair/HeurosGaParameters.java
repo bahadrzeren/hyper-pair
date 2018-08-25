@@ -1,6 +1,6 @@
 package org.heuros.hyperpair;
 
-public class HeurosGaParameters<T, M> {
+public class HeurosGaParameters {
 
     public static long maxElapsedTimeInNanoSecs = 60000000000l;
 
