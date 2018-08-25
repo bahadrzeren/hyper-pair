@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
-import org.heuros.context.PairContext;
+import org.heuros.context.PairOptimizationContext;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
@@ -134,47 +134,49 @@ public class HyperPair {
 			/*
 			 * Generate context.
 			 */
-			PairContext pairContext = new PairContext().setAirportFactory(new AirportFactory())
-														.setAirportRuleContext(new AirportRuleContext())
-														.setAirportRepository(new AirportRepository())
-														.setLegFactory(new LegFactory())
-														.setLegRuleContext(new LegRuleContext())
-														.setLegRepository(new LegRepository())
-														.setDutyFactory(new DutyFactory())
-														.setDutyRuleContext(new DutyRuleContext())
-														.setDutyRepository(new DutyRepository())
-														.setPairFactory(new PairFactory())
-														.setPairRuleContext(new PairRuleContext());
+			PairOptimizationContext pairOptimizationContext = new PairOptimizationContext().setAirportFactory(new AirportFactory())
+																							.setAirportRuleContext(new AirportRuleContext())
+																							.setAirportRepository(new AirportRepository())
+																							.setLegFactory(new LegFactory())
+																							.setLegRuleContext(new LegRuleContext())
+																							.setLegRepository(new LegRepository())
+																							.setDutyFactory(new DutyFactory())
+																							.setDutyRuleContext(new DutyRuleContext())
+																							.setDutyRepository(new DutyRepository())
+																							.setPairFactory(new PairFactory())
+																							.setPairRuleContext(new PairRuleContext());
 
 			/*
 			 * Register rules.
 			 */
-			pairContext.registerRules(HyperPair.rules);
+			pairOptimizationContext.registerRules(HyperPair.rules);
 
 			/*
 			 * Add airports and legs to repositories.
 			 */
-			pairContext.registerAirportsAndLegs(legs, HeurosDatasetParam.dataPeriodStartInc);
+			pairOptimizationContext.registerAirportsAndLegs(legs, HeurosDatasetParam.dataPeriodStartInc);
 			
 			/*
 			 * Generate leg connection index.
 			 */
-			pairContext.buildLegConnectionIndex(HeurosSystemParam.maxLegConnectionTimeInMins);
+			pairOptimizationContext.buildLegConnectionIndex(HeurosSystemParam.maxLegConnectionTimeInMins);
 
 			/*
 			 * Generate duties.
 			 */
-			DutyGenerator dutyGenerator = new DutyGenerator().setDutyFactory(pairContext.getDutyFactory())
-																.setDutyRuleContext(pairContext.getDutyRuleContext())
-																.setLegConnectionIndex(pairContext.getConnectionLegsIndex())
-																.setLegRepository(pairContext.getLegRepository());
+			DutyGenerator dutyGenerator = new DutyGenerator().setDutyFactory(pairOptimizationContext.getDutyFactory())
+																.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+																.setLegConnectionIndex(pairOptimizationContext.getConnectionLegsIndex())
+																.setLegRepository(pairOptimizationContext.getLegRepository());
 			List<Duty> duties = dutyGenerator.proceed();
 
-			/*
-			 * Revalidate duties!
-			 */
+//			/*
+//			 * Revalidate duties!
+//			 */
 //			duties.forEach((d) -> {
-//				if (!pairContext.reValidateDuty(d))
+//				if (!RuleUtil.lazyDutyValidator.validateDuty(d,
+//																pairOptimizationContext.getLegRuleContext(),
+//																pairOptimizationContext.getDutyRuleContext()))
 //					logger.error("Duty " + d + " is not valid!");
 //			});
 
@@ -182,28 +184,9 @@ public class HyperPair {
 			 * Add duties to dutyRepository.
 			 */
 
-//			duties.forEach((d) -> {
-//				d.getLegs().forEach((l) -> {
-//					Leg leg = (Leg) l;
-//					leg.incNumOfDutiesIncludes();
-//					/*
-//					 * TODO HB impl will be changed!
-//					 */
-//					if (d.getFirstDepAirport().isHb())
-//						leg.incNumOfDutiesIncludesHbDep();
-//					else
-//						leg.incNumOfDutiesIncludesNonHbDep();
-//					if (d.getLastArrAirport().isHb())
-//						leg.incNumOfDutiesIncludesHbArr();
-//					else
-//						leg.incNumOfDutiesIncludesNonHbArr();
-//				});
-//			}); 
-System.out.println();
+			pairOptimizationContext.registerDuties(duties);
 
-			/*
-			 * Map Leg list to LegWrapper list
-			 */
+System.out.println();
 
 
 			/*
