@@ -7,11 +7,11 @@ import org.heuros.core.ga.GeneticOptimizer;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Pair;
 
-public class PairOptimizer extends GeneticOptimizer<Integer, Pair> implements Processor<DutyView, Pair>{
+public class PairOptimizer extends GeneticOptimizer<Integer, Pair> implements Processor<DutyView, Pair> {
 
 	@Override
 	public List<Pair> proceed() {
 		this.doMinimize();
-		return null;
+		return this.getDecoder().decode(this.getBest());
 	}
 }

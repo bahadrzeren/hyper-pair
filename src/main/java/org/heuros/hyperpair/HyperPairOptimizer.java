@@ -10,9 +10,8 @@ import org.heuros.rule.PairRuleContext;
 
 public class HyperPairOptimizer implements Processor<DutyView, Pair> {
 
-	protected DutyRuleContext dutyRuleContext;
-
-	protected PairRuleContext pairRuleContext;
+	protected DutyRuleContext dutyRuleContext = null;
+	protected PairRuleContext pairRuleContext = null;
 
 	public HyperPairOptimizer setDutyRuleContext(DutyRuleContext dutyRuleContext) {
 		this.dutyRuleContext = dutyRuleContext;

@@ -7,7 +7,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
 import org.heuros.context.PairOptimizationContext;
-import org.heuros.core.ga.GeneticOptimizer;
+import org.heuros.core.ga.GeneticIterationListener;
+import org.heuros.core.ga.crossover.UniformCrossover;
+import org.heuros.core.ga.mutation.IntegerGeneMutator;
+import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
@@ -21,6 +24,8 @@ import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
 import org.heuros.exception.RuleAnnotationIsMissing;
 import org.heuros.exception.RuleRegistrationMatchingException;
+import org.heuros.hyperpair.ga.PairChromosomeFactory;
+import org.heuros.hyperpair.ga.PairChromosomeDecoder;
 import org.heuros.hyperpair.ga.PairOptimizer;
 import org.heuros.hyperpair.intro.AirportIntroducer;
 import org.heuros.hyperpair.intro.DutyLegAggregator;
@@ -182,21 +187,50 @@ public class HyperPair {
 			 */
 			pairOptimizationContext.registerDuties(duties);
 
-			PairOptimizer pairOptimizer = new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
-																.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
-																.setMaxNumOfIterations(HeurosGaParameters.maxNumOfIterations)
-																.setMaxNumOfIterationsWOProgress(HeurosGaParameters.maxNumOfIterationsWOProgress)
-																.setMinNumOfChildren(HeurosGaParameters.minNumOfChildren)
-																.setMutationRate(HeurosGaParameters.mutationRate)
-																.setNumOfEliteChromosomes(HeurosGaParameters.numOfEliteChromosomes)
-																.setPopulationSize(HeurosGaParameters.populationSize)
-																.setSelector(selector)
-																.setMutator(mutator)
-																.setGeneticIterationListener(geneticIterationListener)
-																.setDecoder(decoder)
-																.setCrossoverOperator(crossoverOperator)
-																.setChromosomeFactory(chromosomeFactory);
-			
+			PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
+																				.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
+																				.setMaxNumOfIterations(HeurosGaParameters.maxNumOfIterations)
+																				.setMaxNumOfIterationsWOProgress(HeurosGaParameters.maxNumOfIterationsWOProgress)
+																				.setMinNumOfChildren(HeurosGaParameters.minNumOfChildren)
+																				.setMutationRate(HeurosGaParameters.mutationRate)
+																				.setNumOfEliteChromosomes(HeurosGaParameters.numOfEliteChromosomes)
+																				.setPopulationSize(HeurosGaParameters.populationSize)
+																				.setSelector(new BinaryTournamentSelector<Integer>())
+																				.setCrossoverOperator(new UniformCrossover<Integer>())
+																				.setGeneticIterationListener(new GeneticIterationListener() {
+																					@Override
+																					public void onProgress(int iteration, double elapsedTime, String info) {
+																						HyperPair.logger.info(iteration + ".th itearation, elapsedTime: " +
+																												elapsedTime + ", best: " + info);
+																					}
+																					@Override
+																					public void onException(Exception ex) {
+																						HyperPair.logger.error(ex);
+																					}
+																				})
+																				/*
+																				 * Number of heuristics = 3.
+																				 * TODO must be parametric.
+																				 */
+																				.setMutator(new IntegerGeneMutator().setMaxGeneValueExc(3))
+																				.setDecoder(new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
+																												.setDutyRepository(pairOptimizationContext.getDutyRepository())
+																												.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+																												.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+																												.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
+																												.setHbDepHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepHbArrDutyIndexByLegNdx())
+																												.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
+																												.setHbArrDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getHbArrDutyIndexByDepAirportNdxBrieftime()))
+																				/*
+																				 * Number of heuristics = 3.
+																				 * Chromosome length = 6000.
+																				 * TODO Params must be parametric.
+																				 */
+																				.setChromosomeFactory(new PairChromosomeFactory().setChromosomeLength(6000)
+																																	.setMaxGeneValue(3));
+
+//			List<Pair> solution = 
+					pairOptimizer.proceed();
 System.out.println();
 
 
