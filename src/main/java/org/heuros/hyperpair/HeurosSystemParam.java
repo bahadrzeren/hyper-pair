@@ -4,7 +4,7 @@ public class HeurosSystemParam {
 	public static int maxPairingLengthInDays = 4;
 	public static int maxIntLay = 60 * 60;
 	public static int maxDomLay = 30 * 60;
-	public static int maxIdleTimeInAPair = 10;
+	public static int maxIdleTimeInAPairInHours = 10;
 
 	/*
 	 * Minimum connection time limits that are designated in rule implementations can not be smaller than this value.

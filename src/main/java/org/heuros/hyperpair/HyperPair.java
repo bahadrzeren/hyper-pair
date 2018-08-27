@@ -187,6 +187,16 @@ public class HyperPair {
 			 */
 			pairOptimizationContext.registerDuties(duties);
 
+			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setPairFactory(pairOptimizationContext.getPairFactory())
+																						.setLegRepository(pairOptimizationContext.getLegRepository())
+																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
+																						.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+																						.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
+																						.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
+																						.setHbDepHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepHbArrDutyIndexByLegNdx())
+																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
+																						.setHbArrDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getHbArrDutyIndexByDepAirportNdxBrieftime());
+
 			PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
 																				.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
 																				.setMaxNumOfIterations(HeurosGaParameters.maxNumOfIterations)
@@ -205,29 +215,17 @@ public class HyperPair {
 																					}
 																					@Override
 																					public void onException(Exception ex) {
+																						ex.printStackTrace();
 																						HyperPair.logger.error(ex);
 																					}
 																				})
+																				.setDecoder(pairChromosomeDecoder)
+																				.setMutator(new IntegerGeneMutator().setMaxGeneValueExc(pairChromosomeDecoder.getNumOfHeuristics()))
 																				/*
-																				 * Number of heuristics = 3.
-																				 * TODO must be parametric.
+																				 * TODO Chromosome length = 6000 must be parametric.
 																				 */
-																				.setMutator(new IntegerGeneMutator().setMaxGeneValueExc(3))
-																				.setDecoder(new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
-																												.setDutyRepository(pairOptimizationContext.getDutyRepository())
-																												.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
-																												.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-																												.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
-																												.setHbDepHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepHbArrDutyIndexByLegNdx())
-																												.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
-																												.setHbArrDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getHbArrDutyIndexByDepAirportNdxBrieftime()))
-																				/*
-																				 * Number of heuristics = 3.
-																				 * Chromosome length = 6000.
-																				 * TODO Params must be parametric.
-																				 */
-																				.setChromosomeFactory(new PairChromosomeFactory().setChromosomeLength(6000)
-																																	.setMaxGeneValue(3));
+																				.setChromosomeFactory(new PairChromosomeFactory().setChromosomeLength(10000)
+																																	.setMaxGeneValue(pairChromosomeDecoder.getNumOfHeuristics()));
 
 //			List<Pair> solution = 
 					pairOptimizer.proceed();

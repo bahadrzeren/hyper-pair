@@ -332,8 +332,8 @@ public class DutyFlightConnectionTime implements ConnectionChecker<LegView> {
 	}
 
 	private int maxLegConnTimeHB = 60 * 3;
-	private int maxLegConnTimeESB = 60 * 3;	//	4 - 1;
-	private int maxLegConnTimeDom = 60 * 3;	//	3 + 59;
+	private int maxLegConnTimeESB = 60 * 3 + 59;
+	private int maxLegConnTimeDom = 60 * 3 + 59;
 	private int maxLegConnTimeInt = 60 * 7;	//	3;
 	private int maxLegConnTimeExc = 60 * 8;
 

@@ -2,10 +2,11 @@ package org.heuros.hyperpair.ga;
 
 import org.heuros.core.ga.chromosome.Chromosome;
 
-public class PairChromosome implements Chromosome<Integer> {
+public class PairChromosome implements Chromosome<Integer>, Cloneable {
 
 	private int[] genes = null;
 	private double fitness = Double.MAX_VALUE;
+	private String info = null;
 
 	@Override
 	public void initializeChromosome(int chromosomeLength) {
@@ -34,6 +35,16 @@ public class PairChromosome implements Chromosome<Integer> {
 	}
 
 	@Override
+    public String getInfo() {
+    	return this.info;
+    }
+
+	@Override
+    public void setInfo(String value) {
+    	this.info = value;
+    }
+
+	@Override
 	public int getChromosomeLength() {
 		return this.genes.length;
 	}
@@ -48,8 +59,9 @@ public class PairChromosome implements Chromosome<Integer> {
 		this.genes[index] = value;
 	}
 
+	@Override
 	public Object clone() throws CloneNotSupportedException {
-		PairChromosome newClone = (PairChromosome) this.clone();
+		PairChromosome newClone = (PairChromosome) super.clone();
 		newClone.genes = this.genes.clone();
 		return newClone;
 	}
