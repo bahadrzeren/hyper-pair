@@ -51,8 +51,13 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return this;
 	}
 
+//	private static Random random = new Random();
+
 	public PairChromosomeDecoder setLegRepository(LegRepository legRepository) {
 		this.legRepository = legRepository;
+//		double[] sortValues = new double[this.legRepository.getModels().size()];
+//		for (int i = 0; i < sortValues.length; i++)
+//			sortValues[i] = random.nextDouble();
 		this.reOrderedLegs = this.legRepository.getModels().parallelStream().sorted(new Comparator<Leg>() {
 			@Override
 			public int compare(Leg a, Leg b) {
@@ -70,6 +75,11 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 						else
 							if (a.getNumOfDutiesIncludesHbDep() > b.getNumOfDutiesIncludesHbDep())
 								return 1;
+//						if (sortValues[a.getNdx()] < sortValues[b.getNdx()])
+//							return -1;
+//						else
+//							if (sortValues[a.getNdx()] > sortValues[b.getNdx()])
+//								return 1;
 				return 0;
 			}
 		}).collect(Collectors.toList());
@@ -169,7 +179,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return best;
 	}
 
-	private DutyView fetchBestDutyDayEffectiveDuty(Pair currentPair, DutyView bestSoFar, DutyView[] candidates, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
+	private DutyView fetchBestActiveBlockTimeEffectiveDuty(Pair currentPair, DutyView bestSoFar, DutyView[] candidates, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
 		DutyView best = bestSoFar;
 		int bestActiveBlocktimeInMins = 0;
 		double bestAvgNumOfIncludingDutiesOfTheSameLegs = Double.MAX_VALUE;
@@ -280,7 +290,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 					res = this.fetchBestDhEffectiveDuty(currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 				else
 					if (heuristicNo == 1)
-						res = this.fetchBestDutyDayEffectiveDuty(currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+						res = this.fetchBestActiveBlockTimeEffectiveDuty(currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 					else
 						if (heuristicNo == 2)
 							res = this.fetchBestLayoverEffectiveDuty(currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
@@ -305,7 +315,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 			return this.fetchBestDhEffectiveDuty(null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 		else
 			if (heuristicNo == 1)
-				return this.fetchBestDutyDayEffectiveDuty(null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+				return this.fetchBestActiveBlockTimeEffectiveDuty(null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			else
 				if (heuristicNo == 2)
 					return this.fetchBestLayoverEffectiveDuty(null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
@@ -322,7 +332,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 		double fitness = 0.0;
 
-		int reOrderedLegNdx = 0;
+		int reOrderedLegNdx = -1;
 		int[] numOfLegCoverings = new int[this.legRepository.getModels().size()];
 		int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 		int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
@@ -361,7 +371,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 							for (int j = 0; j < dutiesOfLeg.length; j++) {
 								DutyView dutyOfLeg = dutiesOfLeg[j];
 								numOfCoveringsInDuties[dutyOfLeg.getNdx()]++;
-								blockTimeOfCoveringsInDuties[dutyOfLeg.getNdx()] += dutyOfLeg.getBlockTimeInMins();
+								blockTimeOfCoveringsInDuties[dutyOfLeg.getNdx()] += leg.getBlockTimeInMins();
 							}
 						}
 
@@ -396,7 +406,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 								for (int j = 0; j < dutiesOfLeg.length; j++) {
 									DutyView dutyOfLeg = dutiesOfLeg[j];
 									numOfCoveringsInDuties[dutyOfLeg.getNdx()]--;
-									blockTimeOfCoveringsInDuties[dutyOfLeg.getNdx()] -= dutyOfLeg.getBlockTimeInMins();
+									blockTimeOfCoveringsInDuties[dutyOfLeg.getNdx()] -= leg.getBlockTimeInMins();
 								}
 							}
 						}
