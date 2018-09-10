@@ -3,7 +3,7 @@ package org.heuros.hyperpair.rule;
 import org.heuros.core.rule.intf.AppendabilityChecker;
 import org.heuros.core.rule.intf.ConnectionChecker;
 import org.heuros.core.rule.intf.RuleImplementation;
-import org.heuros.core.rule.intf.Validator;
+import org.heuros.core.rule.intf.TotalizerChecker;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.PairView;
 
@@ -12,7 +12,7 @@ import org.heuros.data.model.PairView;
 					violationMessage="Total number of passive legs exceeded!")
 public class PairNumOfPassiveLegsLimit implements AppendabilityChecker<PairView, DutyView>, 
 																		ConnectionChecker<DutyView>,
-																		Validator<PairView> {
+																		TotalizerChecker<PairView> {
 
 	private Integer maxNumOfPassiveLegsInPair = 3;
 

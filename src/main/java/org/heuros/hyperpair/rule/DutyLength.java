@@ -1,13 +1,13 @@
 package org.heuros.hyperpair.rule;
 
 import org.heuros.core.rule.intf.RuleImplementation;
-import org.heuros.core.rule.intf.Validator;
+import org.heuros.core.rule.intf.TotalizerChecker;
 import org.heuros.data.model.DutyView;
 
 @RuleImplementation(ruleName="DutyLength", 
 					description="Duty augmentation check.", 
 					violationMessage="Augmentation violation!")
-public class DutyLength implements Validator<DutyView> {
+public class DutyLength implements TotalizerChecker<DutyView> {
 
 //	@Override
 //	public boolean _isDutyValid(Duty d) {

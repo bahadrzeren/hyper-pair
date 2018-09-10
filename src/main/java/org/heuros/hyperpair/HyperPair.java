@@ -145,13 +145,13 @@ public class HyperPair {
 																							.setAirportRuleContext(new AirportRuleContext())
 																							.setAirportRepository(new AirportRepository())
 																							.setLegFactory(new LegFactory())
-																							.setLegRuleContext(new LegRuleContext())
+																							.setLegRuleContext(new LegRuleContext(HeurosSystemParam.homebases.length))
 																							.setLegRepository(new LegRepository())
-																							.setDutyFactory(new DutyFactory())
-																							.setDutyRuleContext(new DutyRuleContext())
+																							.setDutyFactory(new DutyFactory(HeurosSystemParam.homebases.length))
+																							.setDutyRuleContext(new DutyRuleContext(HeurosSystemParam.homebases.length))
 																							.setDutyRepository(new DutyRepository())
 																							.setPairFactory(new PairFactory())
-																							.setPairRuleContext(new PairRuleContext());
+																							.setPairRuleContext(new PairRuleContext(HeurosSystemParam.homebases.length));
 
 			/*
 			 * Register rules.

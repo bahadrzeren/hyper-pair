@@ -7,16 +7,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.heuros.core.rule.intf.Introducer;
 import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.Airport;
+import org.heuros.hyperpair.HeurosSystemParam;
 
 @RuleImplementation(ruleName = "Airport introducer", 
 					violationMessage = "Airport introducer failed", 
 					description = "Airport model initializer.")
 public class AirportIntroducer implements Introducer<Airport> {
-
-	/*
-	 * Homebase airports. For now the problem is a single based one.
-	 */
-	private static String[] homebases = {"IST", "SAW"};
 
 	/*
 	 * Domestic airports. All of the others are going to be flagged as international.
@@ -169,7 +165,7 @@ public class AirportIntroducer implements Introducer<Airport> {
 //				break;
 //			}
 //		}
-		m.setHb(ArrayUtils.indexOf(AirportIntroducer.homebases, m.getCode()) >= 0);
+		m.setHb(ArrayUtils.indexOf(HeurosSystemParam.homebases, m.getCode()) >= 0);
 		m.setNonHb(!m.isHb());
 
 		/*

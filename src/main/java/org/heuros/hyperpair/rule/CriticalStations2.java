@@ -3,7 +3,7 @@ package org.heuros.hyperpair.rule;
 import org.heuros.core.rule.intf.AppendabilityChecker;
 import org.heuros.core.rule.intf.ConnectionChecker;
 import org.heuros.core.rule.intf.RuleImplementation;
-import org.heuros.core.rule.intf.Validator;
+import org.heuros.core.rule.intf.TotalizerChecker;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
@@ -11,7 +11,7 @@ import org.heuros.data.model.LegView;
 					description="Critical stations rule.", 
 					violationMessage="Critical station!")
 public class CriticalStations2 implements AppendabilityChecker<DutyView, LegView>,
-																Validator<DutyView>,
+																TotalizerChecker<DutyView>,
 																ConnectionChecker<DutyView> {
 
 //	@Override

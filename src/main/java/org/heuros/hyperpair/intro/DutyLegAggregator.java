@@ -7,6 +7,7 @@ import org.heuros.core.rule.intf.Aggregator;
 import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.LegView;
+import org.heuros.hyperpair.HeurosSystemParam;
 
 @RuleImplementation(ruleName = "Duty Leg aggregator", 
 					violationMessage = "Duty Leg aggregator failed", 
@@ -66,14 +67,14 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	private int briefPeriodBeforeDutyNonHb = 60;
 	private int debriefPeriodAfterDuty = 30;
 
-	private int getBriefPeriod(boolean hb) {
-		if (hb)
+	private int getBriefPeriod(Duty d, int hbNdx) {
+		if (d.getFirstDepAirport().getNdx() == hbNdx)
 			return briefPeriodBeforeDutyHb;
 		else
 			return briefPeriodBeforeDutyNonHb;
 	}
 
-	private int getDebriefPeriod(Duty d) {
+	private int getDebriefPeriod(Duty d, int hbNdx) {
 		return debriefPeriodAfterDuty;
 	}
 
@@ -564,48 +565,41 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		/*
 		 * States
 		 */
-		d.setBriefDurationInMinsHb(this.getBriefPeriod(true));
-		d.setBriefDurationInMinsNonHb(this.getBriefPeriod(false));
-		d.setDebriefDurationInMins(this.getDebriefPeriod(d));
-
-		d.setBriefTimeHb(d.getFirstLeg().getSobt().minusMinutes(d.getBriefDurationInMinsHb()));
-		d.setBriefTimeNonHb(d.getFirstLeg().getSobt().minusMinutes(d.getBriefDurationInMinsNonHb()));
-		d.setDebriefTime(d.getLastLeg().getSibt().plusMinutes(this.getDebriefPeriod(d)));
-
-		d.setBriefDayBeginningHb(d.getBriefTimeHb().truncatedTo(ChronoUnit.DAYS));
-		d.setBriefDayBeginningNonHb(d.getBriefTimeHb().truncatedTo(ChronoUnit.DAYS));
-		d.setDebriefDayEnding(d.getDebriefTime().minusSeconds(1).truncatedTo(ChronoUnit.DAYS).plusHours(23).plusMinutes(59).plusSeconds(59));
-
-		d.setBriefDayHb(d.getBriefDayBeginningHb().toLocalDate());
-		d.setBriefDayNonHb(d.getBriefDayBeginningNonHb().toLocalDate());
-		d.setDebriefDay(d.getDebriefDayEnding().toLocalDate());
-
-		d.setDutyDurationInMinsHb((int) ChronoUnit.MINUTES.between(d.getBriefTimeHb(), d.getDebriefTime()));
-		d.setDutyDurationInMinsNonHb((int) ChronoUnit.MINUTES.between(d.getBriefTimeNonHb(), d.getDebriefTime()));
-
-		d.setNumOfDaysTouchedHb((int) ChronoUnit.DAYS.between(d.getBriefDayHb(), d.getDebriefDay()) + 1);
-		d.setNumOfDaysTouchedNonHb((int) ChronoUnit.DAYS.between(d.getBriefDayNonHb(), d.getDebriefDay()) + 1);
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setBriefDurationInMins(i, this.getBriefPeriod(d, i));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setDebriefDurationInMins(i, this.getDebriefPeriod(d, i));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setBriefTime(i, d.getFirstLeg().getSobt().minusMinutes(d.getBriefDurationInMins(i)));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setDebriefTime(i, d.getLastLeg().getSibt().plusMinutes(this.getDebriefPeriod(d, i)));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setBriefDayBeginning(i, d.getBriefTime(i).truncatedTo(ChronoUnit.DAYS));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setDebriefDayEnding(i, d.getDebriefTime(i).minusSeconds(1).truncatedTo(ChronoUnit.DAYS).plusHours(23).plusMinutes(59).plusSeconds(59));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setBriefDay(i, d.getBriefDayBeginning(i).toLocalDate());
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setDebriefDay(i, d.getDebriefDayEnding(i).toLocalDate());
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setDutyDurationInMins(i, (int) ChronoUnit.MINUTES.between(d.getBriefTime(i), d.getDebriefTime(i)));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setNumOfDaysTouched(i, (int) ChronoUnit.DAYS.between(d.getBriefDay(i), d.getDebriefDay(i)) + 1);
 
 		d.setEr(this.isDutyAnER(d));
-
-		d.setRestDurationInMinsHbToHb(this.getDutyMinRestPeriod(d, d.getDutyDurationInMinsHb(), true));
-		d.setRestDurationInMinsHbToNonHb(this.getDutyMinRestPeriod(d, d.getDutyDurationInMinsHb(), false));
-		d.setRestDurationInMinsNonHbToHb(this.getDutyMinRestPeriod(d, d.getDutyDurationInMinsNonHb(), true));
-		d.setRestDurationInMinsNonHbToNonHb(this.getDutyMinRestPeriod(d, d.getDutyDurationInMinsNonHb(), false));
-
-		d.setNextBriefTimeHbToHb(d.getDebriefTime().plusMinutes(d.getRestDurationInMinsHbToHb()));
-		d.setNextBriefTimeHbToNonHb(d.getDebriefTime().plusMinutes(d.getRestDurationInMinsHbToNonHb()));
-		d.setNextBriefTimeNonHbToHb(d.getDebriefTime().plusMinutes(d.getRestDurationInMinsNonHbToHb()));
-		d.setNextBriefTimeNonHbToNonHb(d.getDebriefTime().plusMinutes(d.getRestDurationInMinsNonHbToNonHb()));
-
-		d.setAugmentedHb(this.getDutyCrewModel(d, d.getDutyDurationInMinsHb(), d.getBriefTimeHb()));
-		d.setAugmentedNonHb(this.getDutyCrewModel(d, d.getDutyDurationInMinsNonHb(), d.getBriefTimeNonHb()));
-
 		d.setInternational(d.getLastLeg().getArrAirport().isInternational());
-		d.setEarlyHb(this.isDutyEarly(d.getBriefTimeHb()));
-		d.setEarlyNonHb(this.isDutyEarly(d.getBriefTimeNonHb()));
-		d.setHardHb(this.isDutyHard(d, d.getBriefDayBeginningHb(), d.getBriefTimeHb(), d.getDebriefTime()));
-		d.setHardNonHb(this.isDutyHard(d, d.getBriefDayBeginningNonHb(), d.getBriefTimeNonHb(), d.getDebriefTime()));
+
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setRestDurationInMins(i, this.getDutyMinRestPeriod(d, d.getDutyDurationInMins(i), d.getLastArrAirport().getNdx() == i));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setNextBriefTime(i, d.getDebriefTime(i).plusMinutes(d.getRestDurationInMins(i)));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setAugmented(i, this.getDutyCrewModel(d, d.getDutyDurationInMins(i), d.getBriefTime(i)));
+
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setEarly(i, this.isDutyEarly(d.getBriefTime(i)));
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			d.setHard(i, this.isDutyHard(d, d.getBriefDayBeginning(i), d.getBriefTime(i), d.getDebriefTime(i)));
 	}
 
 	@Override
@@ -633,56 +627,32 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 
 		d.setLongConnDiff(0);
 
-		d.setBriefTimeHb(null);
-		d.setBriefTimeNonHb(null);
-		d.setDebriefTime(null);
-
-		d.setBriefDayBeginningHb(null);
-		d.setBriefDayBeginningNonHb(null);
-		d.setDebriefDayEnding(null);
-
-		d.setBriefDayHb(null);
-		d.setBriefDayNonHb(null);
-		d.setDebriefDay(null);
-
-		d.setBriefDurationInMinsHb(0);
-		d.setBriefDurationInMinsNonHb(0);
-		d.setDebriefDurationInMins(0);
-
-		d.setDutyDurationInMinsHb(0);
-		d.setDutyDurationInMinsNonHb(0);
-
-		d.setNumOfDaysTouchedHb(0);
-		d.setNumOfDaysTouchedNonHb(0);
-
-		d.setEr(false);
-
-		d.setRestDurationInMinsHbToHb(0);
-		d.setRestDurationInMinsHbToNonHb(0);
-		d.setRestDurationInMinsNonHbToHb(0);
-		d.setRestDurationInMinsNonHbToNonHb(0);
-
-		d.setNextBriefTimeHbToHb(null);
-		d.setNextBriefTimeHbToNonHb(null);
-		d.setNextBriefTimeNonHbToHb(null);
-		d.setNextBriefTimeNonHbToNonHb(null);
-
-		d.setAugmentedHb(0);
-		d.setAugmentedNonHb(0);
-
-		d.setInternational(false);
-		d.setEarlyHb(false);
-		d.setEarlyNonHb(false);
-		d.setHardHb(false);
-		d.setHardNonHb(false);
-
 		for (int i = 0; i < d.getLongestBlockTimesInMins().length; i++)
-			d.getLongestBlockTimesInMins()[i] = 0;
-			
+			d.getLongestBlockTimesInMins()[i] = 0;	
 		d.setLongestBlockTimeInMins(0);
 
-		d.setValidHb(true);
-		d.setValidNonHb(true);
+		d.setEr(false);
+		d.setInternational(false);
+
+		for (int i = 0; i < HeurosSystemParam.homebases.length; i++) {
+
+			d.setBriefTime(i, null);
+			d.setDebriefTime(i, null);
+			d.setBriefDayBeginning(i, null);
+			d.setDebriefDayEnding(i, null);
+			d.setBriefDay(i, null);
+			d.setDebriefDay(i, null);
+			d.setBriefDurationInMins(i, 0);
+			d.setDebriefDurationInMins(i, 0);
+			d.setDutyDurationInMins(i, 0);
+			d.setNumOfDaysTouched(i, 0);
+			d.setRestDurationInMins(i, 0);
+			d.setNextBriefTime(i, null);
+			d.setAugmented(i, 0);
+			d.setEarly(i, false);
+			d.setHard(i, false);
+			d.setValid(i, true);
+		}
 	}
 
 	@Override
