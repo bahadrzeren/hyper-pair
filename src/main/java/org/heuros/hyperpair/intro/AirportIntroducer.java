@@ -165,8 +165,7 @@ public class AirportIntroducer implements Introducer<Airport> {
 //				break;
 //			}
 //		}
-		m.setHb(ArrayUtils.indexOf(HeurosSystemParam.homebases, m.getCode()) >= 0);
-		m.setNonHb(!m.isHb());
+		m.setHbNdx(ArrayUtils.indexOf(HeurosSystemParam.homebases, m.getCode()));
 
 		/*
 		 * Set flags that will indicate whether airport is domestic or international.

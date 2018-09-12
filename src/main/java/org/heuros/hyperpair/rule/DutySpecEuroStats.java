@@ -27,7 +27,7 @@ public class DutySpecEuroStats implements ConnectionChecker<LegView> {
 //	}
 
 	@Override
-	public boolean areConnectable(LegView pl, LegView nl) {
+	public boolean areConnectable(int hbNdx, LegView pl, LegView nl) {
 
 		int legConnTime = (int) ChronoUnit.MINUTES.between(pl.getSibt(), nl.getSobt());
 
@@ -35,7 +35,7 @@ public class DutySpecEuroStats implements ConnectionChecker<LegView> {
 		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
 		if (nl.getArrAirport().isSpecialEuroStation()
-        		&& nl.getDepAirport().isHb()
+        		&& nl.getDepAirport().isHb(hbNdx)
         		&& nl.isCover()
         		&& (pl.getDepAirport().isInternational()
         				|| (legConnTime < minLegConnTimeForSpecStats)))

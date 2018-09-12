@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
+import org.heuros.core.data.ndx.TwoDimIndexIntXInt;
 import org.heuros.core.data.ndx.TwoDimIndexIntXLocalDateTime;
 import org.heuros.core.ga.chromosome.Chromosome;
 import org.heuros.core.ga.decoder.Decoder;
@@ -39,8 +40,8 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	private PairRuleContext pairRuleContext = null;
 
 	private OneDimIndexInt<DutyView> dutyIndexByLegNdx = null;
-	private OneDimIndexInt<DutyView> hbDepDutyIndexByLegNdx = null;
-	private OneDimIndexInt<DutyView> hbDepHbArrDutyIndexByLegNdx = null;
+	private TwoDimIndexIntXInt<DutyView> hbDepDutyIndexByLegNdx = null;
+	private TwoDimIndexIntXInt<DutyView> hbDepHbArrDutyIndexByLegNdx = null;
 	private TwoDimIndexIntXLocalDateTime<DutyView> dutyIndexByDepAirportNdxBrieftime = null;
 	private TwoDimIndexIntXLocalDateTime<DutyView> hbArrDutyIndexByDepAirportNdxBrieftime = null;
 
@@ -102,12 +103,12 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return this;
 	}
 
-	public PairChromosomeDecoder setHbDepDutyIndexByLegNdx(OneDimIndexInt<DutyView> hbDepDutyIndexByLegNdx) {
+	public PairChromosomeDecoder setHbDepDutyIndexByLegNdx(TwoDimIndexIntXInt<DutyView> hbDepDutyIndexByLegNdx) {
 		this.hbDepDutyIndexByLegNdx = hbDepDutyIndexByLegNdx;
 		return this;
 	}
 
-	public PairChromosomeDecoder setHbDepHbArrDutyIndexByLegNdx(OneDimIndexInt<DutyView> hbDepHbArrDutyIndexByLegNdx) {
+	public PairChromosomeDecoder setHbDepHbArrDutyIndexByLegNdx(TwoDimIndexIntXInt<DutyView> hbDepHbArrDutyIndexByLegNdx) {
 		this.hbDepHbArrDutyIndexByLegNdx = hbDepHbArrDutyIndexByLegNdx;
 		return this;
 	}
@@ -134,7 +135,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return Integer.MAX_VALUE;
 	}
 
-	private DutyView fetchBestDhEffectiveDuty(Pair currentPair, DutyView bestSoFar, DutyView[] candidates, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
+	private DutyView fetchBestDhEffectiveDuty(int hbNdx, Pair currentPair, DutyView bestSoFar, DutyView[] candidates, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
 		DutyView best = bestSoFar;
 		int bestNumOfDh = Integer.MAX_VALUE;
 		int bestDhDurationInMins = Integer.MAX_VALUE;
@@ -154,12 +155,12 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 			if ((bestNumOfDh > dNumOfDh)
 					|| ((bestNumOfDh == dNumOfDh) && (bestDhDurationInMins > dDhDurationInMins))
 					|| ((bestNumOfDh == dNumOfDh) && (bestDhDurationInMins == dDhDurationInMins) && (bestAvgNumOfIncludingDutiesOfTheSameLegs > dAvgNumOfIncludingDutiesOfTheSameLegs))) {
-				if (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(currentPair, d))
-						|| pairRuleContext.getStarterCheckerProxy().canBeStarter(d)) {
+				if (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d))
+						|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d)) {
 
 					if (currentPair != null) {
 						pairRuleContext.getAggregatorProxy().append(currentPair, d);
-						if (pairRuleContext.getValidatorProxy().isValid(currentPair)) {
+						if (pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, currentPair)) {
 							best = d;
 							bestNumOfDh = dNumOfDh;
 							bestDhDurationInMins = dDhDurationInMins;
@@ -179,7 +180,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return best;
 	}
 
-	private DutyView fetchBestActiveBlockTimeEffectiveDuty(Pair currentPair, DutyView bestSoFar, DutyView[] candidates, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
+	private DutyView fetchBestActiveBlockTimeEffectiveDuty(int hbNdx, Pair currentPair, DutyView bestSoFar, DutyView[] candidates, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
 		DutyView best = bestSoFar;
 		int bestActiveBlocktimeInMins = 0;
 		double bestAvgNumOfIncludingDutiesOfTheSameLegs = Double.MAX_VALUE;
@@ -195,12 +196,12 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 			if ((bestActiveBlocktimeInMins < dActiveBlocktimeInMins)
 					|| ((bestActiveBlocktimeInMins == dActiveBlocktimeInMins) && (bestAvgNumOfIncludingDutiesOfTheSameLegs > dAvgNumOfIncludingDutiesOfTheSameLegs))) {
-				if (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(currentPair, d))
-						|| pairRuleContext.getStarterCheckerProxy().canBeStarter(d)) {
+				if (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d))
+						|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d)) {
 
 					if (currentPair != null) {
 						pairRuleContext.getAggregatorProxy().append(currentPair, d);
-						if (pairRuleContext.getValidatorProxy().isValid(currentPair)) {
+						if (pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, currentPair)) {
 							best = d;
 							bestActiveBlocktimeInMins = dActiveBlocktimeInMins;
 							bestAvgNumOfIncludingDutiesOfTheSameLegs = dAvgNumOfIncludingDutiesOfTheSameLegs;
@@ -218,7 +219,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return best;
 	}
 
-	private DutyView fetchBestLayoverEffectiveDuty(Pair currentPair, DutyView bestSoFar, DutyView[] candidates, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
+	private DutyView fetchBestLayoverEffectiveDuty(int hbNdx, Pair currentPair, DutyView bestSoFar, DutyView[] candidates, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
 		DutyView best = bestSoFar;
 		int bestNumOfDh = Integer.MAX_VALUE;
 		int bestDhDurationInMins = Integer.MAX_VALUE;
@@ -242,12 +243,12 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				/*
 				 * TODO HB impl will be changed!
 				 */
-				if (d.getLastArrAirport().isHb()
-						&& (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(currentPair, d))
-								|| pairRuleContext.getStarterCheckerProxy().canBeStarter(d))) {
+				if (d.getLastArrAirport().isHb(hbNdx)
+						&& (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d))
+								|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d))) {
 					if (currentPair != null) {
 						pairRuleContext.getAggregatorProxy().append(currentPair, d);
-						if (pairRuleContext.getValidatorProxy().isValid(currentPair)) {
+						if (pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, currentPair)) {
 							best = d;
 							bestNumOfDh = dNumOfDh;
 							bestDhDurationInMins = dDhDurationInMins;
@@ -267,7 +268,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return best;
 	}
 
-	private DutyView fetchConnectionDuty(Pair currentPair, DutyView previousDuty, int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
+	private DutyView fetchConnectionDuty(int hbNdx, Pair currentPair, DutyView previousDuty, int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
 
 		DutyView res = null;
 		DutyView[] nextDuties = null;
@@ -281,19 +282,19 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		 * TODO HB impl will be changed!
 		 */
 			if (heuristicNo == 2)
-				nextDuties = this.hbArrDutyIndexByDepAirportNdxBrieftime.getArray(lastAirportNdx, previousDuty.getNextBriefTimeHbToNonHb().plusHours(hourCounter));
+				nextDuties = this.hbArrDutyIndexByDepAirportNdxBrieftime.getArray(lastAirportNdx, previousDuty.getNextBriefTime(hbNdx).plusHours(hourCounter));
 			else
-				nextDuties = this.dutyIndexByDepAirportNdxBrieftime.getArray(lastAirportNdx, previousDuty.getNextBriefTimeHbToNonHb().plusHours(hourCounter));
+				nextDuties = this.dutyIndexByDepAirportNdxBrieftime.getArray(lastAirportNdx, previousDuty.getNextBriefTime(hbNdx).plusHours(hourCounter));
 			if ((nextDuties != null)
 					&& (nextDuties.length > 0)) {
 				if (heuristicNo == 0)
-					res = this.fetchBestDhEffectiveDuty(currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+					res = this.fetchBestDhEffectiveDuty(hbNdx, currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 				else
 					if (heuristicNo == 1)
-						res = this.fetchBestActiveBlockTimeEffectiveDuty(currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+						res = this.fetchBestActiveBlockTimeEffectiveDuty(hbNdx, currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 					else
 						if (heuristicNo == 2)
-							res = this.fetchBestLayoverEffectiveDuty(currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+							res = this.fetchBestLayoverEffectiveDuty(hbNdx, currentPair, res, nextDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			}
 			hourCounter++;
 			if (hourCounter > HeurosSystemParam.maxIdleTimeInAPairInHours)
@@ -305,20 +306,20 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	/*
 	 * TODO HB impl will be changed.
 	 */
-	private DutyView fetchHbDepDuty(Leg legToCover, int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
+	private DutyView fetchHbDepDuty(int hbNdx, Leg legToCover, int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
 		DutyView[] hbDepDuties = null;
 		if (heuristicNo == 2)
-			hbDepDuties = this.hbDepHbArrDutyIndexByLegNdx.getArray(legToCover.getNdx());
+			hbDepDuties = this.hbDepHbArrDutyIndexByLegNdx.getArray(hbNdx, legToCover.getNdx());
 		else
-			hbDepDuties = this.hbDepDutyIndexByLegNdx.getArray(legToCover.getNdx());
+			hbDepDuties = this.hbDepDutyIndexByLegNdx.getArray(hbNdx, legToCover.getNdx());
 		if (heuristicNo == 0)
-			return this.fetchBestDhEffectiveDuty(null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+			return this.fetchBestDhEffectiveDuty(hbNdx, null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 		else
 			if (heuristicNo == 1)
-				return this.fetchBestActiveBlockTimeEffectiveDuty(null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+				return this.fetchBestActiveBlockTimeEffectiveDuty(hbNdx, null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			else
 				if (heuristicNo == 2)
-					return this.fetchBestLayoverEffectiveDuty(null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+					return this.fetchBestLayoverEffectiveDuty(hbNdx, null, null, hbDepDuties, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 		return null;
 	}
 
@@ -346,20 +347,16 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 			int heuristicNo = chromosome.getGeneValue(geneNdx);
 			geneNdx++;
 
-//if (legToCover.getFlightNo() == 778)
-//System.out.println();
-
 			/*
 			 * TODO HB impl will be changed.
 			 */
-			DutyView duty = this.fetchHbDepDuty(legToCover, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-//System.out.println("*** HB DEPARTURE DUTY ***");
-//System.out.println(duty);
+			int hbNdx = 0;
+			DutyView duty = this.fetchHbDepDuty(hbNdx, legToCover, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			if (duty != null) {
 				Pair pair = this.pairFactory.generateModel();
 				while (true) {
 					if (duty != null) {
-						if (pairRuleContext.getAppendabilityCheckerProxy().isAppendable(pair, duty))
+						if (pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, pair, duty))
 							pairRuleContext.getAggregatorProxy().append(pair, duty);
 						else
 							PairChromosomeDecoder.logger.error("Non appendable pairing!");
@@ -378,17 +375,17 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 						/*
 						 * TODO HB impl will be changed!
 						 */
-						if (duty.getLastArrAirport().isHb()) {
-							if (pairRuleContext.getValidatorProxy().isValid(pair))
+						if (duty.getLastArrAirport().isHb(hbNdx)) {
+							if (pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, pair))
 								solution.add(pair);
 							else
 								PairChromosomeDecoder.logger.error("Non valid pairing!");
 							break;
 						} else {
-							if (pairRuleContext.getExtensibilityCheckerProxy().isExtensible(pair)) {
+							if (pairRuleContext.getExtensibilityCheckerProxy().isExtensible(hbNdx, pair)) {
 								heuristicNo = chromosome.getGeneValue(geneNdx);
 								geneNdx++;
-								duty = this.fetchConnectionDuty(pair, duty, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+								duty = this.fetchConnectionDuty(hbNdx, pair, duty, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 //System.out.println();
 //System.out.println(duty);
 							} else
@@ -442,11 +439,11 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 	private int hotelTransferCost = 40;
 
-	private int getHotelCostPerCrew(AirportView ap, int gmtDiff, DutyView d, LocalDateTime briefTime) {
+	private int getHotelCostPerCrew(AirportView ap, int gmtDiff, LocalDateTime debriefTime, LocalDateTime briefTime) {
 		if (briefTime == null)
 			return 0;
 
-		LocalDateTime hotelIn = d.getDebriefTime().plusMinutes(hotelTransportTime + gmtDiff);
+		LocalDateTime hotelIn = debriefTime.plusMinutes(hotelTransportTime + gmtDiff);
 		LocalDateTime hotelOut = briefTime.plusMinutes(- hotelTransportTime + gmtDiff);
 
 		LocalDateTime hotelIn00 = hotelIn.truncatedTo(ChronoUnit.DAYS);
@@ -483,16 +480,16 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	/*
 	 * TODO HB impl will be changed!
 	 */
-	public double getDutyCost(int cc, DutyView d, boolean hbDep, LocalDateTime nt) {
-		LocalDateTime sh = d.getBriefTimeNonHb();
-		LocalDateTime eh = d.getDebriefTime();
+	public double getDutyCost(int hbNdx, int cc, DutyView d, boolean hbDep, LocalDateTime nt) {
+		LocalDateTime sh = d.getBriefTime(hbNdx);
+		LocalDateTime eh = d.getDebriefTime(hbNdx);
 
 		if (nt == null)
-			eh = d.getDebriefDayEnding();
+			eh = d.getDebriefDayEnding(hbNdx);
 		else
 			eh = nt;
 		if (hbDep)
-			sh = d.getBriefDayBeginningHb();
+			sh = d.getBriefDayBeginning(hbNdx);
 
 		double dutyDurationInMins = ChronoUnit.MINUTES.between(sh, eh);
 		double dCost = 0.0;
@@ -503,16 +500,16 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		 * TODO HB impl will be changed!
 		 */
 		if (hbDep)
-			dCost += cc * d.getDutyDurationInMinsHb() * dutyHourPenalty / 60.0;
+			dCost += cc * d.getDutyDurationInMins(hbNdx) * dutyHourPenalty / 60.0;
 		else
-			dCost += cc * d.getDutyDurationInMinsNonHb() * dutyHourPenalty / 60.0;
+			dCost += cc * d.getDutyDurationInMins(hbNdx) * dutyHourPenalty / 60.0;
 
 		dCost += acChangePenalty * d.getNumOfAcChanges();
 
 		if (nt != null) {
-			double idleTime = ChronoUnit.MINUTES.between(d.getDebriefTime(), nt);
+			double idleTime = ChronoUnit.MINUTES.between(d.getDebriefTime(hbNdx), nt);
 
-			dCost += cc * getHotelCostPerCrew(d.getLastArrAirport(), d.getLastLeg().getArrOffset(), d, nt);
+			dCost += cc * getHotelCostPerCrew(d.getLastArrAirport(), d.getLastLeg().getArrOffset(), d.getDebriefTime(hbNdx), nt);
 
 			dCost += 2.0 * hotelTransferCost;
 
@@ -533,13 +530,13 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		dCost += d.getLongConnDiff() * longConnPenalty / 60.0;
 
 		if (hbDep) {
-			if (d.getAugmentedHb() > 0) {
-				dCost += d.getDutyDurationInMinsHb() * augmentionHourPenalty / 60.0;
+			if (d.getAugmented(hbNdx) > 0) {
+				dCost += d.getDutyDurationInMins(hbNdx) * augmentionHourPenalty / 60.0;
 				dCost += augmentionDayPenalty;
 			}
 		} else {
-			if (d.getAugmentedNonHb() > 0) {
-				dCost += d.getDutyDurationInMinsNonHb() * augmentionHourPenalty / 60.0;
+			if (d.getAugmented(hbNdx) > 0) {
+				dCost += d.getDutyDurationInMins(hbNdx) * augmentionHourPenalty / 60.0;
 				dCost += augmentionDayPenalty;
 			}
 		}
@@ -555,18 +552,19 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	}
 
 	public double getPairCost(int cc, Pair p) {
+		int hbNdx = p.getHbNdx();
 		DutyView pd = p.getFirstDuty();
 		if (p.getNumOfDuties() == 1)
-			return getDutyCost(cc, pd, true, null);
+			return getDutyCost(hbNdx, cc, pd, true, null);
 		else {
 			DutyView nd = null;
 			double pCost = 0.0;
 			for (int i = 1; i < p.getNumOfDuties(); i++) {
 				nd = p.getDuties().get(i);
-				pCost += getDutyCost(cc, pd, i == 1, nd.getBriefTimeNonHb());
+				pCost += getDutyCost(hbNdx, cc, pd, i == 1, nd.getBriefTime(hbNdx));
 				pd = nd;
 			}
-			pCost += getDutyCost(cc, nd, false, null);
+			pCost += getDutyCost(hbNdx, cc, nd, false, null);
 			return pCost;
 		}
 	}

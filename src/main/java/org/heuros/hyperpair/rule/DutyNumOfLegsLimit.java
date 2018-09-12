@@ -83,7 +83,7 @@ public class DutyNumOfLegsLimit implements ExtensibilityChecker<DutyView>,
 
 
 	@Override
-	public boolean isExtensible(DutyView d) {
+	public boolean isExtensible(int hbNdx, DutyView d) {
 		if (d.getNumOfLegs() >= maxNumOfActiveLegsInDuty + maxNumOfPassiveLegsInDuty)
     		return false;
     	if ((d.getNumOfLegsPassive() > 0)
@@ -93,7 +93,7 @@ public class DutyNumOfLegsLimit implements ExtensibilityChecker<DutyView>,
 	}
 
 	@Override
-	public boolean isValid(DutyView d) {
+	public boolean isValid(int hbNdx, DutyView d) {
 
 		if (d.getNumOfLegsPassive() > maxNumOfPassiveLegsInDuty)
     		return false;
@@ -115,13 +115,13 @@ public class DutyNumOfLegsLimit implements ExtensibilityChecker<DutyView>,
 		 * 
 		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
-		if (d.getBriefDayNonHb().isBefore( d.getLastLeg().getSibt().minusSeconds(1).truncatedTo(ChronoUnit.DAYS).toLocalDate() )) {
+		if (d.getBriefDay(hbNdx).isBefore( d.getLastLeg().getSibt().minusSeconds(1).truncatedTo(ChronoUnit.DAYS).toLocalDate() )) {
 			if (d.getNumOfLegs() > maxNumOfActiveLegsInOvernightDuty2) {
-				if ((d.getAugmentedNonHb() > 0)
+				if ((d.getAugmented(hbNdx) > 0)
 					|| (d.getNumOfLegsActive() > maxNumOfActiveLegsInOvernightDuty2)
 					|| ((d.getNumOfLegsActive() ==  maxNumOfActiveLegsInOvernightDuty2)
 							&& (d.getLastLeg().isCover()
-								|| d.getLastArrAirport().isNonHb())))
+								|| d.getLastArrAirport().isNonHb(hbNdx))))
 				return false;
 			}
 		}

@@ -117,7 +117,7 @@ public class PairDutyLegAggregatorTest extends TestCase {
     	 */
 
     	LegFactory legFactory = new LegFactory();
-    	LegRuleContext legRuleContext = new LegRuleContext();
+    	LegRuleContext legRuleContext = new LegRuleContext(HeurosSystemParam.homebases.length);
 
     	Rule legIntroducer = new LegIntroducer();
 
@@ -184,8 +184,8 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		/*
 		 * Generate Duty context.
 		 */
-		DutyFactory dutyFactory = new DutyFactory();
-		DutyRuleContext dutyRuleContext = new DutyRuleContext();
+		DutyFactory dutyFactory = new DutyFactory(HeurosSystemParam.homebases.length);
+		DutyRuleContext dutyRuleContext = new DutyRuleContext(HeurosSystemParam.homebases.length);
 		DutyLegAggregator dutyLegAggregator = new DutyLegAggregator();
 
 		try {
@@ -217,28 +217,29 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		assertTrue(d.getNumOfIntTouch() == 0);
 		assertTrue(d.getNumOfAcChanges() == 0);
 		assertTrue(d.getLongConnDiff() == 0);
+		int hbNdx = 0;
+		int nonHbNdx = 5;
+		assertTrue(d.getBriefDurationInMins(hbNdx) == 60);	//	90
+		assertTrue(d.getBriefDurationInMins(nonHbNdx) == 60);
+		assertTrue(d.getDebriefDurationInMins(hbNdx) == 30);
 
-		assertTrue(d.getBriefDurationInMinsHb() == 60);	//	90
-		assertTrue(d.getBriefDurationInMinsNonHb() == 60);
-		assertTrue(d.getDebriefDurationInMins() == 30);
+		assertTrue(d.getBriefTime(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
+		assertTrue(d.getBriefTime(nonHbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
+		assertTrue(d.getDebriefTime(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 19, 30)));
 
-		assertTrue(d.getBriefTimeHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
-		assertTrue(d.getBriefTimeNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
-		assertTrue(d.getDebriefTime().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 19, 30)));
+		assertTrue(d.getBriefDayBeginning(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
+		assertTrue(d.getBriefDayBeginning(nonHbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
+		assertTrue(d.getDebriefDayEnding(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 23, 59, 59)));
 
-		assertTrue(d.getBriefDayBeginningHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
-		assertTrue(d.getBriefDayBeginningNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
-		assertTrue(d.getDebriefDayEnding().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 23, 59, 59)));
+		assertTrue(d.getBriefDay(hbNdx).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+		assertTrue(d.getBriefDay(nonHbNdx).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+		assertTrue(d.getDebriefDay(hbNdx).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
 
-		assertTrue(d.getBriefDayHb().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
-		assertTrue(d.getBriefDayNonHb().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
-		assertTrue(d.getDebriefDay().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+		assertTrue(d.getDutyDurationInMins(hbNdx) == 630);
+		assertTrue(d.getDutyDurationInMins(nonHbNdx) == 630);
 
-		assertTrue(d.getDutyDurationInMinsHb() == 630);
-		assertTrue(d.getDutyDurationInMinsNonHb() == 630);
-
-		assertTrue(d.getNumOfDaysTouchedHb() == 1);
-		assertTrue(d.getNumOfDaysTouchedNonHb() == 1);
+		assertTrue(d.getNumOfDaysTouched(hbNdx) == 1);
+		assertTrue(d.getNumOfDaysTouched(nonHbNdx) == 1);
 
 		assertFalse(d.isEr());
 
@@ -247,24 +248,20 @@ public class PairDutyLegAggregatorTest extends TestCase {
 //		System.out.println(d.getRestDurationInMinsNonHbToHb());
 //		System.out.println(d.getRestDurationInMinsNonHbToNonHb());
 
-		assertTrue(d.getRestDurationInMinsHbToHb() == 840);
-		assertTrue(d.getRestDurationInMinsHbToNonHb() == 840);
-		assertTrue(d.getRestDurationInMinsNonHbToHb() == 840);
-		assertTrue(d.getRestDurationInMinsNonHbToNonHb() == 840);
+		assertTrue(d.getRestDurationInMins(hbNdx) == 840);
+		assertTrue(d.getRestDurationInMins(nonHbNdx) == 840);
 
-		assertTrue(d.getNextBriefTimeHbToHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 19, 30).plusMinutes(840)));
-		assertTrue(d.getNextBriefTimeHbToNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 19, 30).plusMinutes(840)));
-		assertTrue(d.getNextBriefTimeNonHbToHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 19, 30).plusMinutes(840)));
-		assertTrue(d.getNextBriefTimeNonHbToNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 19, 30).plusMinutes(840)));
+		assertTrue(d.getNextBriefTime(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 19, 30).plusMinutes(840)));
+		assertTrue(d.getNextBriefTime(nonHbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 19, 30).plusMinutes(840)));
 
-		assertTrue(d.getAugmentedHb() == 0);
-		assertTrue(d.getAugmentedNonHb() == 0);
+		assertTrue(d.getAugmented(hbNdx) == 0);
+		assertTrue(d.getAugmented(nonHbNdx) == 0);
 
-		assertFalse(d.isEarlyHb());
-		assertFalse(d.isEarlyNonHb());
+		assertFalse(d.isEarly(hbNdx));
+		assertFalse(d.isEarly(nonHbNdx));
 
-		assertFalse(d.isHardHb());
-		assertFalse(d.isHardNonHb());
+		assertFalse(d.isHard(hbNdx));
+		assertFalse(d.isHard(nonHbNdx));
 
 		/*
     	 * Remove last leg from duty.
@@ -287,27 +284,27 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		assertTrue(d.getNumOfAcChanges() == 0);
 		assertTrue(d.getLongConnDiff() == 0);
 
-		assertTrue(d.getBriefDurationInMinsHb() == 60);
-		assertTrue(d.getBriefDurationInMinsNonHb() == 60);
-		assertTrue(d.getDebriefDurationInMins() == 30);
+		assertTrue(d.getBriefDurationInMins(hbNdx) == 60);
+		assertTrue(d.getBriefDurationInMins(nonHbNdx) == 60);
+		assertTrue(d.getDebriefDurationInMins(hbNdx) == 30);
 
-		assertTrue(d.getBriefTimeHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
-		assertTrue(d.getBriefTimeNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
-		assertTrue(d.getDebriefTime().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 15, 30)));
+		assertTrue(d.getBriefTime(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
+		assertTrue(d.getBriefTime(nonHbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
+		assertTrue(d.getDebriefTime(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 15, 30)));
 
-		assertTrue(d.getBriefDayBeginningHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
-		assertTrue(d.getBriefDayBeginningNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
-		assertTrue(d.getDebriefDayEnding().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 23, 59, 59)));
+		assertTrue(d.getBriefDayBeginning(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
+		assertTrue(d.getBriefDayBeginning(nonHbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
+		assertTrue(d.getDebriefDayEnding(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 23, 59, 59)));
 
-		assertTrue(d.getBriefDayHb().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
-		assertTrue(d.getBriefDayNonHb().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
-		assertTrue(d.getDebriefDay().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+		assertTrue(d.getBriefDay(hbNdx).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+		assertTrue(d.getBriefDay(nonHbNdx).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+		assertTrue(d.getDebriefDay(hbNdx).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
 
-		assertTrue(d.getDutyDurationInMinsHb() == 390);
-		assertTrue(d.getDutyDurationInMinsNonHb() == 390);
+		assertTrue(d.getDutyDurationInMins(hbNdx) == 390);
+		assertTrue(d.getDutyDurationInMins(nonHbNdx) == 390);
 
-		assertTrue(d.getNumOfDaysTouchedHb() == 1);
-		assertTrue(d.getNumOfDaysTouchedNonHb() == 1);
+		assertTrue(d.getNumOfDaysTouched(hbNdx) == 1);
+		assertTrue(d.getNumOfDaysTouched(nonHbNdx) == 1);
 
 		assertFalse(d.isEr());
 
@@ -316,24 +313,20 @@ public class PairDutyLegAggregatorTest extends TestCase {
 //		System.out.println(d.getRestDurationInMinsNonHbToHb());
 //		System.out.println(d.getRestDurationInMinsNonHbToNonHb());
 
-		assertTrue(d.getRestDurationInMinsHbToHb() == 780);
-		assertTrue(d.getRestDurationInMinsHbToNonHb() == 660);
-		assertTrue(d.getRestDurationInMinsNonHbToHb() == 780);
-		assertTrue(d.getRestDurationInMinsNonHbToNonHb() == 660);
+		assertTrue(d.getRestDurationInMins(hbNdx) == 780);
+		assertTrue(d.getRestDurationInMins(nonHbNdx) == 660);
 
-		assertTrue(d.getNextBriefTimeHbToHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 15, 30).plusMinutes(780)));
-		assertTrue(d.getNextBriefTimeHbToNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 15, 30).plusMinutes(660)));
-		assertTrue(d.getNextBriefTimeNonHbToHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 15, 30).plusMinutes(780)));
-		assertTrue(d.getNextBriefTimeNonHbToNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 15, 30).plusMinutes(660)));
+		assertTrue(d.getNextBriefTime(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 15, 30).plusMinutes(780)));
+		assertTrue(d.getNextBriefTime(nonHbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 15, 30).plusMinutes(660)));
 
-		assertTrue(d.getAugmentedHb() == 0);
-		assertTrue(d.getAugmentedNonHb() == 0);
+		assertTrue(d.getAugmented(hbNdx) == 0);
+		assertTrue(d.getAugmented(nonHbNdx) == 0);
 
-		assertFalse(d.isEarlyHb());
-		assertFalse(d.isEarlyNonHb());
+		assertFalse(d.isEarly(hbNdx));
+		assertFalse(d.isEarly(nonHbNdx));
 
-		assertFalse(d.isHardHb());
-		assertFalse(d.isHardNonHb());
+		assertFalse(d.isHard(hbNdx));
+		assertFalse(d.isHard(nonHbNdx));
 
 		/*
     	 * Remove all legs from duty.
@@ -360,26 +353,26 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		/*
 		 * After reset call in removeLastLeg() method, for empty duties this part is commented out.
 		 */
-//		assertTrue(d.getBriefDurationInMinsHb() == 90);
+//		assertTrue(d.getBriefDurationInMins(hbNdx) == 90);
 //		assertTrue(d.getBriefDurationInMinsNonHb() == 60);
-//		assertTrue(d.getDebriefDurationInMins() == 30);
+//		assertTrue(d.getDebriefDurationInMins(hbNdx) == 30);
 //
-//		assertTrue(d.getBriefTimeHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 8, 30)));
+//		assertTrue(d.getBriefTime(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 8, 30)));
 //		assertTrue(d.getBriefTimeNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0)));
-//		assertTrue(d.getDebriefTime().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 12, 0)));
+//		assertTrue(d.getDebriefTime(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 12, 0)));
 //
-//		assertTrue(d.getBriefDayBeginningHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
+//		assertTrue(d.getBriefDayBeginning(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
 //		assertTrue(d.getBriefDayBeginningNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
-//		assertTrue(d.getDebriefDayEnding().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 23, 59, 59)));
+//		assertTrue(d.getDebriefDayEnding(hbNdx).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 23, 59, 59)));
 //
-//		assertTrue(d.getBriefDayHb().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+//		assertTrue(d.getBriefDay(hbNdx).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
 //		assertTrue(d.getBriefDayNonHb().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
-//		assertTrue(d.getDebriefDay().isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+//		assertTrue(d.getDebriefDay(hbNdx).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
 //
-//		assertTrue(d.getDutyDurationInMinsHb() == 210);
+//		assertTrue(d.getDutyDurationInMins(hbNdx) == 210);
 //		assertTrue(d.getDutyDurationInMinsNonHb() == 180);
 //
-//		assertTrue(d.getNumOfDaysTouchedHb() == 1);
+//		assertTrue(d.getNumOfDaysTouched(hbNdx) == 1);
 //		assertTrue(d.getNumOfDaysTouchedNonHb() == 1);
 //
 //		assertFalse(d.isEr());
@@ -399,47 +392,43 @@ public class PairDutyLegAggregatorTest extends TestCase {
 //		assertTrue(d.getNextBriefTimeNonHbToHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 12, 0).plusMinutes(780)));
 //		assertTrue(d.getNextBriefTimeNonHbToNonHb().isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 12, 0).plusMinutes(660)));
 
-		assertTrue(d.getBriefDurationInMinsHb() == 0);
-		assertTrue(d.getBriefDurationInMinsNonHb() == 0);
-		assertTrue(d.getDebriefDurationInMins() == 0);
+		assertTrue(d.getBriefDurationInMins(hbNdx) == 0);
+		assertTrue(d.getBriefDurationInMins(nonHbNdx) == 0);
+		assertTrue(d.getDebriefDurationInMins(hbNdx) == 0);
 
-		assertTrue(d.getBriefTimeHb() == null);
-		assertTrue(d.getBriefTimeNonHb() == null);
-		assertTrue(d.getDebriefTime() == null);
+		assertTrue(d.getBriefTime(hbNdx) == null);
+		assertTrue(d.getBriefTime(nonHbNdx) == null);
+		assertTrue(d.getDebriefTime(hbNdx) == null);
 
-		assertTrue(d.getBriefDayBeginningHb() == null);
-		assertTrue(d.getBriefDayBeginningNonHb() == null);
-		assertTrue(d.getDebriefDayEnding() == null);
+		assertTrue(d.getBriefDayBeginning(hbNdx) == null);
+		assertTrue(d.getBriefDayBeginning(nonHbNdx) == null);
+		assertTrue(d.getDebriefDayEnding(hbNdx) == null);
 
-		assertTrue(d.getBriefDayHb() == null);
-		assertTrue(d.getBriefDayNonHb() == null);
-		assertTrue(d.getDebriefDay() == null);
+		assertTrue(d.getBriefDay(hbNdx) == null);
+		assertTrue(d.getBriefDay(nonHbNdx) == null);
+		assertTrue(d.getDebriefDay(hbNdx) == null);
 
-		assertTrue(d.getDutyDurationInMinsHb() == 0);
-		assertTrue(d.getDutyDurationInMinsNonHb() == 0);
+		assertTrue(d.getDutyDurationInMins(hbNdx) == 0);
+		assertTrue(d.getDutyDurationInMins(nonHbNdx) == 0);
 
-		assertTrue(d.getNumOfDaysTouchedHb() == 0);
-		assertTrue(d.getNumOfDaysTouchedNonHb() == 0);
+		assertTrue(d.getNumOfDaysTouched(hbNdx) == 0);
+		assertTrue(d.getNumOfDaysTouched(nonHbNdx) == 0);
 
 		assertFalse(d.isEr());
 
-		assertTrue(d.getRestDurationInMinsHbToHb() == 0);
-		assertTrue(d.getRestDurationInMinsHbToNonHb() == 0);
-		assertTrue(d.getRestDurationInMinsNonHbToHb() == 0);
-		assertTrue(d.getRestDurationInMinsNonHbToNonHb() == 0);
+		assertTrue(d.getRestDurationInMins(hbNdx) == 0);
+		assertTrue(d.getRestDurationInMins(nonHbNdx) == 0);
 
-		assertTrue(d.getNextBriefTimeHbToHb() == null);
-		assertTrue(d.getNextBriefTimeHbToNonHb() == null);
-		assertTrue(d.getNextBriefTimeNonHbToHb() == null);
-		assertTrue(d.getNextBriefTimeNonHbToNonHb() == null);
-		assertTrue(d.getAugmentedHb() == 0);
-		assertTrue(d.getAugmentedNonHb() == 0);
+		assertTrue(d.getNextBriefTime(hbNdx) == null);
+		assertTrue(d.getNextBriefTime(nonHbNdx) == null);
+		assertTrue(d.getAugmented(hbNdx) == 0);
+		assertTrue(d.getAugmented(nonHbNdx) == 0);
 
-		assertFalse(d.isEarlyHb());
-		assertFalse(d.isEarlyNonHb());
+		assertFalse(d.isEarly(hbNdx));
+		assertFalse(d.isEarly(nonHbNdx));
 
-		assertFalse(d.isHardHb());
-		assertFalse(d.isHardNonHb());
+		assertFalse(d.isHard(hbNdx));
+		assertFalse(d.isHard(nonHbNdx));
 
 		/*
 		 * Regenerate first duty again.
@@ -460,8 +449,8 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		/*
 		 * Generate pair for test.
 		 */
-		PairFactory pairFactory = new PairFactory();
-		PairRuleContext pairRuleContext = new PairRuleContext();
+		PairFactory pairFactory = new PairFactory(HeurosSystemParam.homebases.length);
+		PairRuleContext pairRuleContext = new PairRuleContext(HeurosSystemParam.homebases.length);
 		PairDutyAggregator pairDutyAggregator = new PairDutyAggregator();
 
 		try {
@@ -475,8 +464,8 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		pairRuleContext.getAggregatorImpl().append(p, d);
 		pairRuleContext.getAggregatorImpl().append(p, d2);
 
-		assertTrue(p.getHomeBase() == d.getFirstDepAirport());
-		assertTrue(p.getHomeBase() == d2.getLastArrAirport());
+		assertTrue(p.getHbNdx() == d.getFirstDepAirport().getHbNdx());
+		assertTrue(p.getHbNdx() == d2.getLastArrAirport().getHbNdx());
 		assertTrue(p.getFirstDuty() == d);
 		assertTrue(p.getLastDuty() == d2);
 		assertTrue(p.getFirstLeg() == legAct11HbToDom);
@@ -491,16 +480,16 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		assertTrue(p.getNumOfLegsPassive() == 0);
 		assertTrue(p.getNumOfLegsIntToDom() == 1);
 		assertTrue(p.getNumOfLegsDomToInt() == 1);
-		assertTrue(p.getBriefDurationInMins() == 120);
-		assertTrue(p.getDutyDurationInMins() == 1040);
-		assertTrue(p.getDebriefDurationInMins() == 60);
-		assertTrue(p.getRestDurationInMins() == d.getRestDurationInMinsHbToNonHb() + d2.getRestDurationInMinsNonHbToHb());
-		assertTrue(p.getNumOfDaysTouched() == 3);
+		assertTrue(p.getBriefDurationInMins(hbNdx) == 120);
+		assertTrue(p.getDutyDurationInMins(hbNdx) == 1040);
+		assertTrue(p.getDebriefDurationInMins(hbNdx) == 60);
+		assertTrue(p.getRestDurationInMins(hbNdx) == d.getRestDurationInMins(hbNdx) + d2.getRestDurationInMins(hbNdx));
+		assertTrue(p.getNumOfDaysTouched(hbNdx) == 3);
 		assertTrue(p.getNumOfDuties() == 2);
 		assertTrue(p.getNumOfInternationalDuties() == 1);
-		assertTrue(p.getNumOfEarlyDuties() == 0);
-		assertTrue(p.getNumOfHardDuties() == 1);
-		assertTrue(p.getNumOfAugmentedDuties() == 0);
+		assertTrue(p.getNumOfEarlyDuties(hbNdx) == 0);
+		assertTrue(p.getNumOfHardDuties(hbNdx) == 1);
+		assertTrue(p.getNumOfAugmentedDuties(hbNdx) == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
 		/*
@@ -508,7 +497,7 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		 */
 		pairRuleContext.getAggregatorImpl().removeLast(p);
 
-		assertTrue(p.getHomeBase() == d.getFirstDepAirport());
+		assertTrue(p.getHbNdx() == d.getFirstDepAirport().getHbNdx());
 		assertTrue(p.getFirstDuty() == d);
 		assertTrue(p.getLastDuty() == d);
 		assertTrue(p.getFirstLeg() == legAct11HbToDom);
@@ -523,16 +512,16 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		assertTrue(p.getNumOfLegsPassive() == 0);
 		assertTrue(p.getNumOfLegsIntToDom() == 0);
 		assertTrue(p.getNumOfLegsDomToInt() == 1);
-		assertTrue(p.getBriefDurationInMins() == 60);
-		assertTrue(p.getDutyDurationInMins() == 630);
-		assertTrue(p.getDebriefDurationInMins() == 30);
-		assertTrue(p.getRestDurationInMins() == d.getRestDurationInMinsHbToNonHb());
-		assertTrue(p.getNumOfDaysTouched() == 1);
+		assertTrue(p.getBriefDurationInMins(hbNdx) == 60);
+		assertTrue(p.getDutyDurationInMins(hbNdx) == 630);
+		assertTrue(p.getDebriefDurationInMins(hbNdx) == 30);
+		assertTrue(p.getRestDurationInMins(hbNdx) == d.getRestDurationInMins(hbNdx));
+		assertTrue(p.getNumOfDaysTouched(hbNdx) == 1);
 		assertTrue(p.getNumOfDuties() == 1);
 		assertTrue(p.getNumOfInternationalDuties() == 1);
-		assertTrue(p.getNumOfEarlyDuties() == 0);
-		assertTrue(p.getNumOfHardDuties() == 0);
-		assertTrue(p.getNumOfAugmentedDuties() == 0);
+		assertTrue(p.getNumOfEarlyDuties(hbNdx) == 0);
+		assertTrue(p.getNumOfHardDuties(hbNdx) == 0);
+		assertTrue(p.getNumOfAugmentedDuties(hbNdx) == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
 		/*
@@ -540,7 +529,7 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		 */
 		pairRuleContext.getAggregatorImpl().removeLast(p);
 
-		assertTrue(p.getHomeBase() == null);
+		assertTrue(p.getHbNdx() == -1);
 		assertTrue(p.getFirstDuty() == null);
 		assertTrue(p.getLastDuty() == null);
 		assertTrue(p.getFirstLeg() == null);
@@ -555,16 +544,16 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		assertTrue(p.getNumOfLegsPassive() == 0);
 		assertTrue(p.getNumOfLegsIntToDom() == 0);
 		assertTrue(p.getNumOfLegsDomToInt() == 0);
-		assertTrue(p.getBriefDurationInMins() == 0);
-		assertTrue(p.getDutyDurationInMins() == 0);
-		assertTrue(p.getDebriefDurationInMins() == 0);
-		assertTrue(p.getRestDurationInMins() == 0);
-		assertTrue(p.getNumOfDaysTouched() == 0);
+		assertTrue(p.getBriefDurationInMins(hbNdx) == 0);
+		assertTrue(p.getDutyDurationInMins(hbNdx) == 0);
+		assertTrue(p.getDebriefDurationInMins(hbNdx) == 0);
+		assertTrue(p.getRestDurationInMins(hbNdx) == 0);
+		assertTrue(p.getNumOfDaysTouched(hbNdx) == 0);
 		assertTrue(p.getNumOfDuties() == 0);
 		assertTrue(p.getNumOfInternationalDuties() == 0);
-		assertTrue(p.getNumOfEarlyDuties() == 0);
-		assertTrue(p.getNumOfHardDuties() == 0);
-		assertTrue(p.getNumOfAugmentedDuties() == 0);
+		assertTrue(p.getNumOfEarlyDuties(hbNdx) == 0);
+		assertTrue(p.getNumOfHardDuties(hbNdx) == 0);
+		assertTrue(p.getNumOfAugmentedDuties(hbNdx) == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
 		/*
@@ -582,11 +571,11 @@ public class PairDutyLegAggregatorTest extends TestCase {
     	}
 
 		int maxPairingLengthInDays = HeurosSystemParam.maxPairingLengthInDays;
-		assertTrue(pairRuleContext.getValidatorProxy().isValid(p));
+		assertTrue(pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, p));
 		HeurosSystemParam.maxPairingLengthInDays = 3;
-		assertTrue(pairRuleContext.getValidatorProxy().isValid(p));
+		assertTrue(pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, p));
 		HeurosSystemParam.maxPairingLengthInDays = 2;
-		assertFalse(pairRuleContext.getValidatorProxy().isValid(p));
+		assertFalse(pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, p));
 		HeurosSystemParam.maxPairingLengthInDays = maxPairingLengthInDays;
 
 		pairRuleContext.removeRule(pairPeriodLengthRule);
@@ -605,10 +594,10 @@ public class PairDutyLegAggregatorTest extends TestCase {
     	}
 
 		pairRuleContext.getAggregatorImpl().removeLast(p);
-		assertTrue(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(p, d2));
+		assertTrue(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, p, d2));
 		pairRuleContext.getAggregatorImpl().append(p, d2);
-		assertTrue(pairRuleContext.getValidatorProxy().isValid(p));
-		assertTrue(dutyRuleContext.getConnectionCheckerProxy().areConnectable(d, d2));
+		assertTrue(pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, p));
+		assertTrue(dutyRuleContext.getConnectionCheckerProxy().areConnectable(hbNdx, d, d2));
 
 		legAct12DomToDom.setCover(false);
 		legAct13DomToInt.setCover(false);
@@ -622,10 +611,10 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		dutyRuleContext.getAggregatorImpl().reCalculate(d2);
 		pairRuleContext.getAggregatorImpl().reCalculate(p);
 
-		assertFalse(pairRuleContext.getValidatorProxy().isValid(p));
-		assertFalse(dutyRuleContext.getConnectionCheckerProxy().areConnectable(d, d2));
+		assertFalse(pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, p));
+		assertFalse(dutyRuleContext.getConnectionCheckerProxy().areConnectable(hbNdx, d, d2));
 		pairRuleContext.getAggregatorImpl().removeLast(p);
-		assertFalse(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(p, d2));
+		assertFalse(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, p, d2));
 
 		dutyRuleContext.removeRule(pairNumOfPassiveLegsLimit);
 		pairRuleContext.removeRule(pairNumOfPassiveLegsLimit);
@@ -646,8 +635,8 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		/*
 		 * Pair is reset. Old values must be valid again!
 		 */
-		assertTrue(p.getHomeBase() == d.getFirstDepAirport());
-		assertTrue(p.getHomeBase() == d2.getLastArrAirport());
+		assertTrue(p.getHbNdx() == d.getFirstDepAirport().getHbNdx());
+		assertTrue(p.getHbNdx() == d2.getLastArrAirport().getHbNdx());
 		assertTrue(p.getFirstDuty() == d);
 		assertTrue(p.getLastDuty() == d2);
 		assertTrue(p.getFirstLeg() == legAct11HbToDom);
@@ -662,16 +651,16 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		assertTrue(p.getNumOfLegsPassive() == 0);
 		assertTrue(p.getNumOfLegsIntToDom() == 1);
 		assertTrue(p.getNumOfLegsDomToInt() == 1);
-		assertTrue(p.getBriefDurationInMins() == 120);
-		assertTrue(p.getDutyDurationInMins() == 1040);
-		assertTrue(p.getDebriefDurationInMins() == 60);
-		assertTrue(p.getRestDurationInMins() == d.getRestDurationInMinsHbToNonHb() + d2.getRestDurationInMinsNonHbToHb());
-		assertTrue(p.getNumOfDaysTouched() == 3);
+		assertTrue(p.getBriefDurationInMins(hbNdx) == 120);
+		assertTrue(p.getDutyDurationInMins(hbNdx) == 1040);
+		assertTrue(p.getDebriefDurationInMins(hbNdx) == 60);
+		assertTrue(p.getRestDurationInMins(hbNdx) == d.getRestDurationInMins(hbNdx) + d2.getRestDurationInMins(hbNdx));
+		assertTrue(p.getNumOfDaysTouched(hbNdx) == 3);
 		assertTrue(p.getNumOfDuties() == 2);
 		assertTrue(p.getNumOfInternationalDuties() == 1);
-		assertTrue(p.getNumOfEarlyDuties() == 0);
-		assertTrue(p.getNumOfHardDuties() == 1);
-		assertTrue(p.getNumOfAugmentedDuties() == 0);
+		assertTrue(p.getNumOfEarlyDuties(hbNdx) == 0);
+		assertTrue(p.getNumOfHardDuties(hbNdx) == 1);
+		assertTrue(p.getNumOfAugmentedDuties(hbNdx) == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
 

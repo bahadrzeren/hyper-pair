@@ -25,13 +25,13 @@ public class PairGrouping implements ConnectionChecker<DutyView> {
 //	}
 
 	@Override
-	public boolean areConnectable(DutyView pd, DutyView nd) {
+	public boolean areConnectable(int hbNdx, DutyView pd, DutyView nd) {
 		/*
 		 * GroupId kontrol
 		 * 
 		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
-		if (pd.getLastArrAirport().isNonHb() && nd.getLastArrAirport().isNonHb()
+		if (pd.getLastArrAirport().isNonHb(hbNdx) && nd.getLastArrAirport().isNonHb(hbNdx)
 				&& (pd.getLastArrAirport().getGroupId() > 0)
 				&& (nd.getLastArrAirport().getGroupId() > 0)
 				&& (pd.getLastArrAirport().getGroupId() != nd.getLastArrAirport().getGroupId()))

@@ -22,7 +22,7 @@ public class DutyACChange implements ConnectionChecker<LegView> {
 //	}
 
 	@Override
-	public boolean areConnectable(LegView pl, LegView nl) {
+	public boolean areConnectable(int hbNdx, LegView pl, LegView nl) {
     	if (pl.isCover() && nl.isCover() //	Both flights must be active.
     			&& nl.getDepAirport().isInternational()
         		&& (!nl.getDepAirport().isAcChangeAllowed())

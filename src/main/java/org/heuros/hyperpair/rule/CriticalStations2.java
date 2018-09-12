@@ -48,7 +48,7 @@ public class CriticalStations2 implements AppendabilityChecker<DutyView, LegView
 //	}
 
 	@Override
-	public boolean areConnectable(DutyView pd, DutyView nd) {
+	public boolean areConnectable(int hbNdx, DutyView pd, DutyView nd) {
 		/*
 		 * CATC duty can have be layover.
 		 */
@@ -59,28 +59,28 @@ public class CriticalStations2 implements AppendabilityChecker<DutyView, LegView
 	}
 
 	@Override
-	public boolean isValid(DutyView d) {
+	public boolean isValid(int hbNdx, DutyView d) {
 		/*
 		 * If CATC layover is not allowed.
 		 */
 		/*
 		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
-		if (d.getLastArrAirport().isNonHb()
+		if (d.getLastArrAirport().isNonHb(hbNdx)
 				&& (d.getNumOfCriticalLegs() > 0))
 			return false;
 		return true;
 	}
 
 	@Override
-	public boolean isAppendable(DutyView d, LegView l) {
+	public boolean isAppendable(int hbNdx, DutyView d, LegView l) {
 	    /*
 	     * If CATC layover is not allowed.
 	     */
 		/*
 		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
-	   	if (d.getFirstDepAirport().isNonHb()
+	   	if (d.getFirstDepAirport().isNonHb(hbNdx)
 	   			&& l.getArrAirport().isCritical())
 	   		return false;
 	   	return true;

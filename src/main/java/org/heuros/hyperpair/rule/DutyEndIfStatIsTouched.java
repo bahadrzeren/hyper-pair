@@ -17,7 +17,7 @@ public class DutyEndIfStatIsTouched implements ExtensibilityChecker<DutyView> {
 //	}
 
 	@Override
-	public boolean isExtensible(DutyView d) {
+	public boolean isExtensible(int hbNdx, DutyView d) {
     	if (d.getLastArrAirport().isEndDutyIfTouches())
     		return false;
 		return true;

@@ -56,16 +56,17 @@ public class AirportIntroducerTest extends TestCase {
     	/*
     	 * Homebase
     	 */
+    	int hbSawNdx = 1;
     	ap1.setCode("SAW");
     	ap2.setCode("ESB");
 
     	apRuleContext.getIntroducerProxy().introduce(ap1);
     	apRuleContext.getIntroducerProxy().introduce(ap2);
 
-    	assertTrue(ap1.isHb());
-		assertFalse(ap1.isNonHb());
-		assertTrue(ap2.isNonHb());
-		assertFalse(ap2.isHb());
+    	assertTrue(ap1.isHb(hbSawNdx));
+		assertFalse(ap1.isNonHb(hbSawNdx));
+		assertTrue(ap2.isNonHb(hbSawNdx));
+		assertFalse(ap2.isHb(hbSawNdx));
 
 		/*
 		 * Domestic/International

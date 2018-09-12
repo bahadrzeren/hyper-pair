@@ -100,11 +100,11 @@ public class LegIntroducer implements Introducer<Leg> {
 							m.setDeadheadable(false);
 		}
 		if (m.isDeadheadable()) {
-			if (m.getDepAirport().isHb()
+			if (m.getDepAirport().isAnyHb()
 		               && m.getArrAirport().isDhNotAllowedIfHBDepOrArr()) {
 					m.setDeadheadable(false);
 			} else
-				if (m.getArrAirport().isHb()
+				if (m.getArrAirport().isAnyHb()
 		               && m.getDepAirport().isDhNotAllowedIfHBDepOrArr()) {
 					m.setDeadheadable(false);
 				}

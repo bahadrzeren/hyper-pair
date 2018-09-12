@@ -30,18 +30,18 @@ public class PairDutyDay implements ConnectionChecker<DutyView> {
 //	}
 
 	@Override
-	public boolean areConnectable(DutyView pd, DutyView nd) {
+	public boolean areConnectable(int hbNdx, DutyView pd, DutyView nd) {
 		/*
 		 *	Max one duty can touch to a calendar day for IY. 
 		 */
 		if (pd.getLastArrAirport().isDomestic()
-				&& pd.getDebriefDay().isEqual(nd.getBriefDayNonHb()))
+				&& pd.getDebriefDay(hbNdx).isEqual(nd.getBriefDay(hbNdx)))
 			return false;
 
 		/*
 		 *	Max one duty can start per calendar day. 
 		 */
-		if (pd.getBriefDayHb() == nd.getBriefDayNonHb())
+		if (pd.getBriefDay(hbNdx) == nd.getBriefDay(hbNdx))
 			return false;
 
 		return true;

@@ -68,7 +68,7 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	private int debriefPeriodAfterDuty = 30;
 
 	private int getBriefPeriod(Duty d, int hbNdx) {
-		if (d.getFirstDepAirport().getNdx() == hbNdx)
+		if (d.getFirstDepAirport().getHbNdx() == hbNdx)
 			return briefPeriodBeforeDutyHb;
 		else
 			return briefPeriodBeforeDutyNonHb;
@@ -542,7 +542,7 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 			d.incNumOfSpecialFlights(incAmount);
 
 		if (connLeg != null) {
-			if (l.getDepAirport().isHb())
+			if (l.getDepAirport().isAnyHb())
 				d.incNumOfAnyHomebaseTouch(incAmount);
 			if (l.getDepAirport().isDomestic())
 				d.incNumOfDomTouch(incAmount);
@@ -590,7 +590,7 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		d.setInternational(d.getLastLeg().getArrAirport().isInternational());
 
 		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
-			d.setRestDurationInMins(i, this.getDutyMinRestPeriod(d, d.getDutyDurationInMins(i), d.getLastArrAirport().getNdx() == i));
+			d.setRestDurationInMins(i, this.getDutyMinRestPeriod(d, d.getDutyDurationInMins(i), d.getLastArrAirport().getHbNdx() == i));
 		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
 			d.setNextBriefTime(i, d.getDebriefTime(i).plusMinutes(d.getRestDurationInMins(i)));
 		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
@@ -635,7 +635,6 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		d.setInternational(false);
 
 		for (int i = 0; i < HeurosSystemParam.homebases.length; i++) {
-
 			d.setBriefTime(i, null);
 			d.setDebriefTime(i, null);
 			d.setBriefDayBeginning(i, null);
@@ -656,10 +655,11 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	}
 
 	@Override
-	public void reCalculate(Duty d) {
+	public boolean reCalculate(Duty d) {
 		this.reset(d);
 		this.softAppend(d, d.getLegs().get(0));
 		for (int i = 1; i < d.getLegs().size(); i++)
 			this.softAppend(d, d.getLegs().get(i));
+		return true;
 	}
 }

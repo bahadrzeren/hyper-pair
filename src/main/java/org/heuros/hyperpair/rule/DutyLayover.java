@@ -29,22 +29,16 @@ public class DutyLayover implements StarterChecker<DutyView, LegView>,
 //	}
 
 	@Override
-	public boolean canBeStarter(LegView l) {
-        /*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
-		 */
+	public boolean canBeStarter(int hbNdx, LegView l) {
     	if (l.getDepAirport().isLayoverAllowed()
-    			|| l.getDepAirport().isHb())
+    			|| l.getDepAirport().isHb(hbNdx))
     		return true;
     	return false;
 	}
 
 	@Override
-	public boolean isValid(DutyView d) {
-        /*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
-		 */
-    	if (d.getLastArrAirport().isHb()
+	public boolean isValid(int hbNdx, DutyView d) {
+    	if (d.getLastArrAirport().isHb(hbNdx)
     			|| d.getLastArrAirport().isLayoverAllowed())
     		return true;
     	return false;

@@ -25,13 +25,13 @@ public class DutyAugmentationCheck implements TotalizerChecker<DutyView> {
 //	}
 
 	@Override
-	public boolean isValid(DutyView d) {
+	public boolean isValid(int hbNdx, DutyView d) {
 		/*
 		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
-    	if (d.getAugmentedHb() > 1)
+    	if (d.getAugmented(hbNdx) > 1)
     		return false;
-    	if (d.getAugmentedHb() > 0) {
+    	if (d.getAugmented(hbNdx) > 0) {
     		if (d.getNumOfDomTouch() > 0)
     			return false;
     		if ((d.getNumOfAnyHomebaseTouch() > 0)

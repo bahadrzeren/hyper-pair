@@ -79,7 +79,7 @@ public class LegIntroducerTest extends TestCase {
     	 */
 
     	LegFactory legFactory = new LegFactory();
-    	LegRuleContext legRuleContext = new LegRuleContext();
+    	LegRuleContext legRuleContext = new LegRuleContext(HeurosSystemParam.homebases.length);
 
     	Rule legIntroducer = new LegIntroducer();
 

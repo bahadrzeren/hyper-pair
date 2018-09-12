@@ -45,7 +45,7 @@ public class PairLayoverCheck implements ConnectionChecker<DutyView> {
 //	}
 
 	@Override
-	public boolean areConnectable(DutyView pd, DutyView nd) {
+	public boolean areConnectable(int hbNdx, DutyView pd, DutyView nd) {
 		/*
 		 * Return after ER IY to homebase.
 		 * 
@@ -53,14 +53,14 @@ public class PairLayoverCheck implements ConnectionChecker<DutyView> {
 		 *  
 		 */
 		if (nd.getFirstLeg().getDepAirport().isDomestic()
-				&& nd.getLastArrAirport().isNonHb()
+				&& nd.getLastArrAirport().isNonHb(hbNdx)
 				&& (pd.isEr()))
 			return false;
 
 		/*
 		 * Layover period
 		 */
-		int layoverDuration = (int) ChronoUnit.MINUTES.between(pd.getDebriefTime(), nd.getBriefTimeNonHb());
+		int layoverDuration = (int) ChronoUnit.MINUTES.between(pd.getDebriefTime(hbNdx), nd.getBriefTime(hbNdx));
 
     	if (pd.getLastLeg().getArrAirport().isDomestic()) {
         	if (layoverDuration > maxDomLay)

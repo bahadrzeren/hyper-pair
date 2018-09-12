@@ -23,13 +23,13 @@ public class DutyFlightConnectionTime implements ConnectionChecker<LegView> {
 	private int minLegConnTimeForSAW = 60;
 	private int minLegConnTimeForISTESB = 90;
 
-	private int getMinConnTime(LegView pl, boolean isPlActive, LegView nl, boolean isNlActive) {
+	private int getMinConnTime(int hbNdx, LegView pl, boolean isPlActive, LegView nl, boolean isNlActive) {
 		if (pl.getFlightNo() == 845)
 			return minLegConnTime30;
 		/*
 		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
-		if (pl.getArrAirport().isHb()) {
+		if (pl.getArrAirport().isHb(hbNdx)) {
     		if (pl.getArrAirport().getCode().equals("IST")) {
     			if (nl.getArrAirport().getCode().equals("ESB")
     					&& isPlActive && isNlActive)
@@ -337,11 +337,11 @@ public class DutyFlightConnectionTime implements ConnectionChecker<LegView> {
 	private int maxLegConnTimeInt = 60 * 7;	//	3;
 	private int maxLegConnTimeExc = 60 * 8;
 
-	private int getMaxConnTime(LegView pl, LegView nl) {
+	private int getMaxConnTime(int hbNdx, LegView pl, LegView nl) {
 		/*
 		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
-        if (pl.getArrAirport().isHb())
+        if (pl.getArrAirport().isHb(hbNdx))
         	return maxLegConnTimeHB;
 
         if (pl.getArrAirport().isLegConnectionExceptionStation())
@@ -371,13 +371,13 @@ public class DutyFlightConnectionTime implements ConnectionChecker<LegView> {
 //	}
 
 	@Override
-	public boolean areConnectable(LegView pl, LegView nl) {
+	public boolean areConnectable(int hbNdx, LegView pl, LegView nl) {
 		int legConnTime = (int) ChronoUnit.MINUTES.between(pl.getSibt(), nl.getSobt());
 
-        if (legConnTime < this.getMinConnTime(pl, pl.isCover(), nl, nl.isCover()))
+        if (legConnTime < this.getMinConnTime(hbNdx, pl, pl.isCover(), nl, nl.isCover()))
         	return false;
 
-        if (legConnTime > this.getMaxConnTime(pl, nl))
+        if (legConnTime > this.getMaxConnTime(hbNdx, pl, nl))
         	return false;
 
         return true;

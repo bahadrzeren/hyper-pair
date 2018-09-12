@@ -150,7 +150,7 @@ public class HyperPair {
 																							.setDutyFactory(new DutyFactory(HeurosSystemParam.homebases.length))
 																							.setDutyRuleContext(new DutyRuleContext(HeurosSystemParam.homebases.length))
 																							.setDutyRepository(new DutyRepository())
-																							.setPairFactory(new PairFactory())
+																							.setPairFactory(new PairFactory(HeurosSystemParam.homebases.length))
 																							.setPairRuleContext(new PairRuleContext(HeurosSystemParam.homebases.length));
 
 			/*
@@ -185,7 +185,7 @@ public class HyperPair {
 			/*
 			 * Add duties to dutyRepository and generate necessary indexes.
 			 */
-			pairOptimizationContext.registerDuties(duties);
+			pairOptimizationContext.registerDuties(duties, HeurosSystemParam.homebases.length);
 
 			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setPairFactory(pairOptimizationContext.getPairFactory())
 																						.setLegRepository(pairOptimizationContext.getLegRepository())

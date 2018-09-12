@@ -21,7 +21,7 @@ public class DutyAgDgFlights implements AppendabilityChecker<DutyView, LegView> 
 //	}
 
 	@Override
-	public boolean isAppendable(DutyView d, LegView l) {
+	public boolean isAppendable(int hbNdx, DutyView d, LegView l) {
         if (((d.getNumOfAgDg() == 2) && (d.getNumOfLegsDomToInt() + d.getNumOfLegsIntToDom() > 0))
         		|| ((d.getNumOfLegsDomToInt() + d.getNumOfLegsIntToDom() >= 2)
         				&& (l.getDepAirport().isAgDg()
