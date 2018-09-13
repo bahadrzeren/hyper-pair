@@ -1,10 +1,8 @@
 package org.heuros.hyperpair;
 
-import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.Airport;
-import org.heuros.data.model.AirportFactory;
 import org.heuros.hyperpair.intro.AirportIntroducer;
-import org.heuros.rule.AirportRuleContext;
+import org.heuros.util.test.HeurosAirportTestUtil;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -38,180 +36,151 @@ public class AirportIntroducerTest extends TestCase {
      */
     public void testAirportInitialization()
     {
-    	AirportFactory apFactory = new AirportFactory();
-    	AirportRuleContext apRuleContext = new AirportRuleContext();
+    	/*
+    	 * Generate airport instances.
+    	 */
+    	assertTrue(HeurosAirportTestUtil.initializeAirportContext(new AirportIntroducer()));
 
-    	Rule apIntroducer = new AirportIntroducer();
-
-    	try {
-    		apRuleContext.registerRule(apIntroducer);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		assertTrue(false);
-    	}
-
-    	Airport ap1 = apFactory.generateModel();
-    	Airport ap2 = apFactory.generateModel();
+    	Airport apIST = HeurosAirportTestUtil.generateAirportInstance("IST");
+    	Airport apSAW = HeurosAirportTestUtil.generateAirportInstance("SAW");
+    	Airport apAYT = HeurosAirportTestUtil.generateAirportInstance("AYT");
+    	Airport apEZS = HeurosAirportTestUtil.generateAirportInstance("EZS");
+    	Airport apESB = HeurosAirportTestUtil.generateAirportInstance("ESB");
+    	Airport apADA = HeurosAirportTestUtil.generateAirportInstance("ADA");
+    	Airport apCDG = HeurosAirportTestUtil.generateAirportInstance("CDG");
+    	Airport apBRE = HeurosAirportTestUtil.generateAirportInstance("BRE");
+    	Airport apHAM = HeurosAirportTestUtil.generateAirportInstance("HAM");
+    	Airport apJED = HeurosAirportTestUtil.generateAirportInstance("JED");
+    	Airport apJFK = HeurosAirportTestUtil.generateAirportInstance("JFK");
+    	Airport apLHR = HeurosAirportTestUtil.generateAirportInstance("LHR");
+    	Airport apVAN = HeurosAirportTestUtil.generateAirportInstance("VAN");
+    	Airport apBHX = HeurosAirportTestUtil.generateAirportInstance("BHX");
+    	Airport apECN = HeurosAirportTestUtil.generateAirportInstance("ECN");
+    	Airport apTLV = HeurosAirportTestUtil.generateAirportInstance("TLV");
+    	Airport apAJI = HeurosAirportTestUtil.generateAirportInstance("AJI");
+    	Airport apSSH = HeurosAirportTestUtil.generateAirportInstance("SSH");
+    	Airport apBRU = HeurosAirportTestUtil.generateAirportInstance("BRU");
+    	Airport apALA = HeurosAirportTestUtil.generateAirportInstance("ALA");
+    	Airport apCAI = HeurosAirportTestUtil.generateAirportInstance("CAI");
+    	Airport apORY = HeurosAirportTestUtil.generateAirportInstance("ORY");
+    	Airport apHOU = HeurosAirportTestUtil.generateAirportInstance("HOU");
 
     	/*
     	 * Homebase
     	 */
-    	int hbSawNdx = 1;
-    	ap1.setCode("SAW");
-    	ap2.setCode("ESB");
+    	int istHbNdx = 0;
+    	int sawHbNdx = 1;
 
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isHb(hbSawNdx));
-		assertFalse(ap1.isNonHb(hbSawNdx));
-		assertTrue(ap2.isNonHb(hbSawNdx));
-		assertFalse(ap2.isHb(hbSawNdx));
+    	assertTrue(apIST.isHb(istHbNdx));
+    	assertTrue(apSAW.isHb(sawHbNdx));
+    	assertFalse(apIST.isNonHb(istHbNdx));
+    	assertFalse(apSAW.isNonHb(sawHbNdx));
+    	assertTrue(apIST.isAnyHb());
+    	assertTrue(apSAW.isAnyHb());
+    	assertTrue(apESB.isNonHb(istHbNdx));
+    	assertTrue(apAYT.isNonHb(istHbNdx));
+    	assertTrue(apCDG.isNonHb(istHbNdx));
+    	assertTrue(apESB.isNonHb(sawHbNdx));
+    	assertTrue(apAYT.isNonHb(sawHbNdx));
+    	assertTrue(apCDG.isNonHb(sawHbNdx));
+    	assertTrue(apESB.isAnyNonHb());
+    	assertTrue(apAYT.isAnyNonHb());
+    	assertTrue(apCDG.isAnyNonHb());
+    	assertFalse(apESB.isAnyHb());
+    	assertFalse(apAYT.isAnyHb());
+    	assertFalse(apCDG.isAnyHb());
 
 		/*
 		 * Domestic/International
 		 */
-    	ap1.setCode("EZS");
-    	ap2.setCode("JFK");
 
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isDomestic());
-		assertFalse(ap1.isInternational());
-		assertTrue(ap2.isInternational());
-		assertFalse(ap2.isDomestic());
+    	assertTrue(apESB.isDomestic());
+		assertFalse(apESB.isInternational());
+    	assertTrue(apEZS.isDomestic());
+		assertFalse(apEZS.isInternational());
+		assertTrue(apJFK.isInternational());
+		assertFalse(apJFK.isDomestic());
 
 		/*
 		 * Stations that subject to special deadhead application.
 		 */
-    	ap1.setCode("JED");
-    	ap2.setCode("BRE");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isDhNotAllowedIfHBDepOrArr());
-		assertFalse(ap2.isDhNotAllowedIfHBDepOrArr());
+    	assertTrue(apJED.isDhNotAllowedIfHBDepOrArr());
+		assertFalse(apBRE.isDhNotAllowedIfHBDepOrArr());
+		assertFalse(apJFK.isDhNotAllowedIfHBDepOrArr());
+		assertFalse(apLHR.isDhNotAllowedIfHBDepOrArr());
+		assertFalse(apIST.isDhNotAllowedIfHBDepOrArr());
+		assertFalse(apSAW.isDhNotAllowedIfHBDepOrArr());
+		assertFalse(apESB.isDhNotAllowedIfHBDepOrArr());
+		assertFalse(apVAN.isDhNotAllowedIfHBDepOrArr());
 
 		/*
 		 * Critical stations.
 		 */
-    	ap1.setCode("VAN");
-    	ap2.setCode("BHX");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isCritical());
-		assertFalse(ap2.isCritical());
+    	assertTrue(apVAN.isCritical());
+		assertFalse(apBHX.isCritical());
+		assertFalse(apIST.isCritical());
+		assertFalse(apSAW.isCritical());
+		assertFalse(apESB.isCritical());
 
 		/*
 		 * AGDG stations.
 		 */
-    	ap1.setCode("ECN");
-    	ap2.setCode("TLV");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isAgDg());
-		assertFalse(ap2.isAgDg());
+    	assertTrue(apECN.isAgDg());
+		assertFalse(apTLV.isAgDg());
+		assertFalse(apESB.isAgDg());
 
 		/*
 		 * OneDuty stations.
 		 */
-    	ap1.setCode("AJI");
-    	ap2.setCode("AYT");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isOneDutyStation());
-		assertFalse(ap2.isOneDutyStation());
+    	assertTrue(apAJI.isOneDutyStation());
+		assertFalse(apESB.isOneDutyStation());
+		assertFalse(apAYT.isOneDutyStation());
 
 		/*
 		 * AC change allowed international stations.
 		 */
-    	ap1.setCode("SSH");
-    	ap2.setCode("LHR");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isAcChangeAllowed());
-		assertFalse(ap2.isAcChangeAllowed());
+    	assertTrue(apSSH.isAcChangeAllowed());
+		assertTrue(apESB.isAcChangeAllowed());
+		assertFalse(apLHR.isAcChangeAllowed());
 
 		/*
 		 * Special european stations.
 		 */
-    	ap1.setCode("BRU");
-    	ap2.setCode("HAM");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isSpecialEuroStation());
-		assertFalse(ap2.isSpecialEuroStation());
+    	assertTrue(apBRU.isSpecialEuroStation());
+		assertFalse(apHAM.isSpecialEuroStation());
 
 		/*
 		 * Layover allowed stations.
 		 */
-    	ap1.setCode("ADA");
-    	ap2.setCode("IST");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isLayoverAllowed());
-		assertFalse(ap2.isLayoverAllowed());
+    	assertTrue(apADA.isLayoverAllowed());
+		assertFalse(apIST.isLayoverAllowed());
+		assertFalse(apSAW.isLayoverAllowed());
+		assertTrue(apESB.isLayoverAllowed());
 
 		/*
 		 * Mandatory overnighting stations.
 		 */
-    	ap1.setCode("ALA");
-    	ap2.setCode("SAW");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isEndDutyIfTouches());
-		assertFalse(ap2.isEndDutyIfTouches());
+    	assertTrue(apALA.isEndDutyIfTouches());
+		assertFalse(apIST.isEndDutyIfTouches());
+		assertFalse(apSAW.isEndDutyIfTouches());
+		assertFalse(apESB.isEndDutyIfTouches());
 
 		/*
 		 * Stations that must be the first overnight in pairings.
 		 */
-    	ap1.setCode("LHR");
-    	ap2.setCode("CDG");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isMandatoryFirstLayover());
-		assertFalse(ap2.isMandatoryFirstLayover());
+    	assertTrue(apLHR.isMandatoryFirstLayover());
+		assertFalse(apCDG.isMandatoryFirstLayover());
 
 		/*
 		 * Max connection exception stations.
 		 */
-    	ap1.setCode("TLV");
-    	ap2.setCode("CAI");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.isLegConnectionExceptionStation());
-		assertFalse(ap2.isLegConnectionExceptionStation());
+    	assertTrue(apTLV.isLegConnectionExceptionStation());
+		assertFalse(apCAI.isLegConnectionExceptionStation());
 
 		/*
 		 * Airport group id test.
 		 */
-    	ap1.setCode("ORY");
-    	ap2.setCode("HOU");
-
-    	apRuleContext.getIntroducerProxy().introduce(ap1);
-    	apRuleContext.getIntroducerProxy().introduce(ap2);
-
-    	assertTrue(ap1.getGroupId() == 1);
-		assertTrue(ap2.getGroupId() == 0);
+    	assertTrue(apORY.getGroupId() == 1);
+		assertTrue(apHOU.getGroupId() == 0);
     }
 }

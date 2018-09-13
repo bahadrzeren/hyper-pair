@@ -63,7 +63,7 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	/*
 	 * Briefing durations.
 	 */
-	private int briefPeriodBeforeDutyHb = 60;
+	private int briefPeriodBeforeDutyHb = 90;
 	private int briefPeriodBeforeDutyNonHb = 60;
 	private int debriefPeriodAfterDuty = 30;
 
