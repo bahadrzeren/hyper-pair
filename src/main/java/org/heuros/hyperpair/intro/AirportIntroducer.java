@@ -50,7 +50,7 @@ public class AirportIntroducer implements Introducer<Airport> {
 	/*
 	 * Aircraft change allowed international stations.
 	 */
-	private static String[] acChangeAllowedInternationaStations = {"AMM", "BEY", "BSR", "CAI", "DAM" , "DOH", "TLV", "KWI", "TBS", "TIF"
+	private static String[] acChangeAllowedInternationalStations = {"AMM", "BEY", "BSR", "CAI", "DAM" , "DOH", "TLV", "KWI", "TBS", "TIF"
 															, "SAH", "GYD", "HBE", "IFN", "IKA", "ISU", "KSH", "NJF", "SJJ", "SSH"
 															//	, "MED"
 															};
@@ -207,7 +207,7 @@ public class AirportIntroducer implements Introducer<Airport> {
 		 */
 		m.setAcChangeAllowed(m.isDomestic());
 		if (m.isInternational())
-			m.setAcChangeAllowed(ArrayUtils.indexOf(AirportIntroducer.acChangeAllowedInternationaStations, m.getCode()) >= 0);
+			m.setAcChangeAllowed(ArrayUtils.indexOf(AirportIntroducer.acChangeAllowedInternationalStations, m.getCode()) >= 0);
 
 		/*
 		 * Check special european stations.

@@ -47,7 +47,7 @@ public class LegIntroducerTest extends TestCase {
     	/*
     	 * Generate airport instances.
     	 */
-    	assertTrue(HeurosAirportTestUtil.initializeAirportContext(new AirportIntroducer()));
+    	assertTrue(HeurosAirportTestUtil.initializeAirportContext(new AirportIntroducer()) != null);
 
     	/*
     	 * Generate leg instances for the test.
@@ -57,7 +57,7 @@ public class LegIntroducerTest extends TestCase {
     	 * Generate leg instances for the test.
     	 */
 
-    	assertTrue(HeurosLegTestUtil.initializeLegContext(new LegIntroducer(), HeurosSystemParam.homebases.length));
+    	assertTrue(HeurosLegTestUtil.initializeLegContext(new LegIntroducer(), HeurosSystemParam.homebases.length) != null);
 
     	Airport apIST = HeurosAirportTestUtil.generateAirportInstance("IST");
     	Airport apSAW = HeurosAirportTestUtil.generateAirportInstance("SAW");

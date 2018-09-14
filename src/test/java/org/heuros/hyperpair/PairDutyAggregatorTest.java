@@ -10,6 +10,7 @@ import org.heuros.data.model.Leg;
 import org.heuros.hyperpair.intro.AirportIntroducer;
 import org.heuros.hyperpair.intro.DutyLegAggregator;
 import org.heuros.hyperpair.intro.LegIntroducer;
+import org.heuros.rule.DutyRuleContext;
 import org.heuros.util.test.DailyLegsTest;
 import org.heuros.util.test.HeurosAirportTestUtil;
 import org.heuros.util.test.HeurosDutyTestUtil;
@@ -22,14 +23,14 @@ import junit.framework.TestSuite;
 /**
  * Airport Introducer test.
  */
-public class PairDutyLegAggregatorTest extends TestCase {
+public class PairDutyAggregatorTest extends TestCase {
 
 	/**
      * Create the test case
      *
      * @param testName name of the test case
      */
-    public PairDutyLegAggregatorTest( String testName )
+    public PairDutyAggregatorTest( String testName )
     {
         super( testName );
     }
@@ -39,7 +40,7 @@ public class PairDutyLegAggregatorTest extends TestCase {
      */
     public static Test suite()
     {
-        return new TestSuite( PairDutyLegAggregatorTest.class );
+        return new TestSuite( PairDutyAggregatorTest.class );
     }
 
     /**
@@ -52,7 +53,7 @@ public class PairDutyLegAggregatorTest extends TestCase {
     	/*
     	 * Generate airport instances.
     	 */
-    	assertTrue(HeurosAirportTestUtil.initializeAirportContext(new AirportIntroducer()));
+    	assertTrue(HeurosAirportTestUtil.initializeAirportContext(new AirportIntroducer()) != null);
 
     	Airport apIST = HeurosAirportTestUtil.generateAirportInstance("IST");
     	Airport apSAW = HeurosAirportTestUtil.generateAirportInstance("SAW");
@@ -83,13 +84,14 @@ public class PairDutyLegAggregatorTest extends TestCase {
     	 * Generate leg instances for the test.
     	 */
 
-    	assertTrue(HeurosLegTestUtil.initializeLegContext(new LegIntroducer(), HeurosSystemParam.homebases.length));
+    	assertTrue(HeurosLegTestUtil.initializeLegContext(new LegIntroducer(), HeurosSystemParam.homebases.length) != null);
     	DailyLegsTest[] dailyLegs = HeurosLegTestUtil.getTestLegs(5, apIST, apSAW, apAYT, apEZS, apCDG, apBRE, apJED, apJFK);
 
 		/*
 		 * Generate Duty context.
 		 */
-    	assertTrue(HeurosDutyTestUtil.initializeDutyContext(new DutyLegAggregator(), HeurosSystemParam.homebases.length));
+    	DutyRuleContext dutyRuleContext = HeurosDutyTestUtil.initializeDutyContext(new DutyLegAggregator(), HeurosSystemParam.homebases.length);
+    	assertFalse(dutyRuleContext == null);
 
     	final Leg[] legs = {dailyLegs[0].getHb1_Hb1ToDom1_1(),
     						dailyLegs[0].getHb1_Dom1ToHb1_1()};

@@ -39,7 +39,7 @@ public class AirportIntroducerTest extends TestCase {
     	/*
     	 * Generate airport instances.
     	 */
-    	assertTrue(HeurosAirportTestUtil.initializeAirportContext(new AirportIntroducer()));
+    	assertTrue(HeurosAirportTestUtil.initializeAirportContext(new AirportIntroducer()) != null);
 
     	Airport apIST = HeurosAirportTestUtil.generateAirportInstance("IST");
     	Airport apSAW = HeurosAirportTestUtil.generateAirportInstance("SAW");
