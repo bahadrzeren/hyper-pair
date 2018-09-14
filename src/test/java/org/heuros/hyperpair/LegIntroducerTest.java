@@ -3,15 +3,12 @@ package org.heuros.hyperpair;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.Airport;
-import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Leg;
-import org.heuros.data.model.LegFactory;
 import org.heuros.hyperpair.intro.AirportIntroducer;
 import org.heuros.hyperpair.intro.LegIntroducer;
-import org.heuros.rule.AirportRuleContext;
-import org.heuros.rule.LegRuleContext;
+import org.heuros.util.test.HeurosAirportTestUtil;
+import org.heuros.util.test.HeurosLegTestUtil;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -48,132 +45,105 @@ public class LegIntroducerTest extends TestCase {
     	HeurosDatasetParam.optPeriodStartInc = LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0);
 
     	/*
-    	 * Generate airport instances for the leg introducer test.
+    	 * Generate airport instances.
     	 */
-    	AirportFactory apFactory = new AirportFactory();
-    	AirportRuleContext apRuleContext = new AirportRuleContext();
-
-    	Rule apIntroducer = new AirportIntroducer();
-
-    	try {
-    		apRuleContext.registerRule(apIntroducer);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		assertTrue(false);
-    	}
-
-    	Airport apIST = apFactory.generateModel();
-    	Airport apADA = apFactory.generateModel();
-    	Airport apJED = apFactory.generateModel();
-
-    	apIST.setCode("IST");
-    	apADA.setCode("ADA");
-    	apJED.setCode("JED");
-
-    	apRuleContext.getIntroducerProxy().introduce(apIST);
-    	apRuleContext.getIntroducerProxy().introduce(apADA);
-    	apRuleContext.getIntroducerProxy().introduce(apJED);
+    	assertTrue(HeurosAirportTestUtil.initializeAirportContext(new AirportIntroducer()));
 
     	/*
     	 * Generate leg instances for the test.
     	 */
 
-    	LegFactory legFactory = new LegFactory();
-    	LegRuleContext legRuleContext = new LegRuleContext(HeurosSystemParam.homebases.length);
+    	/*
+    	 * Generate leg instances for the test.
+    	 */
 
-    	Rule legIntroducer = new LegIntroducer();
+    	assertTrue(HeurosLegTestUtil.initializeLegContext(new LegIntroducer(), HeurosSystemParam.homebases.length));
 
-    	try {
-    		legRuleContext.registerRule(legIntroducer);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		assertTrue(false);
-    	}
+    	Airport apIST = HeurosAirportTestUtil.generateAirportInstance("IST");
+    	Airport apSAW = HeurosAirportTestUtil.generateAirportInstance("SAW");
+    	Airport apADA = HeurosAirportTestUtil.generateAirportInstance("ADA");
+    	Airport apEZS = HeurosAirportTestUtil.generateAirportInstance("EZS");
 
-    	Leg legInFleetHb = legFactory.generateModel();
-    	Leg legNonFleetNonHb = legFactory.generateModel();
-
-    	legInFleetHb.setFlightNo(100);
-    	legInFleetHb.setDepAirport(apIST);
-    	legInFleetHb.setArrAirport(apADA);
-    	legInFleetHb.setSobt(LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0));
-    	legInFleetHb.setSibt(LocalDateTime.of(2014, Month.JANUARY, 1, 11, 13));
-
-    	legNonFleetNonHb.setFlightNo(200);
-    	legNonFleetNonHb.setDepAirport(apADA);
-    	legNonFleetNonHb.setArrAirport(apIST);
-    	legNonFleetNonHb.setSobt(LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0));
-    	legNonFleetNonHb.setSibt(LocalDateTime.of(2014, Month.JANUARY, 2, 0, 1));
+    	Leg legIstDep = HeurosLegTestUtil.generateLegInstance(100, apIST, apADA, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 13), "32J");
+    	Leg legSawDep = HeurosLegTestUtil.generateLegInstance(101, apSAW, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 2, 0, 1), "320");
+    	Leg legIstDepDh = HeurosLegTestUtil.generateLegInstance(102, apIST, apADA, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 13), "737");
+    	Leg legSawDepDh = HeurosLegTestUtil.generateLegInstance(103, apSAW, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 2, 0, 1), "737");
 
     	/*
     	 * Flight number not to consider.
     	 */
-    	int flightNo = legInFleetHb.getFlightNo();
-    	legInFleetHb.setFlightNo(9000);
-		assertFalse(legRuleContext.getIntroducerProxy().introduce(legInFleetHb));
-    	legInFleetHb.setFlightNo(flightNo);
+    	Airport apESB = HeurosAirportTestUtil.generateAirportInstance("ESB");
 
-    	/*
+    	Leg leg9000 = HeurosLegTestUtil.generateLegInstance(9000, apIST, apESB, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0), "320");
+
+    	assertTrue(leg9000 == null);
+
+		/*
+		 * Deadhead state. (Cover Flag).
+		 */
+    	assertTrue(legIstDep.isCover());
+    	assertTrue(legSawDep.isCover());
+    	assertFalse(legIstDepDh.isCover());
+    	assertFalse(legSawDepDh.isCover());
+
+		/*
     	 * Block time.
     	 */
-    	legRuleContext.getIntroducerProxy().introduce(legInFleetHb);
-    	legRuleContext.getIntroducerProxy().introduce(legNonFleetNonHb);
-    	assertTrue(legInFleetHb.getBlockTimeInMins() == 73);
-    	assertTrue(legNonFleetNonHb.getBlockTimeInMins() == 241);
+    	assertTrue(legIstDep.getBlockTimeInMins() == 73);
+    	assertTrue(legIstDepDh.getBlockTimeInMins() == 73);
+    	assertTrue(legSawDep.getBlockTimeInMins() == 241);
+    	assertTrue(legSawDepDh.getBlockTimeInMins() == 241);
 
     	/*
     	 * Fleets.
     	 */
-    	legInFleetHb.setAcType("32J");
-    	legNonFleetNonHb.setAcType("737");
-
-    	legRuleContext.getIntroducerProxy().introduce(legInFleetHb);
-    	legRuleContext.getIntroducerProxy().introduce(legNonFleetNonHb);
-
-    	assertTrue(legInFleetHb.isInFleet());
-		assertFalse(legNonFleetNonHb.isInFleet());
+    	assertTrue(legIstDep.isInFleet());
+		assertTrue(legSawDep.isInFleet());
+    	assertFalse(legIstDepDh.isInFleet());
+		assertFalse(legSawDepDh.isInFleet());
 
     	/*
     	 * Special flights.
     	 */
-    	legInFleetHb.setFlightNo(1942);
+    	Airport apLHR = HeurosAirportTestUtil.generateAirportInstance("LHR");
 
-    	legRuleContext.getIntroducerProxy().introduce(legInFleetHb);
+		Leg legSpecFlight = HeurosLegTestUtil.generateLegInstance(1942, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 12, 0), "320");
 
-    	assertTrue(legInFleetHb.isSpecialFlight());
-		assertFalse(legNonFleetNonHb.isSpecialFlight());
+    	assertTrue(legSpecFlight.isSpecialFlight());
+		assertFalse(legIstDep.isSpecialFlight());
+		assertFalse(legSawDep.isSpecialFlight());
+		assertFalse(legIstDepDh.isSpecialFlight());
+		assertFalse(legSawDepDh.isSpecialFlight());
 
     	/*
     	 * No deadhead flight numbers.
     	 */
-    	legInFleetHb.setFlightNo(1967);
+    	Airport apCDG = HeurosAirportTestUtil.generateAirportInstance("CDG");
 
-    	legRuleContext.getIntroducerProxy().introduce(legInFleetHb);
+    	Leg legNoDhFlightNo = HeurosLegTestUtil.generateLegInstance(1967, apIST, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), "320");
 
-    	assertFalse(legInFleetHb.isDeadheadable());
-		assertTrue(legNonFleetNonHb.isDeadheadable());
+    	assertFalse(legNoDhFlightNo.isDeadheadable());
+		assertTrue(legIstDep.isDeadheadable());
+		assertTrue(legSawDep.isDeadheadable());
+    	assertTrue(legIstDepDh.isDeadheadable());
+		assertTrue(legSawDepDh.isDeadheadable());
 
     	/*
     	 * No deadhead flight number range.
     	 */
-    	legInFleetHb.setFlightNo(3500);
+    	Airport apBRU = HeurosAirportTestUtil.generateAirportInstance("BRU");
 
-    	legRuleContext.getIntroducerProxy().introduce(legInFleetHb);
+    	Leg legNoDhFlightRange = HeurosLegTestUtil.generateLegInstance(3500, apIST, apBRU, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), "320");
 
-    	assertFalse(legInFleetHb.isDeadheadable());
-		assertTrue(legNonFleetNonHb.isDeadheadable());
-
-    	/*
-    	 * Cover flag.
-    	 */
-    	assertFalse(legInFleetHb.isCover());
-		assertFalse(legNonFleetNonHb.isCover());
+    	assertTrue((legNoDhFlightRange == null) || (!legNoDhFlightRange.isDeadheadable()));
 
     	/*
     	 * No deadhead on special stations if HB dep or arr.
     	 */
-		legNonFleetNonHb.setDepAirport(apJED);
-		legRuleContext.getIntroducerProxy().introduce(legNonFleetNonHb);
-		assertFalse(legNonFleetNonHb.isDeadheadable());
+    	Airport apJED = HeurosAirportTestUtil.generateAirportInstance("JED");
+
+    	Leg legNoDhStation = HeurosLegTestUtil.generateLegInstance(300, apIST, apJED, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), "320");
+
+		assertFalse(legNoDhStation.isDeadheadable());
     }
 }
