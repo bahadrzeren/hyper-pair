@@ -23,7 +23,7 @@ public class PairIntDuties implements TotalizerChecker<PairView> {
 //	}
 
 	@Override
-	public boolean isValid(int hbNdx, PairView p) {
+	public boolean acceptable(int hbNdx, PairView p) {
 		/*
 		 * Max num of int duties
 		 */

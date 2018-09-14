@@ -59,7 +59,7 @@ public class CriticalStations2 implements AppendabilityChecker<DutyView, LegView
 	}
 
 	@Override
-	public boolean isValid(int hbNdx, DutyView d) {
+	public boolean acceptable(int hbNdx, DutyView d) {
 		/*
 		 * If CATC layover is not allowed.
 		 */

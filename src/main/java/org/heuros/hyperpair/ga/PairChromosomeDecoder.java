@@ -160,7 +160,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 					if (currentPair != null) {
 						pairRuleContext.getAggregatorProxy().append(currentPair, d);
-						if (pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, currentPair)) {
+						if (pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdx, currentPair)) {
 							best = d;
 							bestNumOfDh = dNumOfDh;
 							bestDhDurationInMins = dDhDurationInMins;
@@ -201,7 +201,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 					if (currentPair != null) {
 						pairRuleContext.getAggregatorProxy().append(currentPair, d);
-						if (pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, currentPair)) {
+						if (pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdx, currentPair)) {
 							best = d;
 							bestActiveBlocktimeInMins = dActiveBlocktimeInMins;
 							bestAvgNumOfIncludingDutiesOfTheSameLegs = dAvgNumOfIncludingDutiesOfTheSameLegs;
@@ -248,7 +248,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 								|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d))) {
 					if (currentPair != null) {
 						pairRuleContext.getAggregatorProxy().append(currentPair, d);
-						if (pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, currentPair)) {
+						if (pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdx, currentPair)) {
 							best = d;
 							bestNumOfDh = dNumOfDh;
 							bestDhDurationInMins = dDhDurationInMins;
@@ -376,7 +376,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 						 * TODO HB impl will be changed!
 						 */
 						if (duty.getLastArrAirport().isHb(hbNdx)) {
-							if (pairRuleContext.getTotalizerCheckerProxy().isValid(hbNdx, pair))
+							if (pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdx, pair))
 								solution.add(pair);
 							else
 								PairChromosomeDecoder.logger.error("Non valid pairing!");

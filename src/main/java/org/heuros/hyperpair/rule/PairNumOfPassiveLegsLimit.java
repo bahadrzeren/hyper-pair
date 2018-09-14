@@ -42,7 +42,7 @@ public class PairNumOfPassiveLegsLimit implements AppendabilityChecker<PairView,
 //	}
 
 	@Override
-	public boolean isValid(int hbNdx, PairView p) {
+	public boolean acceptable(int hbNdx, PairView p) {
 		if (p.getNumOfLegsPassive() > maxNumOfPassiveLegsInPair)
 			return false;
 		return true;

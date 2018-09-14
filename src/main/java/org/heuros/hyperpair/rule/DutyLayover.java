@@ -37,7 +37,7 @@ public class DutyLayover implements StarterChecker<DutyView, LegView>,
 	}
 
 	@Override
-	public boolean isValid(int hbNdx, DutyView d) {
+	public boolean acceptable(int hbNdx, DutyView d) {
     	if (d.getLastArrAirport().isHb(hbNdx)
     			|| d.getLastArrAirport().isLayoverAllowed())
     		return true;

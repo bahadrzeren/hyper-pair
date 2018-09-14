@@ -93,7 +93,7 @@ public class DutyNumOfLegsLimit implements ExtensibilityChecker<DutyView>,
 	}
 
 	@Override
-	public boolean isValid(int hbNdx, DutyView d) {
+	public boolean acceptable(int hbNdx, DutyView d) {
 
 		if (d.getNumOfLegsPassive() > maxNumOfPassiveLegsInDuty)
     		return false;
