@@ -6,6 +6,7 @@ import java.time.Month;
 
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
+import org.heuros.util.test.DutyTestUtil;
 import org.heuros.util.test.HeurosDutyTestUtil;
 
 import junit.framework.Test;
@@ -14,14 +15,14 @@ import junit.framework.TestSuite;
 /**
  * Airport Introducer test.
  */
-public class DutyLegAggregatorHbDomTest extends DutyLegAggregatorTest {
+public class DutyLegAggregator1DayDutyTest extends DutyLegAggregatorTest {
 
 	/**
      * Create the test case
      *
      * @param testName name of the test case
      */
-    public DutyLegAggregatorHbDomTest( String testName )
+    public DutyLegAggregator1DayDutyTest( String testName )
     {
         super( testName );
     }
@@ -31,7 +32,7 @@ public class DutyLegAggregatorHbDomTest extends DutyLegAggregatorTest {
      */
     public static Test suite()
     {
-        return new TestSuite( DutyLegAggregatorHbDomTest.class );
+        return new TestSuite( DutyLegAggregator1DayDutyTest.class );
     }
 
     /**
@@ -42,9 +43,12 @@ public class DutyLegAggregatorHbDomTest extends DutyLegAggregatorTest {
 		/*
 		 * HB departed, DOM arrival 1 Leg Duty.
 		 */
-    	final Leg[] lHbDepDomArr = {dailyLegs[0].getHb1_Hb1ToDom1_1()};	//	LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "320"));	//	IST-DOM	90
+    	Duty d = this.dutyFactory.generateModel();
 
-    	Duty d = HeurosDutyTestUtil.generateDutyInstance(lHbDepDomArr);
+    	final Leg[] lHbDepDomArr = Heuros
+    		{dailyLegs[0].getHb1_Hb1ToDom1_1()};	//	LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "320"));	//	IST-DOM	90
+
+    	Duty d = DutyTestUtil.generateDutyInstance(lHbDepDomArr);
 
 		assertTrue(d.getBlockTimeInMins() == 90);
 		assertTrue(d.getNumOfLegs() == 1);
