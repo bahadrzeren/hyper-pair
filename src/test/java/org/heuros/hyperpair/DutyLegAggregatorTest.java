@@ -59,6 +59,7 @@ public abstract class DutyLegAggregatorTest extends TestCase {
     public void testDutyLegAggregation()
     {
     	HeurosDatasetParam.optPeriodStartInc = LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0);
+    	HeurosSystemParam.briefPeriodBeforeDutyHb = 90;
 
     	/*
     	 * Generate airport instances.

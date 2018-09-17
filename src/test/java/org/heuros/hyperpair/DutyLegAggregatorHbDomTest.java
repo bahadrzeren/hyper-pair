@@ -173,7 +173,7 @@ public class DutyLegAggregatorHbDomTest extends DutyLegAggregatorTest {
 		assertTrue(d.getNumOfLegsPassive() == 1);
 
 		/*
-		 *	Change Leg's state.
+		 *	Make the last leg DH.
 		 */
 		dailyLegs[0].getHb1_Dom1ToHb1_1().setAcType("737");
 		legRuleContext.getIntroducerProxy().introduce(dailyLegs[0].getHb1_Dom1ToHb1_1());

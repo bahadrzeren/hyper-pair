@@ -12,6 +12,10 @@ public class HeurosSystemParam {
 	public static int maxDomLay = 30 * 60;
 	public static int maxIdleTimeInAPairInHours = 10;
 
+	public static int briefPeriodBeforeDutyHb = 60;
+	public static int briefPeriodBeforeDutyNonHb = 60;
+	public static int debriefPeriodAfterDuty = 30;
+
 	/*
 	 * Minimum connection time limits that are designated in rule implementations can not be smaller than this value.
 	 */

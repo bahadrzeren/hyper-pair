@@ -63,19 +63,19 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	/*
 	 * Briefing durations.
 	 */
-	private int briefPeriodBeforeDutyHb = 90;
-	private int briefPeriodBeforeDutyNonHb = 60;
-	private int debriefPeriodAfterDuty = 30;
+//	private int briefPeriodBeforeDutyHb = 90;
+//	private int briefPeriodBeforeDutyNonHb = 60;
+//	private int debriefPeriodAfterDuty = 30;
 
 	private int getBriefPeriod(Duty d, int hbNdx) {
 		if (d.getFirstDepAirport().getHbNdx() == hbNdx)
-			return briefPeriodBeforeDutyHb;
+			return HeurosSystemParam.briefPeriodBeforeDutyHb;
 		else
-			return briefPeriodBeforeDutyNonHb;
+			return HeurosSystemParam.briefPeriodBeforeDutyNonHb;
 	}
 
 	private int getDebriefPeriod(Duty d, int hbNdx) {
-		return debriefPeriodAfterDuty;
+		return HeurosSystemParam.debriefPeriodAfterDuty;
 	}
 
 
