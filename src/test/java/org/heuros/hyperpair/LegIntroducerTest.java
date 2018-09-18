@@ -3,21 +3,15 @@ package org.heuros.hyperpair;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-import org.heuros.data.model.Airport;
 import org.heuros.data.model.Leg;
-import org.heuros.hyperpair.intro.AirportIntroducer;
-import org.heuros.hyperpair.intro.LegIntroducer;
-import org.heuros.util.test.AirportTestUtil;
-import org.heuros.util.test.LegTestUtil;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
  * Airport Introducer test.
  */
-public class LegIntroducerTest extends TestCase {
+public class LegIntroducerTest extends AbsTestBase {
 
 	/**
      * Create the test case
@@ -38,43 +32,29 @@ public class LegIntroducerTest extends TestCase {
     }
 
     /**
-     * Test Leg initialization.
+     * Test Leg introducer.
      */
-    public void testLegInitialization()
+    public void runTestProcedure()
     {
     	HeurosDatasetParam.optPeriodStartInc = LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0);
 
-    	/*
-    	 * Generate airport instances.
-    	 */
-    	assertTrue(AirportTestUtil.initializeAirportContext(new AirportIntroducer()) != null);
-
-    	/*
-    	 * Generate leg instances for the test.
-    	 */
-
-    	/*
-    	 * Generate leg instances for the test.
-    	 */
-
-    	assertTrue(LegTestUtil.initializeLegContext(new LegIntroducer(), HeurosSystemParam.homebases.length) != null);
-
-    	Airport apIST = AirportTestUtil.generateAirportInstance("IST");
-    	Airport apSAW = AirportTestUtil.generateAirportInstance("SAW");
-    	Airport apADA = AirportTestUtil.generateAirportInstance("ADA");
-    	Airport apEZS = AirportTestUtil.generateAirportInstance("EZS");
-
-    	Leg legIstDep = LegTestUtil.generateLegInstance(100, apIST, apADA, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 13), "32J");
-    	Leg legSawDep = LegTestUtil.generateLegInstance(101, apSAW, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 2, 0, 1), "320");
-    	Leg legIstDepDh = LegTestUtil.generateLegInstance(102, apIST, apADA, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 13), "737");
-    	Leg legSawDepDh = LegTestUtil.generateLegInstance(103, apSAW, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 2, 0, 1), "737");
+    	Leg legIstDep = this.generateLegInstance(100, apIST, apADA, 
+    												LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), 
+    												LocalDateTime.of(2014, Month.JANUARY, 1, 11, 13), "32J");
+    	Leg legSawDep = this.generateLegInstance(101, apSAW, apEZS, 
+    												LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0), 
+    												LocalDateTime.of(2014, Month.JANUARY, 2, 0, 1), "320");
+    	Leg legIstDepDh = this.generateLegInstance(102, apIST, apADA, 
+    												LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), 
+    												LocalDateTime.of(2014, Month.JANUARY, 1, 11, 13), "737");
+    	Leg legSawDepDh = this.generateLegInstance(103, apSAW, apEZS, 
+    												LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0), 
+    												LocalDateTime.of(2014, Month.JANUARY, 2, 0, 1), "737");
 
     	/*
     	 * Flight number not to consider.
     	 */
-    	Airport apESB = AirportTestUtil.generateAirportInstance("ESB");
-
-    	Leg leg9000 = LegTestUtil.generateLegInstance(9000, apIST, apESB, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0), "320");
+    	Leg leg9000 = this.generateLegInstance(9000, apIST, apESB, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0), "320");
 
     	assertTrue(leg9000 == null);
 
@@ -105,9 +85,9 @@ public class LegIntroducerTest extends TestCase {
     	/*
     	 * Special flights.
     	 */
-    	Airport apLHR = AirportTestUtil.generateAirportInstance("LHR");
-
-		Leg legSpecFlight = LegTestUtil.generateLegInstance(1942, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 12, 0), "320");
+		Leg legSpecFlight = this.generateLegInstance(1942, apIST, apLHR, 
+														LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), 
+														LocalDateTime.of(2014, Month.JANUARY, 1, 12, 0), "320");
 
     	assertTrue(legSpecFlight.isSpecialFlight());
 		assertFalse(legIstDep.isSpecialFlight());
@@ -118,9 +98,9 @@ public class LegIntroducerTest extends TestCase {
     	/*
     	 * No deadhead flight numbers.
     	 */
-    	Airport apCDG = AirportTestUtil.generateAirportInstance("CDG");
-
-    	Leg legNoDhFlightNo = LegTestUtil.generateLegInstance(1967, apIST, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), "320");
+    	Leg legNoDhFlightNo = this.generateLegInstance(1967, apIST, apCDG, 
+    													LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), 
+    													LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), "320");
 
     	assertFalse(legNoDhFlightNo.isDeadheadable());
 		assertTrue(legIstDep.isDeadheadable());
@@ -131,18 +111,18 @@ public class LegIntroducerTest extends TestCase {
     	/*
     	 * No deadhead flight number range.
     	 */
-    	Airport apBRU = AirportTestUtil.generateAirportInstance("BRU");
-
-    	Leg legNoDhFlightRange = LegTestUtil.generateLegInstance(3500, apIST, apBRU, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), "320");
+    	Leg legNoDhFlightRange = this.generateLegInstance(3500, apIST, apBRU, 
+    														LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), 
+    														LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), "320");
 
     	assertTrue((legNoDhFlightRange == null) || (!legNoDhFlightRange.isDeadheadable()));
 
     	/*
     	 * No deadhead on special stations if HB dep or arr.
     	 */
-    	Airport apJED = AirportTestUtil.generateAirportInstance("JED");
-
-    	Leg legNoDhStation = LegTestUtil.generateLegInstance(300, apIST, apJED, LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), "320");
+    	Leg legNoDhStation = this.generateLegInstance(300, apIST, apJED, 
+    													LocalDateTime.of(2014, Month.JANUARY, 1, 8, 0), 
+    													LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), "320");
 
 		assertFalse(legNoDhStation.isDeadheadable());
     }

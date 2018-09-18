@@ -1,17 +1,12 @@
 package org.heuros.hyperpair;
 
-import org.heuros.data.model.Airport;
-import org.heuros.hyperpair.intro.AirportIntroducer;
-import org.heuros.util.test.AirportTestUtil;
-
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
  * Airport Introducer test.
  */
-public class AirportIntroducerTest extends TestCase {
+public class AirportIntroducerTest extends AbsTestBase {
 
 	/**
      * Create the test case
@@ -32,39 +27,10 @@ public class AirportIntroducerTest extends TestCase {
     }
 
     /**
-     * Test Airport initialization.
+     * Test Airport introducer.
      */
-    public void testAirportInitialization()
+    public void runTestProcedure()
     {
-    	/*
-    	 * Generate airport instances.
-    	 */
-    	assertTrue(AirportTestUtil.initializeAirportContext(new AirportIntroducer()) != null);
-
-    	Airport apIST = AirportTestUtil.generateAirportInstance("IST");
-    	Airport apSAW = AirportTestUtil.generateAirportInstance("SAW");
-    	Airport apAYT = AirportTestUtil.generateAirportInstance("AYT");
-    	Airport apEZS = AirportTestUtil.generateAirportInstance("EZS");
-    	Airport apESB = AirportTestUtil.generateAirportInstance("ESB");
-    	Airport apADA = AirportTestUtil.generateAirportInstance("ADA");
-    	Airport apCDG = AirportTestUtil.generateAirportInstance("CDG");
-    	Airport apBRE = AirportTestUtil.generateAirportInstance("BRE");
-    	Airport apHAM = AirportTestUtil.generateAirportInstance("HAM");
-    	Airport apJED = AirportTestUtil.generateAirportInstance("JED");
-    	Airport apJFK = AirportTestUtil.generateAirportInstance("JFK");
-    	Airport apLHR = AirportTestUtil.generateAirportInstance("LHR");
-    	Airport apVAN = AirportTestUtil.generateAirportInstance("VAN");
-    	Airport apBHX = AirportTestUtil.generateAirportInstance("BHX");
-    	Airport apECN = AirportTestUtil.generateAirportInstance("ECN");
-    	Airport apTLV = AirportTestUtil.generateAirportInstance("TLV");
-    	Airport apAJI = AirportTestUtil.generateAirportInstance("AJI");
-    	Airport apSSH = AirportTestUtil.generateAirportInstance("SSH");
-    	Airport apBRU = AirportTestUtil.generateAirportInstance("BRU");
-    	Airport apALA = AirportTestUtil.generateAirportInstance("ALA");
-    	Airport apCAI = AirportTestUtil.generateAirportInstance("CAI");
-    	Airport apORY = AirportTestUtil.generateAirportInstance("ORY");
-    	Airport apHOU = AirportTestUtil.generateAirportInstance("HOU");
-
     	/*
     	 * Homebase
     	 */

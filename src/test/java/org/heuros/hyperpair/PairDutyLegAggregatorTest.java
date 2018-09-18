@@ -4,34 +4,19 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-import org.heuros.core.rule.intf.Rule;
-import org.heuros.data.model.Airport;
-import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
-import org.heuros.data.model.DutyFactory;
 import org.heuros.data.model.Leg;
-import org.heuros.data.model.LegFactory;
 import org.heuros.data.model.Pair;
-import org.heuros.data.model.PairFactory;
-import org.heuros.hyperpair.intro.AirportIntroducer;
-import org.heuros.hyperpair.intro.DutyLegAggregator;
-import org.heuros.hyperpair.intro.LegIntroducer;
-import org.heuros.hyperpair.intro.PairDutyAggregator;
 import org.heuros.hyperpair.rule.PairNumOfPassiveLegsLimit;
 import org.heuros.hyperpair.rule.PairPeriodLength;
-import org.heuros.rule.AirportRuleContext;
-import org.heuros.rule.DutyRuleContext;
-import org.heuros.rule.LegRuleContext;
-import org.heuros.rule.PairRuleContext;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
  * Airport Introducer test.
  */
-public class PairDutyLegAggregatorTest extends TestCase {
+public class PairDutyLegAggregatorTest extends AbsTestBase {
 
 	/**
      * Create the test case
@@ -54,147 +39,27 @@ public class PairDutyLegAggregatorTest extends TestCase {
     /**
      * Test Duty Leg append/remove.
      */
-    public void testDutyLegAggregation()
+    public void runTestProcedure()
     {
-    	HeurosDatasetParam.optPeriodStartInc = LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0);
-    	HeurosSystemParam.briefPeriodBeforeDutyHb = 90;
-
-    	/*
-    	 * Generate airport instances for the leg introducer test.
-    	 */
-    	AirportFactory apFactory = new AirportFactory();
-    	AirportRuleContext apRuleContext = new AirportRuleContext();
-
-    	Rule apIntroducer = new AirportIntroducer();
-
-    	try {
-    		apRuleContext.registerRule(apIntroducer);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		assertTrue(false);
-    	}
-
-    	Airport apIST = apFactory.generateModel();
-    	Airport apSAW = apFactory.generateModel();
-    	Airport apESB = apFactory.generateModel();
-    	Airport apADA = apFactory.generateModel();
-    	Airport apAYT = apFactory.generateModel();
-    	Airport apEZS = apFactory.generateModel();
-    	Airport apCDG = apFactory.generateModel();
-    	Airport apBRE = apFactory.generateModel();
-    	Airport apHAM = apFactory.generateModel();
-    	Airport apLHR = apFactory.generateModel();
-    	Airport apJED = apFactory.generateModel();
-    	Airport apJFK = apFactory.generateModel();
-
-    	apIST.setCode("IST");
-    	apSAW.setCode("SAW");
-    	apESB.setCode("ESB");
-    	apADA.setCode("ADA");
-    	apAYT.setCode("AYT");
-    	apEZS.setCode("EZS");
-    	apCDG.setCode("CDG");
-    	apBRE.setCode("BRE");
-    	apHAM.setCode("HAM");
-    	apLHR.setCode("LHR");
-    	apJED.setCode("JED");
-    	apJFK.setCode("JFK");
-
-    	apRuleContext.getIntroducerProxy().introduce(apIST);
-    	apRuleContext.getIntroducerProxy().introduce(apSAW);
-    	apRuleContext.getIntroducerProxy().introduce(apESB);
-    	apRuleContext.getIntroducerProxy().introduce(apADA);
-    	apRuleContext.getIntroducerProxy().introduce(apAYT);
-    	apRuleContext.getIntroducerProxy().introduce(apEZS);
-    	apRuleContext.getIntroducerProxy().introduce(apCDG);
-    	apRuleContext.getIntroducerProxy().introduce(apBRE);
-    	apRuleContext.getIntroducerProxy().introduce(apHAM);
-    	apRuleContext.getIntroducerProxy().introduce(apLHR);
-    	apRuleContext.getIntroducerProxy().introduce(apJED);
-    	apRuleContext.getIntroducerProxy().introduce(apJFK);
-
     	/*
     	 * Generate leg instances for the test.
     	 */
-
-    	LegFactory legFactory = new LegFactory();
-    	LegRuleContext legRuleContext = new LegRuleContext(HeurosSystemParam.homebases.length);
-
-    	Rule legIntroducer = new LegIntroducer();
-
-    	try {
-    		legRuleContext.registerRule(legIntroducer);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		assertTrue(false);
-    	}
-
-    	Leg legAct11HbToDom = legFactory.generateModel();
-    	Leg legAct12DomToDom = legFactory.generateModel();
-    	Leg legAct13DomToInt = legFactory.generateModel();
-    	Leg legAct21IntToDom = legFactory.generateModel();
-    	Leg legAct22DomToHb = legFactory.generateModel();
-    	Leg legAct31HbToInt = legFactory.generateModel();
-    	Leg legAct32IntToHb = legFactory.generateModel();
-    	Leg legAct41HbToHb = legFactory.generateModel();
-    	Leg legPss11HbToDom = legFactory.generateModel();
-    	Leg legPss12DomToDom = legFactory.generateModel();
-    	Leg legPss13DomToInt = legFactory.generateModel();
-    	Leg legPss21IntToDom = legFactory.generateModel();
-    	Leg legPss22DomToHb = legFactory.generateModel();
-    	Leg legPss31HbToInt = legFactory.generateModel();
-    	Leg legPss32IntToHb = legFactory.generateModel();
-    	Leg legPss41HbToHb = legFactory.generateModel();
-
-    	PairDutyLegAggregatorTest.setLegFields(legAct11HbToDom, 101, apIST, apAYT, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "320");	//	90
-    	PairDutyLegAggregatorTest.setLegFields(legAct12DomToDom, 102, apAYT, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 15, 0), "320");	//	120
-    	PairDutyLegAggregatorTest.setLegFields(legAct13DomToInt, 103, apEZS, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 16, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "320");	//	180
-    	PairDutyLegAggregatorTest.setLegFields(legAct21IntToDom, 104, apCDG, apADA, LocalDateTime.of(2014, Month.JANUARY, 2, 20, 30), LocalDateTime.of(2014, Month.JANUARY, 2, 22, 15), "320");	//	105
-    	PairDutyLegAggregatorTest.setLegFields(legAct22DomToHb, 105, apADA, apIST, LocalDateTime.of(2014, Month.JANUARY, 2, 23, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 1, 50), "320");		//	170
-    	PairDutyLegAggregatorTest.setLegFields(legAct31HbToInt, 106, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 3, 14, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 15, 50), "320");		//	110
-    	PairDutyLegAggregatorTest.setLegFields(legAct32IntToHb, 107, apLHR, apSAW, LocalDateTime.of(2014, Month.JANUARY, 3, 17, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 20, 10), "320");		//	190
-    	PairDutyLegAggregatorTest.setLegFields(legAct41HbToHb, 108, apIST, apSAW, LocalDateTime.of(2014, Month.JANUARY, 4, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 5, 4, 0), "320");			//	480
-
-    	PairDutyLegAggregatorTest.setLegFields(legPss11HbToDom, 101, apIST, apAYT, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "737");
-    	PairDutyLegAggregatorTest.setLegFields(legPss12DomToDom, 102, apAYT, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 15, 0), "737");
-    	PairDutyLegAggregatorTest.setLegFields(legPss13DomToInt, 103, apEZS, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 16, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "737");
-    	PairDutyLegAggregatorTest.setLegFields(legPss21IntToDom, 104, apCDG, apADA, LocalDateTime.of(2014, Month.JANUARY, 2, 20, 30), LocalDateTime.of(2014, Month.JANUARY, 2, 22, 15), "737");
-    	PairDutyLegAggregatorTest.setLegFields(legPss22DomToHb, 105, apADA, apIST, LocalDateTime.of(2014, Month.JANUARY, 2, 23, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 1, 50), "737");
-    	PairDutyLegAggregatorTest.setLegFields(legPss31HbToInt, 106, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 3, 14, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 15, 50), "737");
-    	PairDutyLegAggregatorTest.setLegFields(legPss32IntToHb, 107, apLHR, apSAW, LocalDateTime.of(2014, Month.JANUARY, 3, 17, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 20, 10), "737");
-    	PairDutyLegAggregatorTest.setLegFields(legPss41HbToHb, 108, apIST, apSAW, LocalDateTime.of(2014, Month.JANUARY, 4, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 5, 4, 0), "737");
-
-    	legRuleContext.getIntroducerProxy().introduce(legAct11HbToDom);
-    	legRuleContext.getIntroducerProxy().introduce(legAct12DomToDom);
-    	legRuleContext.getIntroducerProxy().introduce(legAct13DomToInt);
-    	legRuleContext.getIntroducerProxy().introduce(legAct21IntToDom);
-    	legRuleContext.getIntroducerProxy().introduce(legAct22DomToHb);
-    	legRuleContext.getIntroducerProxy().introduce(legAct31HbToInt);
-    	legRuleContext.getIntroducerProxy().introduce(legAct32IntToHb);
-    	legRuleContext.getIntroducerProxy().introduce(legAct41HbToHb);
-
-    	legRuleContext.getIntroducerProxy().introduce(legPss11HbToDom);
-    	legRuleContext.getIntroducerProxy().introduce(legPss12DomToDom);
-    	legRuleContext.getIntroducerProxy().introduce(legPss13DomToInt);
-    	legRuleContext.getIntroducerProxy().introduce(legPss21IntToDom);
-    	legRuleContext.getIntroducerProxy().introduce(legPss22DomToHb);
-    	legRuleContext.getIntroducerProxy().introduce(legPss31HbToInt);
-    	legRuleContext.getIntroducerProxy().introduce(legPss32IntToHb);
-    	legRuleContext.getIntroducerProxy().introduce(legPss41HbToHb);
-
-		/*
-		 * Generate Duty context.
-		 */
-		DutyFactory dutyFactory = new DutyFactory(HeurosSystemParam.homebases.length);
-		DutyRuleContext dutyRuleContext = new DutyRuleContext(HeurosSystemParam.homebases.length);
-		DutyLegAggregator dutyLegAggregator = new DutyLegAggregator();
-
-		try {
-			dutyRuleContext.registerRule(dutyLegAggregator);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		assertTrue(false);
-    	}
+    	Leg legAct11HbToDom = this.generateLegInstance(101, apIST, apAYT, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "320");	//	90
+    	Leg legAct12DomToDom = this.generateLegInstance(102, apAYT, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 15, 0), "320");	//	120
+    	Leg legAct13DomToInt = this.generateLegInstance(103, apEZS, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 16, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "320");	//	180
+    	Leg legAct21IntToDom = this.generateLegInstance(104, apCDG, apADA, LocalDateTime.of(2014, Month.JANUARY, 2, 20, 30), LocalDateTime.of(2014, Month.JANUARY, 2, 22, 15), "320");	//	105
+    	Leg legAct22DomToHb = this.generateLegInstance(105, apADA, apIST, LocalDateTime.of(2014, Month.JANUARY, 2, 23, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 1, 50), "320");		//	170
+//    	Leg legAct31HbToInt = this.generateLegInstance(106, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 3, 14, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 15, 50), "320");		//	110
+//    	Leg legAct32IntToHb = this.generateLegInstance(107, apLHR, apSAW, LocalDateTime.of(2014, Month.JANUARY, 3, 17, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 20, 10), "320");		//	190
+//    	Leg legAct41HbToHb = this.generateLegInstance(108, apIST, apSAW, LocalDateTime.of(2014, Month.JANUARY, 4, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 5, 4, 0), "320");			//	480
+//    	Leg legPss11HbToDom = this.generateLegInstance(101, apIST, apAYT, LocalDateTime.of(2014, Month.JANUARY, 1, 10, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 11, 30), "737");
+//    	Leg legPss12DomToDom = this.generateLegInstance(102, apAYT, apEZS, LocalDateTime.of(2014, Month.JANUARY, 1, 13, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 15, 0), "737");
+//    	Leg legPss13DomToInt = this.generateLegInstance(103, apEZS, apCDG, LocalDateTime.of(2014, Month.JANUARY, 1, 16, 0), LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "737");
+//    	Leg legPss21IntToDom = this.generateLegInstance(104, apCDG, apADA, LocalDateTime.of(2014, Month.JANUARY, 2, 20, 30), LocalDateTime.of(2014, Month.JANUARY, 2, 22, 15), "737");
+//    	Leg legPss22DomToHb = this.generateLegInstance(105, apADA, apIST, LocalDateTime.of(2014, Month.JANUARY, 2, 23, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 1, 50), "737");
+//    	Leg legPss31HbToInt = this.generateLegInstance(106, apIST, apLHR, LocalDateTime.of(2014, Month.JANUARY, 3, 14, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 15, 50), "737");
+//    	Leg legPss32IntToHb = this.generateLegInstance(107, apLHR, apSAW, LocalDateTime.of(2014, Month.JANUARY, 3, 17, 0), LocalDateTime.of(2014, Month.JANUARY, 3, 20, 10), "737");
+//    	Leg legPss41HbToHb = this.generateLegInstance(108, apIST, apSAW, LocalDateTime.of(2014, Month.JANUARY, 4, 20, 0), LocalDateTime.of(2014, Month.JANUARY, 5, 4, 0), "737");
 
 		int hbNdxIST = 0;
 		int hbNdxSAW = 1;
@@ -202,7 +67,7 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		/*
     	 * Aggregate Legs on duty.
     	 */
-		Duty d = dutyFactory.generateModel();
+		Duty d = this.generateDutyInstance();
 		dutyRuleContext.getAggregatorImpl().append(d, legAct11HbToDom);
 		dutyRuleContext.getAggregatorImpl().append(d, legAct12DomToDom);
 		dutyRuleContext.getAggregatorImpl().append(d, legAct13DomToInt);
@@ -452,18 +317,7 @@ public class PairDutyLegAggregatorTest extends TestCase {
 		/*
 		 * Generate pair for test.
 		 */
-		PairFactory pairFactory = new PairFactory(HeurosSystemParam.homebases.length);
-		PairRuleContext pairRuleContext = new PairRuleContext(HeurosSystemParam.homebases.length);
-		PairDutyAggregator pairDutyAggregator = new PairDutyAggregator();
-
-		try {
-			pairRuleContext.registerRule(pairDutyAggregator);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		assertTrue(false);
-    	}
-
-		Pair p = pairFactory.generateModel();
+		Pair p = this.generatePairInstance();
 		pairRuleContext.getAggregatorImpl().append(p, d);
 		pairRuleContext.getAggregatorImpl().append(p, d2);
 
@@ -672,20 +526,5 @@ public class PairDutyLegAggregatorTest extends TestCase {
 //		dutyRuleContext.getAggregatorImpl().append(d, legAct41HbToHb);
 
 
-    }
-
-    private static void setLegFields(Leg leg,
-    							int flightNo,
-	    						Airport depAirport,
-	    						Airport arrAirport,
-	    						LocalDateTime sobt,
-	    						LocalDateTime sibt,
-	    						String acType) {
-    	leg.setFlightNo(flightNo);
-    	leg.setDepAirport(depAirport);
-    	leg.setArrAirport(arrAirport);
-    	leg.setSobt(sobt);
-    	leg.setSibt(sibt);
-    	leg.setAcType(acType);
     }
 }
