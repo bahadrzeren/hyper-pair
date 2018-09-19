@@ -67,7 +67,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		/*
     	 * Aggregate Legs on duty.
     	 */
-		Duty d = this.generateDutyInstance();
+		Duty d = this.generateDutyInstance(2);
 		dutyRuleContext.getAggregatorImpl().append(d, legAct11HbToDom);
 		dutyRuleContext.getAggregatorImpl().append(d, legAct12DomToDom);
 		dutyRuleContext.getAggregatorImpl().append(d, legAct13DomToInt);
@@ -310,14 +310,14 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		 * Regenerate second duty again.
 		 */
 
-		Duty d2 = dutyFactory.generateModel();
+		Duty d2 = this.generateDutyInstance(2);
 		dutyRuleContext.getAggregatorImpl().append(d2, legAct21IntToDom);
 		dutyRuleContext.getAggregatorImpl().append(d2, legAct22DomToHb);
 
 		/*
 		 * Generate pair for test.
 		 */
-		Pair p = this.generatePairInstance();
+		Pair p = this.generatePairInstance(0);
 		pairRuleContext.getAggregatorImpl().append(p, d);
 		pairRuleContext.getAggregatorImpl().append(p, d2);
 
@@ -337,16 +337,16 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		assertTrue(p.getNumOfLegsPassive() == 0);
 		assertTrue(p.getNumOfLegsIntToDom() == 1);
 		assertTrue(p.getNumOfLegsDomToInt() == 1);
-		assertTrue(p.getBriefDurationInMins(hbNdxIST) == 150);
-		assertTrue(p.getDutyDurationInMins(hbNdxIST) == 1070);
-		assertTrue(p.getDebriefDurationInMins(hbNdxIST) == 60);
-		assertTrue(p.getRestDurationInMins(hbNdxIST) == d.getRestDurationInMins(hbNdxIST) + d2.getRestDurationInMins(hbNdxIST));
-		assertTrue(p.getNumOfDaysTouched(hbNdxIST) == 3);
+		assertTrue(p.getBriefDurationInMins() == 150);
+		assertTrue(p.getDutyDurationInMins() == 1070);
+		assertTrue(p.getDebriefDurationInMins() == 60);
+		assertTrue(p.getRestDurationInMins() == d.getRestDurationInMins(hbNdxIST) + d2.getRestDurationInMins(hbNdxIST));
+		assertTrue(p.getNumOfDaysTouched() == 3);
 		assertTrue(p.getNumOfDuties() == 2);
 		assertTrue(p.getNumOfInternationalDuties() == 1);
-		assertTrue(p.getNumOfEarlyDuties(hbNdxIST) == 0);
-		assertTrue(p.getNumOfHardDuties(hbNdxIST) == 1);
-		assertTrue(p.getNumOfAugmentedDuties(hbNdxIST) == 0);
+		assertTrue(p.getNumOfEarlyDuties() == 0);
+		assertTrue(p.getNumOfHardDuties() == 1);
+		assertTrue(p.getNumOfAugmentedDuties() == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
 		/*
@@ -368,16 +368,16 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		assertTrue(p.getNumOfLegsPassive() == 0);
 		assertTrue(p.getNumOfLegsIntToDom() == 0);
 		assertTrue(p.getNumOfLegsDomToInt() == 1);
-		assertTrue(p.getBriefDurationInMins(hbNdxIST) == 90);
-		assertTrue(p.getDutyDurationInMins(hbNdxIST) == 660);
-		assertTrue(p.getDebriefDurationInMins(hbNdxIST) == 30);
-		assertTrue(p.getRestDurationInMins(hbNdxIST) == d.getRestDurationInMins(hbNdxIST));
-		assertTrue(p.getNumOfDaysTouched(hbNdxIST) == 1);
+		assertTrue(p.getBriefDurationInMins() == 90);
+		assertTrue(p.getDutyDurationInMins() == 660);
+		assertTrue(p.getDebriefDurationInMins() == 30);
+		assertTrue(p.getRestDurationInMins() == d.getRestDurationInMins(hbNdxIST));
+		assertTrue(p.getNumOfDaysTouched() == 1);
 		assertTrue(p.getNumOfDuties() == 1);
 		assertTrue(p.getNumOfInternationalDuties() == 1);
-		assertTrue(p.getNumOfEarlyDuties(hbNdxIST) == 0);
-		assertTrue(p.getNumOfHardDuties(hbNdxIST) == 0);
-		assertTrue(p.getNumOfAugmentedDuties(hbNdxIST) == 0);
+		assertTrue(p.getNumOfEarlyDuties() == 0);
+		assertTrue(p.getNumOfHardDuties() == 0);
+		assertTrue(p.getNumOfAugmentedDuties() == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
 		/*
@@ -385,7 +385,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		 */
 		pairRuleContext.getAggregatorImpl().removeLast(p);
 
-		assertTrue(p.getHbNdx() == -1);
+		assertTrue(p.getHbNdx() == 0);
 		assertTrue(p.getFirstDuty() == null);
 		assertTrue(p.getLastDuty() == null);
 		assertTrue(p.getFirstLeg() == null);
@@ -400,16 +400,16 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		assertTrue(p.getNumOfLegsPassive() == 0);
 		assertTrue(p.getNumOfLegsIntToDom() == 0);
 		assertTrue(p.getNumOfLegsDomToInt() == 0);
-		assertTrue(p.getBriefDurationInMins(hbNdxIST) == 0);
-		assertTrue(p.getDutyDurationInMins(hbNdxIST) == 0);
-		assertTrue(p.getDebriefDurationInMins(hbNdxIST) == 0);
-		assertTrue(p.getRestDurationInMins(hbNdxIST) == 0);
-		assertTrue(p.getNumOfDaysTouched(hbNdxIST) == 0);
+		assertTrue(p.getBriefDurationInMins() == 0);
+		assertTrue(p.getDutyDurationInMins() == 0);
+		assertTrue(p.getDebriefDurationInMins() == 0);
+		assertTrue(p.getRestDurationInMins() == 0);
+		assertTrue(p.getNumOfDaysTouched() == 0);
 		assertTrue(p.getNumOfDuties() == 0);
 		assertTrue(p.getNumOfInternationalDuties() == 0);
-		assertTrue(p.getNumOfEarlyDuties(hbNdxIST) == 0);
-		assertTrue(p.getNumOfHardDuties(hbNdxIST) == 0);
-		assertTrue(p.getNumOfAugmentedDuties(hbNdxIST) == 0);
+		assertTrue(p.getNumOfEarlyDuties() == 0);
+		assertTrue(p.getNumOfHardDuties() == 0);
+		assertTrue(p.getNumOfAugmentedDuties() == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
 		/*
@@ -507,16 +507,16 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		assertTrue(p.getNumOfLegsPassive() == 0);
 		assertTrue(p.getNumOfLegsIntToDom() == 1);
 		assertTrue(p.getNumOfLegsDomToInt() == 1);
-		assertTrue(p.getBriefDurationInMins(hbNdxIST) == 150);
-		assertTrue(p.getDutyDurationInMins(hbNdxIST) == 1070);
-		assertTrue(p.getDebriefDurationInMins(hbNdxIST) == 60);
-		assertTrue(p.getRestDurationInMins(hbNdxIST) == d.getRestDurationInMins(hbNdxIST) + d2.getRestDurationInMins(hbNdxIST));
-		assertTrue(p.getNumOfDaysTouched(hbNdxIST) == 3);
+		assertTrue(p.getBriefDurationInMins() == 150);
+		assertTrue(p.getDutyDurationInMins() == 1070);
+		assertTrue(p.getDebriefDurationInMins() == 60);
+		assertTrue(p.getRestDurationInMins() == d.getRestDurationInMins(hbNdxIST) + d2.getRestDurationInMins(hbNdxIST));
+		assertTrue(p.getNumOfDaysTouched() == 3);
 		assertTrue(p.getNumOfDuties() == 2);
 		assertTrue(p.getNumOfInternationalDuties() == 1);
-		assertTrue(p.getNumOfEarlyDuties(hbNdxIST) == 0);
-		assertTrue(p.getNumOfHardDuties(hbNdxIST) == 1);
-		assertTrue(p.getNumOfAugmentedDuties(hbNdxIST) == 0);
+		assertTrue(p.getNumOfEarlyDuties() == 0);
+		assertTrue(p.getNumOfHardDuties() == 1);
+		assertTrue(p.getNumOfAugmentedDuties() == 0);
 		assertTrue(p.getNumOfErDuties() == 0);
 
 

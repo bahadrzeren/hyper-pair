@@ -19,7 +19,7 @@ public class PairPeriodLength implements FinalChecker<PairView> {
 
 	@Override
 	public boolean acceptable(int hbNdx, PairView p) {
-        if (p.getNumOfDaysTouched(hbNdx) > HeurosSystemParam.maxPairingLengthInDays)
+        if (p.getNumOfDaysTouched() > HeurosSystemParam.maxPairingLengthInDays)
         	return false;
 		return true;
 	}

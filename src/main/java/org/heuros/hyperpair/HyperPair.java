@@ -16,12 +16,8 @@ import org.heuros.core.ga.crossover.UniformCrossover;
 import org.heuros.core.ga.mutation.IntegerGeneMutator;
 import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.core.rule.intf.Rule;
-import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
-import org.heuros.data.model.DutyFactory;
 import org.heuros.data.model.Leg;
-import org.heuros.data.model.LegFactory;
-import org.heuros.data.model.PairFactory;
 import org.heuros.data.processor.DutyGenerator;
 import org.heuros.data.repo.AirportRepository;
 import org.heuros.data.repo.DutyRepository;
@@ -131,9 +127,7 @@ public class HyperPair {
 			/*
 			 * Load LEG data from CSV file.
 			 */
-			List<Leg> legs = new LegsLoader().setLegsFileName(conf.getLegs())
-												.setModelFactory(new LegFactory())
-												.extractData();
+			List<Leg> legs = new LegsLoader().setLegsFileName(conf.getLegs()).extractData();
 
 			HeurosDatasetParam.dataPeriodStartInc = legs.get(0).getSobt().withDayOfMonth(1).toLocalDate().plusMonths(1).atStartOfDay();
 			logger.info("Data period start: " + HeurosDatasetParam.dataPeriodStartInc);
@@ -148,16 +142,12 @@ public class HyperPair {
 			/*
 			 * Generate context.
 			 */
-			PairOptimizationContext pairOptimizationContext = new PairOptimizationContext().setAirportFactory(new AirportFactory())
-																							.setAirportRuleContext(new AirportRuleContext())
+			PairOptimizationContext pairOptimizationContext = new PairOptimizationContext().setAirportRuleContext(new AirportRuleContext())
 																							.setAirportRepository(new AirportRepository())
-																							.setLegFactory(new LegFactory())
 																							.setLegRuleContext(new LegRuleContext(HeurosSystemParam.homebases.length))
 																							.setLegRepository(new LegRepository())
-																							.setDutyFactory(new DutyFactory(HeurosSystemParam.homebases.length))
 																							.setDutyRuleContext(new DutyRuleContext(HeurosSystemParam.homebases.length))
 																							.setDutyRepository(new DutyRepository())
-																							.setPairFactory(new PairFactory(HeurosSystemParam.homebases.length))
 																							.setPairRuleContext(new PairRuleContext(HeurosSystemParam.homebases.length));
 
 			/*
@@ -173,10 +163,10 @@ public class HyperPair {
 			/*
 			 * Generate duties.
 			 */
-			DutyGenerator dutyGenerator = new DutyGenerator().setDutyFactory(pairOptimizationContext.getDutyFactory())
-																.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+			DutyGenerator dutyGenerator = new DutyGenerator().setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																.setLegConnectionIndex(pairOptimizationContext.getConnectionLegsIndex())
-																.setLegRepository(pairOptimizationContext.getLegRepository());
+																.setLegRepository(pairOptimizationContext.getLegRepository())
+																.setNumOfBases(HeurosSystemParam.homebases.length);
 			List<Duty> duties = dutyGenerator.proceed();
 
 //			/*
@@ -194,8 +184,7 @@ public class HyperPair {
 			 */
 			pairOptimizationContext.registerDuties(duties, HeurosSystemParam.homebases.length);
 
-			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setPairFactory(pairOptimizationContext.getPairFactory())
-																						.setLegRepository(pairOptimizationContext.getLegRepository())
+			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
 																						.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																						.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())

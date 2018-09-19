@@ -5,13 +5,9 @@ import java.time.Month;
 
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.Airport;
-import org.heuros.data.model.AirportFactory;
 import org.heuros.data.model.Duty;
-import org.heuros.data.model.DutyFactory;
 import org.heuros.data.model.Leg;
-import org.heuros.data.model.LegFactory;
 import org.heuros.data.model.Pair;
-import org.heuros.data.model.PairFactory;
 import org.heuros.hyperpair.intro.AirportIntroducer;
 import org.heuros.hyperpair.intro.DutyLegAggregator;
 import org.heuros.hyperpair.intro.LegIntroducer;
@@ -41,13 +37,9 @@ public abstract class AbsTestBase extends TestCase {
     public abstract void runTestProcedure();
 
 	protected AirportRuleContext airportRuleContext = null;
-	protected AirportFactory airportFactory = null;
 	protected LegRuleContext legRuleContext = null;
-	protected LegFactory legFactory = null;
 	protected DutyRuleContext dutyRuleContext = null;
-	protected DutyFactory dutyFactory = null;
 	protected PairRuleContext pairRuleContext = null;
-	protected PairFactory pairFactory = null;
 
 	protected Airport apIST = null;
 	protected Airport apSAW = null;
@@ -159,7 +151,6 @@ public abstract class AbsTestBase extends TestCase {
     }
 
 	private AirportRuleContext initializeAirportContext(Rule apIntroducer) {
-		this.airportFactory = new AirportFactory();
 		this.airportRuleContext = new AirportRuleContext();
     	try {
     		this.airportRuleContext.registerRule(apIntroducer);
@@ -171,7 +162,6 @@ public abstract class AbsTestBase extends TestCase {
 	}
 
 	private LegRuleContext initializeLegContext(Rule legIntroducer, int numOfBases) {
-		this.legFactory = new LegFactory();
 		this.legRuleContext = new LegRuleContext(numOfBases);
     	try {
     		this.legRuleContext.registerRule(legIntroducer);
@@ -183,7 +173,6 @@ public abstract class AbsTestBase extends TestCase {
 	}
 
 	private DutyRuleContext initializeDutyContext(Rule dutyLegAggregator, int numOfBases) {
-		this.dutyFactory = new DutyFactory(numOfBases);
 		this.dutyRuleContext = new DutyRuleContext(numOfBases);
 		try {
 			this.dutyRuleContext.registerRule(dutyLegAggregator);
@@ -195,7 +184,6 @@ public abstract class AbsTestBase extends TestCase {
 	}
 
 	private PairRuleContext initializePairContext(Rule pairDutyAggregator, int numOfBases) {
-		this.pairFactory = new PairFactory(numOfBases);
 		this.pairRuleContext = new PairRuleContext(numOfBases);
 		try {
 			this.pairRuleContext.registerRule(pairDutyAggregator);
@@ -207,8 +195,7 @@ public abstract class AbsTestBase extends TestCase {
 	}
 
 	public Airport generateAirportInstance(String apCode) {
-    	Airport apInstance = this.airportFactory.generateModel();
-    	apInstance.setCode(apCode);
+    	Airport apInstance = Airport.newInstance(apCode);
     	if (this.airportRuleContext.getIntroducerProxy().introduce(apInstance))
     		return apInstance;
     	return null;
@@ -220,7 +207,7 @@ public abstract class AbsTestBase extends TestCase {
 			LocalDateTime sobt,
 			LocalDateTime sibt,
 			String acType) {
-		Leg legInstance = this.legFactory.generateModel();
+		Leg legInstance = Leg.newInstance();
 		legInstance.setFlightNo(flightNo);
 		legInstance.setDepAirport(depAirport);
 		legInstance.setArrAirport(arrAirport);
@@ -235,36 +222,36 @@ public abstract class AbsTestBase extends TestCase {
 		return null;
 	}
 
-	public Duty generateDutyInstance() {
-    	return this.dutyFactory.generateModel();
+	public Duty generateDutyInstance(int numOfBases) {
+    	return Duty.newInstance(numOfBases);
 	}
 
-	public Duty generateDutyInstance(Leg leg) {
-    	Duty dutyInstance = this.dutyFactory.generateModel();
+	public Duty generateDutyInstance(int numOfBases, Leg leg) {
+    	Duty dutyInstance = Duty.newInstance(numOfBases);
    		this.dutyRuleContext.getAggregatorProxy().append(dutyInstance, leg);
     	return dutyInstance;
 	}
 
-	public Duty generateDutyInstance(Leg[] legs) {
-    	Duty dutyInstance = this.dutyFactory.generateModel();
+	public Duty generateDutyInstance(int numOfBases, Leg[] legs) {
+		Duty dutyInstance = Duty.newInstance(numOfBases);
     	for (Leg leg: legs) {
     		this.dutyRuleContext.getAggregatorProxy().append(dutyInstance, leg);
 		}
     	return dutyInstance;
 	}
 
-	public Pair generatePairInstance() {
-    	return this.pairFactory.generateModel();
+	public Pair generatePairInstance(int hbNdx) {
+    	return Pair.newInstance(hbNdx);
 	}
 
-	public Pair generatePairInstance(Duty duty) {
-		Pair pairInstance = this.pairFactory.generateModel();
+	public Pair generatePairInstance(int hbNdx, Duty duty) {
+		Pair pairInstance = Pair.newInstance(hbNdx);
    		this.pairRuleContext.getAggregatorProxy().append(pairInstance, duty);
     	return pairInstance;
 	}
 
-	public Pair generatePairInstance(Duty[] duties) {
-		Pair pairInstance = this.pairFactory.generateModel();
+	public Pair generatePairInstance(int hbNdx, Duty[] duties) {
+		Pair pairInstance = Pair.newInstance(hbNdx);
     	for (Duty duty: duties) {
     		this.pairRuleContext.getAggregatorProxy().append(pairInstance, duty);
 		}

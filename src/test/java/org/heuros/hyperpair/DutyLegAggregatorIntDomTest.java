@@ -45,7 +45,7 @@ public class DutyLegAggregatorIntDomTest extends AbsTestBase {
     										LocalDateTime.of(2014, Month.JANUARY, 1, 14, 40), 
     										LocalDateTime.of(2014, Month.JANUARY, 1, 19, 0), "320");	//	260
 
-    	Duty d = this.generateDutyInstance(l1);
+    	Duty d = this.generateDutyInstance(2, l1);
 
 		assertTrue(d.getBlockTimeInMins() == 260);
 		assertTrue(d.getNumOfLegs() == 1);

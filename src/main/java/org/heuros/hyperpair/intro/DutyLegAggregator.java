@@ -650,8 +650,9 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 			d.setAugmented(i, 0);
 			d.setEarly(i, false);
 			d.setHard(i, false);
-			d.setValid(i, true);
+			d.setValid(i, false);
 		}
+		d.setValidated(false);
 	}
 
 	@Override

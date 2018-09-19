@@ -18,7 +18,6 @@ import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
-import org.heuros.data.model.PairFactory;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
 import org.heuros.hyperpair.HeurosSystemParam;
@@ -33,8 +32,6 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return numOfHeuristics;
 	}
 
-	private PairFactory pairFactory = null;
-
 	private LegRepository legRepository = null;
 	private DutyRepository dutyRepository = null;
 	private PairRuleContext pairRuleContext = null;
@@ -46,11 +43,6 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	private TwoDimIndexIntXLocalDateTime<DutyView> hbArrDutyIndexByDepAirportNdxBrieftime = null;
 
 	private List<Leg> reOrderedLegs = null;
-
-	public PairChromosomeDecoder setPairFactory(PairFactory pairFactory) {
-		this.pairFactory = pairFactory;
-		return this;
-	}
 
 //	private static Random random = new Random();
 
@@ -353,7 +345,10 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 			int hbNdx = 0;
 			DutyView duty = this.fetchHbDepDuty(hbNdx, legToCover, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			if (duty != null) {
-				Pair pair = this.pairFactory.generateModel();
+				/*
+				 * TODO Single base assumption!!!
+				 */
+				Pair pair = Pair.newInstance(0);
 				while (true) {
 					if (duty != null) {
 						if (pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, pair, duty))

@@ -45,7 +45,7 @@ public class DutyLegAggregatorHbErTest extends AbsTestBase {
     										LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0), 
     										LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0), "320");	//	660
 
-    	Duty d = this.generateDutyInstance(l1);
+    	Duty d = this.generateDutyInstance(2, l1);
 
 		assertTrue(d.getBlockTimeInMins() == 660);
 		assertTrue(d.getNumOfLegs() == 1);

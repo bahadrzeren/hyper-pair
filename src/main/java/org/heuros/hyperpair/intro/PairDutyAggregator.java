@@ -6,7 +6,6 @@ import org.heuros.core.rule.intf.Aggregator;
 import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Pair;
-import org.heuros.hyperpair.HeurosSystemParam;
 
 @RuleImplementation(ruleName = "Pair duty aggregator", 
 					violationMessage = "Pair duty aggregator failed", 
@@ -56,33 +55,34 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 		p.incNumOfLegsIntToDom(incAmount * d.getNumOfLegsIntToDom());
 		p.incNumOfLegsDomToInt(incAmount * d.getNumOfLegsDomToInt());
 
-		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
-			p.setNumOfDaysTouched(i, (int) ChronoUnit.DAYS.between(p.getFirstDuty().getBriefDay(i), p.getLastDuty().getDebriefDay(i)) + 1);
+//		for (int i = 0; i < HeurosSystemParam.homebases.length; i++)
+			p.setNumOfDaysTouched((int) ChronoUnit.DAYS.between(p.getFirstDuty().getBriefDay(p.getHbNdx()), 
+																p.getLastDuty().getDebriefDay(p.getHbNdx())) + 1);
 
-		for (int i = 0; i < HeurosSystemParam.homebases.length; i++) {
+//		for (int i = 0; i < HeurosSystemParam.homebases.length; i++) {
 			if ((p.getNumOfDuties() == 1) && (incAmount > 0)) {
-				p.incBriefDurationInMins(i, incAmount * d.getBriefDurationInMins(i));
-				p.incDutyDurationInMins(i, incAmount * d.getDutyDurationInMins(i));
-				p.incRestDurationInMins(i, incAmount * d.getRestDurationInMins(i));
-				if (d.isEarly(i))
-					p.incNumOfEarlyDuties(i, incAmount);
-				if (d.isHard(i))
-					p.incNumOfHardDuties(i, incAmount);
-				if (d.getAugmented(i) > 0)
-					p.incNumOfAugmentedDuties(i, incAmount);
+				p.incBriefDurationInMins(incAmount * d.getBriefDurationInMins(p.getHbNdx()));
+				p.incDutyDurationInMins(incAmount * d.getDutyDurationInMins(p.getHbNdx()));
+				p.incRestDurationInMins(incAmount * d.getRestDurationInMins(p.getHbNdx()));
+				if (d.isEarly(p.getHbNdx()))
+					p.incNumOfEarlyDuties(incAmount);
+				if (d.isHard(p.getHbNdx()))
+					p.incNumOfHardDuties(incAmount);
+				if (d.getAugmented(p.getHbNdx()) > 0)
+					p.incNumOfAugmentedDuties(incAmount);
 			} else {
-				p.incBriefDurationInMins(i, incAmount * d.getBriefDurationInMins(i));
-				p.incDutyDurationInMins(i, incAmount * d.getDutyDurationInMins(i));
-				p.incRestDurationInMins(i, incAmount * d.getRestDurationInMins(i));
-				if (d.isEarly(i))
-					p.incNumOfEarlyDuties(i, incAmount);
-				if (d.isHard(i))
-					p.incNumOfHardDuties(i, incAmount);
-				if (d.getAugmented(i) > 0)
-					p.incNumOfAugmentedDuties(i, incAmount);
+				p.incBriefDurationInMins(incAmount * d.getBriefDurationInMins(p.getHbNdx()));
+				p.incDutyDurationInMins(incAmount * d.getDutyDurationInMins(p.getHbNdx()));
+				p.incRestDurationInMins(incAmount * d.getRestDurationInMins(p.getHbNdx()));
+				if (d.isEarly(p.getHbNdx()))
+					p.incNumOfEarlyDuties(incAmount);
+				if (d.isHard(p.getHbNdx()))
+					p.incNumOfHardDuties(incAmount);
+				if (d.getAugmented(p.getHbNdx()) > 0)
+					p.incNumOfAugmentedDuties(incAmount);
 			}
-			p.incDebriefDurationInMins(i, incAmount * d.getDebriefDurationInMins(i));
-		}
+			p.incDebriefDurationInMins(incAmount * d.getDebriefDurationInMins(p.getHbNdx()));
+//		}
 
 		if (d.isInternational())
 			p.incNumOfInternationalDuties(incAmount);
@@ -101,16 +101,16 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 		p.setNumOfLegsPassive(0);
 		p.setNumOfLegsIntToDom(0);
 		p.setNumOfLegsDomToInt(0);
-		for (int i = 0; i < HeurosSystemParam.homebases.length; i++) {
-			p.setBriefDurationInMins(i, 0);
-			p.setDutyDurationInMins(i, 0);
-			p.setRestDurationInMins(i, 0);
-			p.setNumOfDaysTouched(i, 0);
-			p.setNumOfEarlyDuties(i, 0);
-			p.setNumOfHardDuties(i, 0);
-			p.setNumOfAugmentedDuties(i, 0);
-			p.setDebriefDurationInMins(i, 0);
-		}
+//		for (int i = 0; i < HeurosSystemParam.homebases.length; i++) {
+			p.setBriefDurationInMins(0);
+			p.setDutyDurationInMins(0);
+			p.setRestDurationInMins(0);
+			p.setNumOfDaysTouched(0);
+			p.setNumOfEarlyDuties(0);
+			p.setNumOfHardDuties(0);
+			p.setNumOfAugmentedDuties(0);
+			p.setDebriefDurationInMins(0);
+//		}
 		p.setNumOfInternationalDuties(0);
 		p.setNumOfErDuties(0);
 	}
