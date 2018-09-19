@@ -21,9 +21,6 @@ public class PairDutyRestCheck implements ConnectionChecker<DutyView> {
 
 	@Override
 	public boolean areConnectable(int hbNdx, DutyView pd, DutyView nd) {
-		/*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
-		 */
 		int idleTime = (int) ChronoUnit.MINUTES.between(pd.getNextBriefTime(hbNdx), nd.getBriefTime(hbNdx));
 		if (idleTime < 0)
 			return false;

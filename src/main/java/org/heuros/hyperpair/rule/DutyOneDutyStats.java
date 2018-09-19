@@ -38,11 +38,11 @@ public class DutyOneDutyStats implements AppendabilityChecker<DutyView, LegView>
 
 	@Override
 	public boolean isAppendable(int hbNdx, DutyView d, LegView l) {
-        /*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		/*
+		 * isAnyNonHb check is used for backward compatibility.
 		 */
 		if ((l.getArrAirport().isOneDutyStation())
-				&& (d.getFirstDepAirport().isNonHb(hbNdx)))
+				&& (d.getFirstDepAirport().isAnyNonHb()))
     		return false;
     	return true;
 	}

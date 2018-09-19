@@ -38,11 +38,11 @@ public class DutyForceToBeFirstLayoverDuty implements TotalizerChecker<DutyView>
 
 	@Override
 	public boolean acceptable(int hbNdx, DutyView d) {
-        /*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		/*
+		 * isAnyNonHb check is used for backward compatibility.
 		 */
     	if (d.getLastArrAirport().isMandatoryFirstLayover()
-    			&& d.getFirstDepAirport().isNonHb(hbNdx))
+    			&& d.getFirstDepAirport().isAnyNonHb())
     		return false;
     	return true;
 	}

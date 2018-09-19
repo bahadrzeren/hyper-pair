@@ -46,9 +46,9 @@ public class CriticalStations1 implements ConnectionChecker<LegView> {
 	   	 * Check whether IST or SAW departed CATC is first flight in duty.
 	   	 */
 		/*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		 * isAnyHb check is used for backward compatibility.
 		 */
-	   	if (nl.getDepAirport().isHb(hbNdx)
+	   	if (nl.getDepAirport().isAnyHb()
 	   			&& nl.getArrAirport().isCritical())
 	   		return false;
 

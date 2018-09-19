@@ -41,12 +41,15 @@ public class DutyMaxBlockTimeForIntLayovers implements ConnectionChecker<LegView
 
 	@Override
 	public boolean areConnectable(int hbNdx, LegView pl, LegView nl) {
+		/*
+		 * isAnyHb check is used for backward compatibility.
+		 */
         if ((pl.getDepAirport().isInternational()
-        		&& pl.getArrAirport().isHb(hbNdx)
+        		&& pl.getArrAirport().isAnyHb()
         		&& pl.isCover()
         		&& (pl.getBlockTimeInMins() >= maxBlockTimeInDutyForIntLayovers))
         		|| (nl.getArrAirport().isInternational()
-                		&& nl.getDepAirport().isHb(hbNdx)
+                		&& nl.getDepAirport().isAnyHb()
                 		&& nl.isCover()
                 		&& (nl.getBlockTimeInMins() >= maxBlockTimeInDutyForIntLayovers)))
         	return false;

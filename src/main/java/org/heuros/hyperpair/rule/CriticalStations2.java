@@ -64,9 +64,9 @@ public class CriticalStations2 implements AppendabilityChecker<DutyView, LegView
 		 * If CATC layover is not allowed.
 		 */
 		/*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		 * isAnyNonHb check is used for backward compatibility.
 		 */
-		if (d.getLastArrAirport().isNonHb(hbNdx)
+		if (d.getLastArrAirport().isAnyNonHb()
 				&& (d.getNumOfCriticalLegs() > 0))
 			return false;
 		return true;
@@ -78,9 +78,9 @@ public class CriticalStations2 implements AppendabilityChecker<DutyView, LegView
 	     * If CATC layover is not allowed.
 	     */
 		/*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		 * isAnyNonHb check is used for backward compatibility.
 		 */
-	   	if (d.getFirstDepAirport().isNonHb(hbNdx)
+	   	if (d.getFirstDepAirport().isAnyNonHb()
 	   			&& l.getArrAirport().isCritical())
 	   		return false;
 	   	return true;

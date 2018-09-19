@@ -25,10 +25,10 @@ public class DutySpecialFlightNums2 implements ConnectionChecker<DutyView> {
 	public boolean areConnectable(int hbNdx, DutyView pd, DutyView nd) {
         /*
          * Spec Flight Nums.
-         *  
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+         * 
+		 * isAnyHb check is used for backward compatibility.
 		 */
-        if (pd.getFirstDepAirport().isNonHb(hbNdx)
+        if (pd.getFirstDepAirport().isAnyNonHb()
         		&& pd.getFirstDepAirport().isDomestic()
         		&& nd.getFirstLeg().isSpecialFlight())
         	return false;

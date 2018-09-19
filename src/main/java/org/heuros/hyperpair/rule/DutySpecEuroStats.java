@@ -31,11 +31,11 @@ public class DutySpecEuroStats implements ConnectionChecker<LegView> {
 
 		int legConnTime = (int) ChronoUnit.MINUTES.between(pl.getSibt(), nl.getSobt());
 
-        /*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		/*
+		 * isAnyHb check is used for backward compatibility.
 		 */
 		if (nl.getArrAirport().isSpecialEuroStation()
-        		&& nl.getDepAirport().isHb(hbNdx)
+        		&& nl.getDepAirport().isAnyHb()
         		&& nl.isCover()
         		&& (pl.getDepAirport().isInternational()
         				|| (legConnTime < minLegConnTimeForSpecStats)))

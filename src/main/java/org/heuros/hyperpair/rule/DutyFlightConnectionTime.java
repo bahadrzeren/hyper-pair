@@ -27,9 +27,9 @@ public class DutyFlightConnectionTime implements ConnectionChecker<LegView> {
 		if (pl.getFlightNo() == 845)
 			return minLegConnTime30;
 		/*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		 * isAnyHb check is used for backward compatibility.
 		 */
-		if (pl.getArrAirport().isHb(hbNdx)) {
+		if (pl.getArrAirport().isAnyHb()) {
     		if (pl.getArrAirport().getCode().equals("IST")) {
     			if (nl.getArrAirport().getCode().equals("ESB")
     					&& isPlActive && isNlActive)
@@ -339,9 +339,9 @@ public class DutyFlightConnectionTime implements ConnectionChecker<LegView> {
 
 	private int getMaxConnTime(int hbNdx, LegView pl, LegView nl) {
 		/*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		 * isAnyHb check is used for backward compatibility.
 		 */
-        if (pl.getArrAirport().isHb(hbNdx))
+        if (pl.getArrAirport().isAnyHb())
         	return maxLegConnTimeHB;
 
         if (pl.getArrAirport().isLegConnectionExceptionStation())

@@ -24,8 +24,6 @@ public class PairHardDuty implements ConnectionChecker<DutyView> {
 	public boolean areConnectable(int hbNdx, DutyView pd, DutyView nd) {
 		/*
 		 * Do not connect two hard duties back to back.
-		 * 
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
 		 */
         if (pd.isHard(hbNdx) && nd.isHard(hbNdx))
         	return false;

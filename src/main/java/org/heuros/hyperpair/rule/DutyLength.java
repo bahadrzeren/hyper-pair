@@ -16,9 +16,6 @@ public class DutyLength implements TotalizerChecker<DutyView> {
 
 	@Override
 	public boolean acceptable(int hbNdx, DutyView d) {
-        /*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
-		 */
 		return d.getAugmented(hbNdx) <= 2;
 	}
 }

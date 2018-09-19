@@ -113,7 +113,7 @@ public class DutyNumOfLegsLimit implements ExtensibilityChecker<DutyView>,
 		/*
 		 * Gecisli
 		 * 
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		 * isAnyNonHb check is used for backward compatibility.
 		 */
 		if (d.getBriefDay(hbNdx).isBefore( d.getLastLeg().getSibt().minusSeconds(1).truncatedTo(ChronoUnit.DAYS).toLocalDate() )) {
 			if (d.getNumOfLegs() > maxNumOfActiveLegsInOvernightDuty2) {
@@ -121,7 +121,7 @@ public class DutyNumOfLegsLimit implements ExtensibilityChecker<DutyView>,
 					|| (d.getNumOfLegsActive() > maxNumOfActiveLegsInOvernightDuty2)
 					|| ((d.getNumOfLegsActive() ==  maxNumOfActiveLegsInOvernightDuty2)
 							&& (d.getLastLeg().isCover()
-								|| d.getLastArrAirport().isNonHb(hbNdx))))
+								|| d.getLastArrAirport().isAnyNonHb())))
 				return false;
 			}
 		}

@@ -1,8 +1,12 @@
 package org.heuros.hyperpair;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
@@ -70,11 +74,12 @@ import org.heuros.rule.PairRuleContext;
  */
 public class HyperPair {
 
-	private static Logger logger = Logger.getLogger(HyperPair.class);
-
 	private static List<Rule> rules = new ArrayList<Rule>();
 
 	static {
+		DateTimeFormatter datetimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss", Locale.ENGLISH).withZone(ZoneOffset.UTC);
+		System.setProperty("logfile.date.time", datetimeFormatter.format(LocalDateTime.now()));
+
 		HyperPair.rules.add(new AirportIntroducer());
 		HyperPair.rules.add(new DutyLegAggregator());
 		HyperPair.rules.add(new LegIntroducer());
@@ -106,6 +111,8 @@ public class HyperPair {
 		HyperPair.rules.add(new PairNumOfPassiveLegsLimit());
 		HyperPair.rules.add(new PairPeriodLength());
 	}
+
+	private static Logger logger = Logger.getLogger(HyperPair.class);
 
 	public static void main(String[] args) throws IOException, RuleAnnotationIsMissing, RuleRegistrationMatchingException {
     	/*

@@ -32,10 +32,10 @@ public class PairEarlyDuty implements ConnectionChecker<DutyView> {
 	@Override
 	public boolean areConnectable(int hbNdx, DutyView pd, DutyView nd) {
 		/*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		 * isAnyNonHb check is used for backward compatibility.
 		 */
 		if (pd.isEarly(hbNdx) && nd.isEarly(hbNdx)
-				&& (pd.getFirstDepAirport().isNonHb(hbNdx) || nd.getLastArrAirport().isNonHb(hbNdx)))
+				&& (pd.getFirstDepAirport().isAnyNonHb() || nd.getLastArrAirport().isAnyNonHb()))
 			return false;
 		return true;
 	}

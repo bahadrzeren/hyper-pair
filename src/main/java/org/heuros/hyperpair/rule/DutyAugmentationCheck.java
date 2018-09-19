@@ -27,7 +27,7 @@ public class DutyAugmentationCheck implements TotalizerChecker<DutyView> {
 	@Override
 	public boolean acceptable(int hbNdx, DutyView d) {
 		/*
-		 * TODO An additonal HB parameter is necessary for accurate HB or NonHb desicion.
+		 * numOfAnyHbTouch check is used for backward compatibility.
 		 */
     	if (d.getAugmented(hbNdx) > 1)
     		return false;
