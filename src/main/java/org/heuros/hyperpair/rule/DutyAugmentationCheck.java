@@ -1,13 +1,13 @@
 package org.heuros.hyperpair.rule;
 
 import org.heuros.core.rule.intf.RuleImplementation;
-import org.heuros.core.rule.intf.TotalizerChecker;
+import org.heuros.core.rule.intf.FinalChecker;
 import org.heuros.data.model.DutyView;
 
 @RuleImplementation(ruleName="DutyAugmentationCheck", 
 					description="Duty with augmented crew rule.", 
 					violationMessage="Augmentation is not allowed!")
-public class DutyAugmentationCheck implements TotalizerChecker<DutyView> {
+public class DutyAugmentationCheck implements FinalChecker<DutyView> {
 
 //	@Override
 //	public boolean _isDutyValid(Duty d) {

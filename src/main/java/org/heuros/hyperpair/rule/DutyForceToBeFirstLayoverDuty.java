@@ -2,14 +2,14 @@ package org.heuros.hyperpair.rule;
 
 import org.heuros.core.rule.intf.ConnectionChecker;
 import org.heuros.core.rule.intf.RuleImplementation;
-import org.heuros.core.rule.intf.TotalizerChecker;
+import org.heuros.core.rule.intf.FinalChecker;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
 @RuleImplementation(ruleName="DutyForceToBeFirstLayoverDuty", 
 					description="Tripteki zorunlu ilk yati kurali.", 
 					violationMessage="Tripteki ilk yati olmali!")
-public class DutyForceToBeFirstLayoverDuty implements TotalizerChecker<DutyView>,
+public class DutyForceToBeFirstLayoverDuty implements FinalChecker<DutyView>,
 																			ConnectionChecker<LegView> {
 
 //	@Override

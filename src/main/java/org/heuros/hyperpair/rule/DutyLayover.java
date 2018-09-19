@@ -2,7 +2,7 @@ package org.heuros.hyperpair.rule;
 
 import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.core.rule.intf.StarterChecker;
-import org.heuros.core.rule.intf.TotalizerChecker;
+import org.heuros.core.rule.intf.FinalChecker;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
@@ -10,7 +10,7 @@ import org.heuros.data.model.LegView;
 					description="Layover stations rule.", 
 					violationMessage="No layover permission!")
 public class DutyLayover implements StarterChecker<DutyView, LegView>,
-															TotalizerChecker<DutyView> {
+															FinalChecker<DutyView> {
 
 //	@Override
 //	public boolean _canADutyEndAt(Flight f) {

@@ -4,14 +4,14 @@ import java.time.temporal.ChronoUnit;
 
 import org.heuros.core.rule.intf.ExtensibilityChecker;
 import org.heuros.core.rule.intf.RuleImplementation;
-import org.heuros.core.rule.intf.TotalizerChecker;
+import org.heuros.core.rule.intf.FinalChecker;
 import org.heuros.data.model.DutyView;
 
 @RuleImplementation(ruleName="DutyNumOfLegsLimit", 
 					description="Max number of legs in a duty check.",
 					violationMessage="Max number of legs exceeded!")
 public class DutyNumOfLegsLimit implements ExtensibilityChecker<DutyView>,
-																	TotalizerChecker<DutyView> {
+																	FinalChecker<DutyView> {
 
 	private Integer maxNumOfActiveLegsInDuty = 4;
 	private Integer maxNumOfPassiveLegsInDuty = 1;

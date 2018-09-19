@@ -1,13 +1,13 @@
 package org.heuros.hyperpair.rule;
 
 import org.heuros.core.rule.intf.RuleImplementation;
-import org.heuros.core.rule.intf.TotalizerChecker;
+import org.heuros.core.rule.intf.FinalChecker;
 import org.heuros.data.model.PairView;
 
 @RuleImplementation(ruleName="PairIntDuties", 
 					description="Max number of international duties check.", 
 					violationMessage="Max number of international duties limit exceeded!")
-public class PairIntDuties implements TotalizerChecker<PairView> {
+public class PairIntDuties implements FinalChecker<PairView> {
 
 	private Integer maxNumOfIntDutiesInAPair = 2; // Int layover ?
 

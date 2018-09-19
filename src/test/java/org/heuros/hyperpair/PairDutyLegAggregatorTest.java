@@ -427,11 +427,11 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
     	}
 
 		int maxPairingLengthInDays = HeurosSystemParam.maxPairingLengthInDays;
-		assertTrue(pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdxIST, p));
+		assertTrue(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		HeurosSystemParam.maxPairingLengthInDays = 3;
-		assertTrue(pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdxIST, p));
+		assertTrue(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		HeurosSystemParam.maxPairingLengthInDays = 2;
-		assertFalse(pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdxIST, p));
+		assertFalse(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		HeurosSystemParam.maxPairingLengthInDays = maxPairingLengthInDays;
 
 		pairRuleContext.removeRule(pairPeriodLengthRule);
@@ -452,7 +452,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		pairRuleContext.getAggregatorImpl().removeLast(p);
 		assertTrue(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdxIST, p, d2));
 		pairRuleContext.getAggregatorImpl().append(p, d2);
-		assertTrue(pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdxIST, p));
+		assertTrue(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		assertTrue(dutyRuleContext.getConnectionCheckerProxy().areConnectable(hbNdxIST, d, d2));
 
 		legAct12DomToDom.setCover(false);
@@ -467,7 +467,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		dutyRuleContext.getAggregatorImpl().reCalculate(d2);
 		pairRuleContext.getAggregatorImpl().reCalculate(p);
 
-		assertFalse(pairRuleContext.getTotalizerCheckerProxy().acceptable(hbNdxIST, p));
+		assertFalse(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		assertFalse(dutyRuleContext.getConnectionCheckerProxy().areConnectable(hbNdxIST, d, d2));
 		pairRuleContext.getAggregatorImpl().removeLast(p);
 		assertFalse(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdxIST, p, d2));
