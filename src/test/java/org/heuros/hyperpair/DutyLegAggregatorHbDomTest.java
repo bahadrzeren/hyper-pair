@@ -107,7 +107,7 @@ public class DutyLegAggregatorHbDomTest extends AbsTestBase {
 		Leg l2 = this.generateLegInstance(101, apAYT, apIST, 
 											LocalDateTime.of(2014, Month.JANUARY, 1, 12, 30), 
 											LocalDateTime.of(2014, Month.JANUARY, 1, 14, 0), "320");	//	90
-		this.dutyRuleContext.getAggregatorProxy().append(d, l2);
+		this.dutyRuleContext.getAggregatorProxy().appendFw(d, l2);
 
 		assertTrue(d.getBlockTimeInMins() == 180);
 		assertTrue(d.getNumOfLegs() == 2);
@@ -254,7 +254,7 @@ public class DutyLegAggregatorHbDomTest extends AbsTestBase {
 		 */
 		l2.setAcType("320");
 		legRuleContext.getIntroducerProxy().introduce(l2);
-		dutyRuleContext.getAggregatorProxy().append(d, l2);
+		dutyRuleContext.getAggregatorProxy().appendFw(d, l2);
 		dutyRuleContext.getAggregatorProxy().reCalculate(d);
 
 		assertTrue(d.getBlockTimeInMins() == 180);

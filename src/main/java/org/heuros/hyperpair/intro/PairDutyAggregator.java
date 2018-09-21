@@ -13,13 +13,13 @@ import org.heuros.data.model.Pair;
 public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 
 	@Override
-	public void append(Pair p, DutyView d) {
+	public void appendFw(Pair p, DutyView d) {
 		p.append(d);
 		this.softAppend(p, d);
 	}
 
 	@Override
-	public void softAppend(Pair p, DutyView d) {
+	public void softAppendFw(Pair p, DutyView d) {
 		incTotalizers(p, d, 1);
 	}
 

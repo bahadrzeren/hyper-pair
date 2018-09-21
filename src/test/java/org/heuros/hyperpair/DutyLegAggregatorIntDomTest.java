@@ -107,7 +107,7 @@ public class DutyLegAggregatorIntDomTest extends AbsTestBase {
 		Leg l2 = this.generateLegInstance(101, apAYT, apIST, 
 											LocalDateTime.of(2014, Month.JANUARY, 1, 20, 30), 
 											LocalDateTime.of(2014, Month.JANUARY, 1, 22, 0), "320");	//	90
-		this.dutyRuleContext.getAggregatorProxy().append(d, l2);
+		this.dutyRuleContext.getAggregatorProxy().appendFw(d, l2);
 
 		assertTrue(d.getBlockTimeInMins() == 350);
 		assertTrue(d.getNumOfLegs() == 2);

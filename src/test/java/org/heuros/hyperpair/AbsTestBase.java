@@ -228,14 +228,14 @@ public abstract class AbsTestBase extends TestCase {
 
 	public Duty generateDutyInstance(int numOfBases, Leg leg) {
     	Duty dutyInstance = Duty.newInstance(numOfBases);
-   		this.dutyRuleContext.getAggregatorProxy().append(dutyInstance, leg);
+   		this.dutyRuleContext.getAggregatorProxy().appendFw(dutyInstance, leg);
     	return dutyInstance;
 	}
 
 	public Duty generateDutyInstance(int numOfBases, Leg[] legs) {
 		Duty dutyInstance = Duty.newInstance(numOfBases);
     	for (Leg leg: legs) {
-    		this.dutyRuleContext.getAggregatorProxy().append(dutyInstance, leg);
+    		this.dutyRuleContext.getAggregatorProxy().appendFw(dutyInstance, leg);
 		}
     	return dutyInstance;
 	}
@@ -246,14 +246,14 @@ public abstract class AbsTestBase extends TestCase {
 
 	public Pair generatePairInstance(int hbNdx, Duty duty) {
 		Pair pairInstance = Pair.newInstance(hbNdx);
-   		this.pairRuleContext.getAggregatorProxy().append(pairInstance, duty);
+   		this.pairRuleContext.getAggregatorProxy().appendFw(pairInstance, duty);
     	return pairInstance;
 	}
 
 	public Pair generatePairInstance(int hbNdx, Duty[] duties) {
 		Pair pairInstance = Pair.newInstance(hbNdx);
     	for (Duty duty: duties) {
-    		this.pairRuleContext.getAggregatorProxy().append(pairInstance, duty);
+    		this.pairRuleContext.getAggregatorProxy().appendFw(pairInstance, duty);
 		}
     	return pairInstance;
 	}

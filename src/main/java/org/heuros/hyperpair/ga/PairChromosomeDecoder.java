@@ -152,7 +152,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 						|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d)) {
 
 					if (currentPair != null) {
-						pairRuleContext.getAggregatorProxy().append(currentPair, d);
+						pairRuleContext.getAggregatorProxy().appendFw(currentPair, d);
 						if (pairRuleContext.getFinalCheckerProxy().acceptable(hbNdx, currentPair)) {
 							best = d;
 							bestNumOfDh = dNumOfDh;
@@ -193,7 +193,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 						|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d)) {
 
 					if (currentPair != null) {
-						pairRuleContext.getAggregatorProxy().append(currentPair, d);
+						pairRuleContext.getAggregatorProxy().appendFw(currentPair, d);
 						if (pairRuleContext.getFinalCheckerProxy().acceptable(hbNdx, currentPair)) {
 							best = d;
 							bestActiveBlocktimeInMins = dActiveBlocktimeInMins;
@@ -240,7 +240,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 						&& (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d, true))
 								|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d))) {
 					if (currentPair != null) {
-						pairRuleContext.getAggregatorProxy().append(currentPair, d);
+						pairRuleContext.getAggregatorProxy().appendFw(currentPair, d);
 						if (pairRuleContext.getFinalCheckerProxy().acceptable(hbNdx, currentPair)) {
 							best = d;
 							bestNumOfDh = dNumOfDh;
@@ -353,7 +353,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				while (true) {
 					if (duty != null) {
 						if (pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, pair, duty, true))
-							pairRuleContext.getAggregatorProxy().append(pair, duty);
+							pairRuleContext.getAggregatorProxy().appendFw(pair, duty);
 						else
 							PairChromosomeDecoder.logger.error("Non appendable pairing!");
 

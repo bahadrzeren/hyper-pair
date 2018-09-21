@@ -107,7 +107,7 @@ public class DutyLegAggregatorErHbTest extends AbsTestBase {
 		Leg l2 = this.generateLegInstance(101, apIST, apJFK, 
 											LocalDateTime.of(2014, Month.JANUARY, 1, 9, 0), 
 											LocalDateTime.of(2014, Month.JANUARY, 1, 20, 0), "320");	//	660
-		this.dutyRuleContext.getAggregatorProxy().append(d, l2);
+		this.dutyRuleContext.getAggregatorProxy().appendFw(d, l2);
 
 		assertTrue(d.getBlockTimeInMins() == 1380);
 		assertTrue(d.getNumOfLegs() == 2);
