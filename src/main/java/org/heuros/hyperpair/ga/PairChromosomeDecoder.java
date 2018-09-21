@@ -54,12 +54,12 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		this.reOrderedLegs = this.legRepository.getModels().parallelStream().sorted(new Comparator<Leg>() {
 			@Override
 			public int compare(Leg a, Leg b) {
-				if (a.getSobt().toLocalDate().isBefore(b.getSobt().toLocalDate()))
-					return -1;
-				else
-					if (a.getSobt().toLocalDate().isAfter(b.getSobt().toLocalDate()))
-						return 1;
-					else
+//				if (a.getSobt().toLocalDate().isBefore(b.getSobt().toLocalDate()))
+//					return -1;
+//				else
+//					if (a.getSobt().toLocalDate().isAfter(b.getSobt().toLocalDate()))
+//						return 1;
+//					else
 						/*
 						 * TODO HB impl will be changed.
 						 */

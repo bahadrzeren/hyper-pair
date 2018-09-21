@@ -68,9 +68,9 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
     	 * Aggregate Legs on duty.
     	 */
 		Duty d = this.generateDutyInstance(2);
-		dutyRuleContext.getAggregatorImpl().append(d, legAct11HbToDom);
-		dutyRuleContext.getAggregatorImpl().append(d, legAct12DomToDom);
-		dutyRuleContext.getAggregatorImpl().append(d, legAct13DomToInt);
+		dutyRuleContext.getAggregatorProxy().append(d, legAct11HbToDom);
+		dutyRuleContext.getAggregatorProxy().append(d, legAct12DomToDom);
+		dutyRuleContext.getAggregatorProxy().append(d, legAct13DomToInt);
 
 		assertTrue(d.getBlockTimeInMins() == 390);
 		assertTrue(d.getNumOfLegs() == 3);
@@ -135,7 +135,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
     	 * Remove last leg from duty.
     	 */
 
-		dutyRuleContext.getAggregatorImpl().removeLast(d);
+		dutyRuleContext.getAggregatorProxy().removeLast(d);
 
 		assertTrue(d.getBlockTimeInMins() == 210);
 		assertTrue(d.getNumOfLegs() == 2);
@@ -200,8 +200,8 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
     	 * Remove all legs from duty.
     	 */
 
-		dutyRuleContext.getAggregatorImpl().removeLast(d);
-		dutyRuleContext.getAggregatorImpl().removeLast(d);
+		dutyRuleContext.getAggregatorProxy().removeLast(d);
+		dutyRuleContext.getAggregatorProxy().removeLast(d);
 
 		assertTrue(d.getBlockTimeInMins() == 0);
 		assertTrue(d.getNumOfLegs() == 0);
@@ -302,24 +302,24 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		 * Regenerate first duty again.
 		 */
 
-		dutyRuleContext.getAggregatorImpl().append(d, legAct11HbToDom);
-		dutyRuleContext.getAggregatorImpl().append(d, legAct12DomToDom);
-		dutyRuleContext.getAggregatorImpl().append(d, legAct13DomToInt);
+		dutyRuleContext.getAggregatorProxy().append(d, legAct11HbToDom);
+		dutyRuleContext.getAggregatorProxy().append(d, legAct12DomToDom);
+		dutyRuleContext.getAggregatorProxy().append(d, legAct13DomToInt);
 
 		/*
 		 * Regenerate second duty again.
 		 */
 
 		Duty d2 = this.generateDutyInstance(2);
-		dutyRuleContext.getAggregatorImpl().append(d2, legAct21IntToDom);
-		dutyRuleContext.getAggregatorImpl().append(d2, legAct22DomToHb);
+		dutyRuleContext.getAggregatorProxy().append(d2, legAct21IntToDom);
+		dutyRuleContext.getAggregatorProxy().append(d2, legAct22DomToHb);
 
 		/*
 		 * Generate pair for test.
 		 */
 		Pair p = this.generatePairInstance(0);
-		pairRuleContext.getAggregatorImpl().append(p, d);
-		pairRuleContext.getAggregatorImpl().append(p, d2);
+		pairRuleContext.getAggregatorProxy().append(p, d);
+		pairRuleContext.getAggregatorProxy().append(p, d2);
 
 		assertTrue(p.getHbNdx() == d.getFirstDepAirport().getHbNdx());
 		assertTrue(p.getHbNdx() == d2.getLastArrAirport().getHbNdx());
@@ -352,7 +352,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		/*
 		 * Remove second duty from pair.
 		 */
-		pairRuleContext.getAggregatorImpl().removeLast(p);
+		pairRuleContext.getAggregatorProxy().removeLast(p);
 
 		assertTrue(p.getFirstDuty() == d);
 		assertTrue(p.getLastDuty() == d);
@@ -383,7 +383,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		/*
 		 * Remove all duties from pair.
 		 */
-		pairRuleContext.getAggregatorImpl().removeLast(p);
+		pairRuleContext.getAggregatorProxy().removeLast(p);
 
 		assertTrue(p.getHbNdx() == 0);
 		assertTrue(p.getFirstDuty() == null);
@@ -416,8 +416,8 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		 * PairPeriodLength rule test.
 		 */
 		PairPeriodLength pairPeriodLengthRule = new PairPeriodLength();
-		pairRuleContext.getAggregatorImpl().append(p, d);
-		pairRuleContext.getAggregatorImpl().append(p, d2);
+		pairRuleContext.getAggregatorProxy().append(p, d);
+		pairRuleContext.getAggregatorProxy().append(p, d2);
 
 		try {
 			pairRuleContext.registerRule(pairPeriodLengthRule);
@@ -449,9 +449,9 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
     		assertTrue(false);
     	}
 
-		pairRuleContext.getAggregatorImpl().removeLast(p);
+		pairRuleContext.getAggregatorProxy().removeLast(p);
 		assertTrue(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdxIST, p, d2));
-		pairRuleContext.getAggregatorImpl().append(p, d2);
+		pairRuleContext.getAggregatorProxy().append(p, d2);
 		assertTrue(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		assertTrue(dutyRuleContext.getConnectionCheckerProxy().areConnectable(hbNdxIST, d, d2));
 
@@ -463,13 +463,13 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		/*
 		 * TODO Here pairing reCalculate method must cover duty methods as well!
 		 */
-		dutyRuleContext.getAggregatorImpl().reCalculate(d);
-		dutyRuleContext.getAggregatorImpl().reCalculate(d2);
-		pairRuleContext.getAggregatorImpl().reCalculate(p);
+		dutyRuleContext.getAggregatorProxy().reCalculate(d);
+		dutyRuleContext.getAggregatorProxy().reCalculate(d2);
+		pairRuleContext.getAggregatorProxy().reCalculate(p);
 
 		assertFalse(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		assertFalse(dutyRuleContext.getConnectionCheckerProxy().areConnectable(hbNdxIST, d, d2));
-		pairRuleContext.getAggregatorImpl().removeLast(p);
+		pairRuleContext.getAggregatorProxy().removeLast(p);
 		assertFalse(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdxIST, p, d2));
 
 		dutyRuleContext.removeRule(pairNumOfPassiveLegsLimit);
@@ -483,10 +483,10 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		/*
 		 * TODO Here pairing reCalculate method must cover duty methods as well!
 		 */
-		pairRuleContext.getAggregatorImpl().append(p, d2);
-		dutyRuleContext.getAggregatorImpl().reCalculate(d);
-		dutyRuleContext.getAggregatorImpl().reCalculate(d2);
-		pairRuleContext.getAggregatorImpl().reCalculate(p);
+		pairRuleContext.getAggregatorProxy().append(p, d2);
+		dutyRuleContext.getAggregatorProxy().reCalculate(d);
+		dutyRuleContext.getAggregatorProxy().reCalculate(d2);
+		pairRuleContext.getAggregatorProxy().reCalculate(p);
 
 		/*
 		 * Pair is reset. Old values must be valid again!
@@ -520,10 +520,10 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		assertTrue(p.getNumOfErDuties() == 0);
 
 
-//		dutyRuleContext.getAggregatorImpl().append(d, legAct31HbToInt);
-//		dutyRuleContext.getAggregatorImpl().append(d, legAct32IntToHb);
+//		dutyRuleContext.getAggregatorProxy().append(d, legAct31HbToInt);
+//		dutyRuleContext.getAggregatorProxy().append(d, legAct32IntToHb);
 //
-//		dutyRuleContext.getAggregatorImpl().append(d, legAct41HbToHb);
+//		dutyRuleContext.getAggregatorProxy().append(d, legAct41HbToHb);
 
 
     }
