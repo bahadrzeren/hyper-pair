@@ -14,6 +14,7 @@ import org.heuros.core.data.ndx.TwoDimIndexIntXLocalDateTime;
 import org.heuros.core.ga.chromosome.Chromosome;
 import org.heuros.core.ga.decoder.Decoder;
 import org.heuros.data.model.AirportView;
+import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegView;
@@ -36,11 +37,11 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	private DutyRepository dutyRepository = null;
 	private PairRuleContext pairRuleContext = null;
 
-	private OneDimIndexInt<DutyView> dutyIndexByLegNdx = null;
-	private TwoDimIndexIntXInt<DutyView> hbDepDutyIndexByLegNdx = null;
-	private TwoDimIndexIntXInt<DutyView> hbDepHbArrDutyIndexByLegNdx = null;
-	private TwoDimIndexIntXLocalDateTime<DutyView> dutyIndexByDepAirportNdxBrieftime = null;
-	private TwoDimIndexIntXLocalDateTime<DutyView> hbArrDutyIndexByDepAirportNdxBrieftime = null;
+	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+	private TwoDimIndexIntXInt<Duty> hbDepDutyIndexByLegNdx = null;
+	private TwoDimIndexIntXInt<Duty> hbDepHbArrDutyIndexByLegNdx = null;
+	private TwoDimIndexIntXLocalDateTime<Duty> dutyIndexByDepAirportNdxBrieftime = null;
+	private TwoDimIndexIntXLocalDateTime<Duty> hbArrDutyIndexByDepAirportNdxBrieftime = null;
 
 	private List<Leg> reOrderedLegs = null;
 
@@ -90,29 +91,29 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return this;
 	}
 
-	public PairChromosomeDecoder setDutyIndexByLegNdx(OneDimIndexInt<DutyView> dutyIndexByLegNdx) {
+	public PairChromosomeDecoder setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
 		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
 		return this;
 	}
 
-	public PairChromosomeDecoder setHbDepDutyIndexByLegNdx(TwoDimIndexIntXInt<DutyView> hbDepDutyIndexByLegNdx) {
+	public PairChromosomeDecoder setHbDepDutyIndexByLegNdx(TwoDimIndexIntXInt<Duty> hbDepDutyIndexByLegNdx) {
 		this.hbDepDutyIndexByLegNdx = hbDepDutyIndexByLegNdx;
 		return this;
 	}
 
-	public PairChromosomeDecoder setHbDepHbArrDutyIndexByLegNdx(TwoDimIndexIntXInt<DutyView> hbDepHbArrDutyIndexByLegNdx) {
+	public PairChromosomeDecoder setHbDepHbArrDutyIndexByLegNdx(TwoDimIndexIntXInt<Duty> hbDepHbArrDutyIndexByLegNdx) {
 		this.hbDepHbArrDutyIndexByLegNdx = hbDepHbArrDutyIndexByLegNdx;
 		return this;
 	}
 
 	public PairChromosomeDecoder setDutyIndexByDepAirportNdxBrieftime(
-			TwoDimIndexIntXLocalDateTime<DutyView> dutyIndexByDepAirportNdxBrieftime) {
+			TwoDimIndexIntXLocalDateTime<Duty> dutyIndexByDepAirportNdxBrieftime) {
 		this.dutyIndexByDepAirportNdxBrieftime = dutyIndexByDepAirportNdxBrieftime;
 		return this;
 	}
 
 	public PairChromosomeDecoder setHbArrDutyIndexByDepAirportNdxBrieftime(
-			TwoDimIndexIntXLocalDateTime<DutyView> hbArrDutyIndexByDepAirportNdxBrieftime) {
+			TwoDimIndexIntXLocalDateTime<Duty> hbArrDutyIndexByDepAirportNdxBrieftime) {
 		this.hbArrDutyIndexByDepAirportNdxBrieftime = hbArrDutyIndexByDepAirportNdxBrieftime;
 		return this;
 	}
@@ -147,7 +148,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 			if ((bestNumOfDh > dNumOfDh)
 					|| ((bestNumOfDh == dNumOfDh) && (bestDhDurationInMins > dDhDurationInMins))
 					|| ((bestNumOfDh == dNumOfDh) && (bestDhDurationInMins == dDhDurationInMins) && (bestAvgNumOfIncludingDutiesOfTheSameLegs > dAvgNumOfIncludingDutiesOfTheSameLegs))) {
-				if (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d))
+				if (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d, true))
 						|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d)) {
 
 					if (currentPair != null) {
@@ -188,7 +189,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 			if ((bestActiveBlocktimeInMins < dActiveBlocktimeInMins)
 					|| ((bestActiveBlocktimeInMins == dActiveBlocktimeInMins) && (bestAvgNumOfIncludingDutiesOfTheSameLegs > dAvgNumOfIncludingDutiesOfTheSameLegs))) {
-				if (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d))
+				if (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d, true))
 						|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d)) {
 
 					if (currentPair != null) {
@@ -236,7 +237,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				 * TODO HB impl will be changed!
 				 */
 				if (d.getLastArrAirport().isHb(hbNdx)
-						&& (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d))
+						&& (((currentPair != null) && pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, currentPair, d, true))
 								|| pairRuleContext.getStarterCheckerProxy().canBeStarter(hbNdx, d))) {
 					if (currentPair != null) {
 						pairRuleContext.getAggregatorProxy().append(currentPair, d);
@@ -351,7 +352,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				Pair pair = Pair.newInstance(0);
 				while (true) {
 					if (duty != null) {
-						if (pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, pair, duty))
+						if (pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdx, pair, duty, true))
 							pairRuleContext.getAggregatorProxy().append(pair, duty);
 						else
 							PairChromosomeDecoder.logger.error("Non appendable pairing!");

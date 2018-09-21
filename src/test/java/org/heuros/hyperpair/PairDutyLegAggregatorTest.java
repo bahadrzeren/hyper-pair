@@ -450,7 +450,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
     	}
 
 		pairRuleContext.getAggregatorProxy().removeLast(p);
-		assertTrue(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdxIST, p, d2));
+		assertTrue(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdxIST, p, d2, true));
 		pairRuleContext.getAggregatorProxy().append(p, d2);
 		assertTrue(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		assertTrue(dutyRuleContext.getConnectionCheckerProxy().areConnectable(hbNdxIST, d, d2));
@@ -470,7 +470,7 @@ public class PairDutyLegAggregatorTest extends AbsTestBase {
 		assertFalse(pairRuleContext.getFinalCheckerProxy().acceptable(hbNdxIST, p));
 		assertFalse(dutyRuleContext.getConnectionCheckerProxy().areConnectable(hbNdxIST, d, d2));
 		pairRuleContext.getAggregatorProxy().removeLast(p);
-		assertFalse(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdxIST, p, d2));
+		assertFalse(pairRuleContext.getAppendabilityCheckerProxy().isAppendable(hbNdxIST, p, d2, true));
 
 		dutyRuleContext.removeRule(pairNumOfPassiveLegsLimit);
 		pairRuleContext.removeRule(pairNumOfPassiveLegsLimit);

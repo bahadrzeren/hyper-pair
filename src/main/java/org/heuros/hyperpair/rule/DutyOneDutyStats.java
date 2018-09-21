@@ -37,7 +37,7 @@ public class DutyOneDutyStats implements AppendabilityChecker<DutyView, LegView>
 	}
 
 	@Override
-	public boolean isAppendable(int hbNdx, DutyView d, LegView l) {
+	public boolean isAppendable(int hbNdx, DutyView d, LegView l, boolean fw) {
 		/*
 		 * isAnyNonHb check is used for backward compatibility.
 		 */

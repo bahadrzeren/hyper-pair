@@ -7,6 +7,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
@@ -19,6 +22,7 @@ import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.processor.DutyGenerator;
+import org.heuros.data.processor.UniDirPairingChecker;
 import org.heuros.data.repo.AirportRepository;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
@@ -183,6 +187,33 @@ public class HyperPair {
 			 * Add duties to dutyRepository and generate necessary indexes.
 			 */
 			pairOptimizationContext.registerDuties(duties, HeurosSystemParam.homebases.length);
+
+			ExecutorService executorService = Executors.newFixedThreadPool(HeurosSystemParam.homebases.length);
+
+			List<Future<Boolean>> pairGenCalls = new ArrayList<Future<Boolean>>(HeurosSystemParam.homebases.length);
+
+//			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
+			int hbNdx = 0;
+				UniDirPairingChecker pairGenerator = new UniDirPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+																		.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
+																		.setDutyRepository(pairOptimizationContext.getDutyRepository())
+																		.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+																		.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+																		.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
+				pairGenCalls.add(executorService.submit(pairGenerator));
+//			}
+
+//			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
+				try {
+					if (pairGenCalls.get(hbNdx).get())
+						logger.info(hbNdx + "th pairGen is completed its task!");
+				} catch(Exception ex) {
+					ex.printStackTrace();
+					logger.error(ex);
+				}
+//			}
+
+			executorService.shutdown();
 
 			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())

@@ -25,7 +25,7 @@ public class DutyIntFlights implements AppendabilityChecker<DutyView, LegView> {
 //	}
 
 	@Override
-	public boolean isAppendable(int hbNdx, DutyView d, LegView l) {
+	public boolean isAppendable(int hbNdx, DutyView d, LegView l, boolean fw) {
        if (((d.getNumOfLegsDomToInt() + d.getNumOfLegsIntToDom()) >= maxNumOfIntToFromDomLegsInDuty)
     		   && (l.getDepAirport().isDomestic() != l.getArrAirport().isDomestic())
     		   && ((d.getLongestBlockTimeInMins() >= minFlightTimeLimitForIntDuties)
