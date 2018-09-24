@@ -465,8 +465,14 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 
 	@Override
 	public void appendFw(Duty d, LegView l) {
-		d.append(l);
-		this.softAppend(d, l);
+		d.appendFw(l);
+		this.softAppendFw(d, l);
+	}
+
+	@Override
+	public void appendBw(Duty d, LegView l) {
+		d.appendBw(l);
+		this.softAppendBw(d, l);
 	}
 
 	@Override
@@ -475,15 +481,38 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 
 		LegView connLeg = d.getSecondToLastLeg();
 
+		this.incTotalizers(d, l, 1);
+		this.incTotalizers(d, connLeg, l, 1);
+		this.setStateVariables(d);
+
+		/*
+		 * Max blocktime
+		 */
+		if ((d.getNumOfLegs() == 1)
+				|| (d.getLongestBlockTimeInMins() < l.getBlockTimeInMins()))
+        	d.setLongestBlockTimeInMins(l.getBlockTimeInMins());
+		else
+			d.setLongestBlockTimeInMins(d.getLongestBlockTimeInMins());
+	}
+
+	@Override
+	public void softAppendBw(Duty d, LegView l) {
+		d.incNumOfLegs(1);
+
+		LegView connLeg = d.getSecondLeg();
+
+		this.incTotalizers(d, l, 1);
 		this.incTotalizers(d, l, connLeg, 1);
 		this.setStateVariables(d);
 
 		/*
 		 * Max blocktime
 		 */
-		if (d.getLongestBlockTimeInMins() < l.getBlockTimeInMins())
+		if ((d.getNumOfLegs() == 1)
+				|| (d.getLongestBlockTimeInMins() < l.getBlockTimeInMins()))
         	d.setLongestBlockTimeInMins(l.getBlockTimeInMins());
-		d.getLongestBlockTimesInMins()[d.getNumOfLegs()] = l.getBlockTimeInMins();
+		else
+			d.setLongestBlockTimeInMins(d.getLongestBlockTimeInMins());
 	}
 
 	@Override
@@ -497,6 +526,17 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
        	return l;
 	}
 
+	@Override
+	public LegView removeFirst(Duty d) {
+		LegView l = d.removeFirst();
+		if (l == null)
+			return null;
+
+		this.removeFirst(d, l);
+
+       	return l;
+	}
+
 	private void removeLast(Duty d, LegView l) {
 		d.incNumOfLegs(-1);
 
@@ -505,17 +545,35 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		if (connLeg == null)
 			this.reset(d);
 		else {
+			this.incTotalizers(d, l, -1);
+			this.incTotalizers(d, connLeg, l, -1);
+			this.setStateVariables(d);
+			/*
+			 * Max blocktime
+			 */
+	       	d.removeLongestBlockTimeInMins();
+		}
+	}
+
+	private void removeFirst(Duty d, LegView l) {
+		d.incNumOfLegs(-1);
+
+		LegView connLeg = d.getFirstLeg();
+
+		if (connLeg == null)
+			this.reset(d);
+		else {
+			this.incTotalizers(d, l, -1);
 			this.incTotalizers(d, l, connLeg, -1);
 			this.setStateVariables(d);
 			/*
 			 * Max blocktime
 			 */
-	       	d.setLongestBlockTimeInMins(d.getLongestBlockTimesInMins()[d.getNumOfLegs()]);
+	       	d.removeLongestBlockTimeInMins();
 		}
 	}
 
-	private void incTotalizers(Duty d, LegView l, LegView connLeg,
-								int incAmount) {
+	private void incTotalizers(Duty d, LegView l, int incAmount) {
 		/*
 		 * Totalizers
 		 */
@@ -540,21 +598,26 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 			d.incNumOfAgDg(incAmount);
 		if (l.isSpecialFlight())
 			d.incNumOfSpecialFlights(incAmount);
+	}
 
-		if (connLeg != null) {
-			if (l.getDepAirport().isAnyHb())
+	private void incTotalizers(Duty d, LegView pl, LegView nl, int incAmount) {
+		/*
+		 * Totalizers
+		 */
+		if ((pl != null) && (nl != null)) {
+			if (nl.getDepAirport().isAnyHb())
 				d.incNumOfAnyHomebaseTouch(incAmount);
-			if (l.getDepAirport().isDomestic())
+			if (nl.getDepAirport().isDomestic())
 				d.incNumOfDomTouch(incAmount);
-			if (l.getDepAirport().isInternational())
+			if (nl.getDepAirport().isInternational())
 				d.incNumOfIntTouch(incAmount);
 
-			if (connLeg.isCover() && l.isCover()
-					&& ((connLeg.getAcSequence() != l.getAcSequence())
-							|| (!connLeg.getAcType().equals(l.getAcType()))))
+			if (pl.isCover() && nl.isCover()
+					&& ((pl.getAcSequence() != nl.getAcSequence())
+							|| (!pl.getAcType().equals(nl.getAcType()))))
 				d.incNumOfAcChanges(incAmount);
 
-			int connTime = (int) ChronoUnit.MINUTES.between(connLeg.getSibt(), l.getSobt());
+			int connTime = (int) ChronoUnit.MINUTES.between(pl.getSibt(), nl.getSobt());
 			if (connTime > 120) {
 				d.incLongConnDiff(incAmount * (connTime - 120));
 			}
@@ -627,9 +690,7 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 
 		d.setLongConnDiff(0);
 
-		for (int i = 0; i < d.getLongestBlockTimesInMins().length; i++)
-			d.getLongestBlockTimesInMins()[i] = 0;	
-		d.setLongestBlockTimeInMins(0);
+		d.removeAllLongestBlockTimeInMins();
 
 		d.setEr(false);
 		d.setInternational(false);
@@ -658,9 +719,9 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	@Override
 	public boolean reCalculate(Duty d) {
 		this.reset(d);
-		this.softAppend(d, d.getLegs().get(0));
+		this.softAppendFw(d, d.getLegs().get(0));
 		for (int i = 1; i < d.getLegs().size(); i++)
-			this.softAppend(d, d.getLegs().get(i));
+			this.softAppendFw(d, d.getLegs().get(i));
 		return true;
 	}
 }

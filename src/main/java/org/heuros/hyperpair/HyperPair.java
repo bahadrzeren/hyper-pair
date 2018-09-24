@@ -21,8 +21,8 @@ import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
+import org.heuros.data.processor.BiDirPairingChecker;
 import org.heuros.data.processor.DutyGenerator;
-import org.heuros.data.processor.UniDirPairingChecker;
 import org.heuros.data.repo.AirportRepository;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
@@ -131,7 +131,9 @@ public class HyperPair {
 			/*
 			 * Load LEG data from CSV file.
 			 */
-			List<Leg> legs = new LegsLoader().setLegsFileName(conf.getLegs()).extractData();
+			List<Leg> legs = new LegsLoader().setLegsFileName(conf.getLegs())
+												.setNumOfBases(HeurosSystemParam.homebases.length)
+												.extractData();
 
 			HeurosDatasetParam.dataPeriodStartInc = legs.get(0).getSobt().withDayOfMonth(1).toLocalDate().plusMonths(1).atStartOfDay();
 			logger.info("Data period start: " + HeurosDatasetParam.dataPeriodStartInc);
@@ -194,13 +196,25 @@ public class HyperPair {
 
 //			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
 			int hbNdx = 0;
-				UniDirPairingChecker pairGenerator = new UniDirPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
-																		.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
-																		.setDutyRepository(pairOptimizationContext.getDutyRepository())
-																		.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
-																		.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-																		.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
-				pairGenCalls.add(executorService.submit(pairGenerator));
+
+//			UniDirPairingChecker pairGenerator = new UniDirPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+//																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
+//																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
+//																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+//																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+//																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
+
+
+			BiDirPairingChecker pairChecker = new BiDirPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
+																	.setLegRepository(pairOptimizationContext.getLegRepository())
+																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
+																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
+																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+
+				pairGenCalls.add(executorService.submit(pairChecker));
 //			}
 
 //			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {

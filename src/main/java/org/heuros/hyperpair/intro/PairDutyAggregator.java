@@ -14,12 +14,23 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 
 	@Override
 	public void appendFw(Pair p, DutyView d) {
-		p.append(d);
-		this.softAppend(p, d);
+		p.appendFw(d);
+		this.softAppendFw(p, d);
+	}
+
+	@Override
+	public void appendBw(Pair p, DutyView d) {
+		p.appendBw(d);
+		this.softAppendBw(p, d);
 	}
 
 	@Override
 	public void softAppendFw(Pair p, DutyView d) {
+		incTotalizers(p, d, 1);
+	}
+
+	@Override
+	public void softAppendBw(Pair p, DutyView d) {
 		incTotalizers(p, d, 1);
 	}
 
@@ -29,12 +40,23 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 		if (d == null)
 			return null;
 
-		this.removeLast(p, d);
+		this.remove(p, d);
 
 		return d;
 	}
 
-	private void removeLast(Pair p, DutyView d) {
+	@Override
+	public DutyView removeFirst(Pair p) {
+		DutyView d = p.removeFirst();
+		if (d == null)
+			return null;
+
+		this.remove(p, d);
+
+		return d;
+	}
+
+	private void remove(Pair p, DutyView d) {
 		incTotalizers(p, d, -1);
 	}
 
@@ -119,7 +141,7 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 	public boolean reCalculate(Pair p) {
 		if (p.isComplete()) {
 			this.reset(p);
-			p.getDuties().forEach((d) -> this.softAppend(p, d));
+			p.getDuties().forEach((d) -> this.softAppendFw(p, d));
 			return true;
 		}
 		return false;

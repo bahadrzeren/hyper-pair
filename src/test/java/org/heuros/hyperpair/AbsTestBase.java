@@ -207,7 +207,7 @@ public abstract class AbsTestBase extends TestCase {
 			LocalDateTime sobt,
 			LocalDateTime sibt,
 			String acType) {
-		Leg legInstance = Leg.newInstance();
+		Leg legInstance = Leg.newInstance(2);
 		legInstance.setFlightNo(flightNo);
 		legInstance.setDepAirport(depAirport);
 		legInstance.setArrAirport(arrAirport);
