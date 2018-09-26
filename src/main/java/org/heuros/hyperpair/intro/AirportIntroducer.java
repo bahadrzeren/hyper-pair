@@ -90,6 +90,7 @@ public class AirportIntroducer implements Introducer<Airport> {
 	 * Stations that leg connection rule is not directly applied.
 	 */
 	private static String[] maxConnectionExceptionStations = {"TLV"
+																, "MZH", "DIY"
 																//	"AMM", "ASR", "ATH", "BJV", "CKZ", "DIY", "DLM", "DNZ", "ECN", "ERZ",
 																//	"GZT", "HTY", "ISE", "KYA", "MLX", "MXP", "MZH", "NAV", "ROV", "SZF",
 																//	"TZX", "USQ", "VAS"

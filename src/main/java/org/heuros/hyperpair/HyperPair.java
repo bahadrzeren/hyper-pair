@@ -21,7 +21,7 @@ import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
-import org.heuros.data.processor.BiDirPairingChecker;
+import org.heuros.data.processor.BiDirLegPairingChecker;
 import org.heuros.data.processor.DutyGenerator;
 import org.heuros.data.repo.AirportRepository;
 import org.heuros.data.repo.DutyRepository;
@@ -197,7 +197,7 @@ public class HyperPair {
 //			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
 			int hbNdx = 0;
 
-//			UniDirPairingChecker pairGenerator = new UniDirPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+//			UniDirDutyPairingChecker pairChecker = new UniDirDutyPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
 //																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
 //																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
 //																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
@@ -205,9 +205,19 @@ public class HyperPair {
 //																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
 
 
-			BiDirPairingChecker pairChecker = new BiDirPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+//			BiDirDutyPairingChecker pairChecker = new BiDirDutyPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+//																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
+//																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
+//																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+//																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+//																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
+//																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+
+
+			BiDirLegPairingChecker pairChecker = new BiDirLegPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
 																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
 																	.setLegRepository(pairOptimizationContext.getLegRepository())
+																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
 																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
