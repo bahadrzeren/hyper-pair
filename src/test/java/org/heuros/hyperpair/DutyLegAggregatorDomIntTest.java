@@ -63,43 +63,43 @@ public class DutyLegAggregatorDomIntTest extends AbsTestBase {
 		assertTrue(d.getLongConnDiff() == 0);
 
 		assertTrue(d.getBriefDurationInMins(hbNdxIST) == 60);
-		assertTrue(d.getBriefDurationInMins(hbNdxSAW) == 60);
+//		assertTrue(d.getBriefDurationInMins(hbNdxSAW) == 60);
 		assertTrue(d.getDebriefDurationInMins(hbNdxIST) == 30);
 
 		assertTrue(d.getBriefTime(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 11, 40)));
-		assertTrue(d.getBriefTime(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 11, 40)));
+//		assertTrue(d.getBriefTime(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 11, 40)));
 		assertTrue(d.getDebriefTime(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 16, 20)));
 
 		assertTrue(d.getBriefDayBeginning(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
-		assertTrue(d.getBriefDayBeginning(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
+//		assertTrue(d.getBriefDayBeginning(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
 		assertTrue(d.getDebriefDayEnding(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 23, 59, 59)));
 
 		assertTrue(d.getBriefDay(hbNdxIST).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
-		assertTrue(d.getBriefDay(hbNdxSAW).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+//		assertTrue(d.getBriefDay(hbNdxSAW).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
 		assertTrue(d.getDebriefDay(hbNdxIST).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
 
 		assertTrue(d.getDutyDurationInMins(hbNdxIST) == 280);
-		assertTrue(d.getDutyDurationInMins(hbNdxSAW) == 280);
+//		assertTrue(d.getDutyDurationInMins(hbNdxSAW) == 280);
 
 		assertTrue(d.getNumOfDaysTouched(hbNdxIST) == 1);
-		assertTrue(d.getNumOfDaysTouched(hbNdxSAW) == 1);
+//		assertTrue(d.getNumOfDaysTouched(hbNdxSAW) == 1);
 
 		assertFalse(d.isEr());
 
 		assertTrue(d.getRestDurationInMins(hbNdxIST) == 660);
-		assertTrue(d.getRestDurationInMins(hbNdxSAW) == 660);
+//		assertTrue(d.getRestDurationInMins(hbNdxSAW) == 660);
 
 		assertTrue(d.getNextBriefTime(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 16, 20).plusMinutes(660)));
-		assertTrue(d.getNextBriefTime(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 16, 20).plusMinutes(660)));
+//		assertTrue(d.getNextBriefTime(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 16, 20).plusMinutes(660)));
 
 		assertTrue(d.getAugmented(hbNdxIST) == 0);
-		assertTrue(d.getAugmented(hbNdxSAW) == 0);
+//		assertTrue(d.getAugmented(hbNdxSAW) == 0);
 
 		assertFalse(d.isEarly(hbNdxIST));
-		assertFalse(d.isEarly(hbNdxSAW));
+//		assertFalse(d.isEarly(hbNdxSAW));
 
 		assertFalse(d.isHard(hbNdxIST));
-		assertFalse(d.isHard(hbNdxSAW));
+//		assertFalse(d.isHard(hbNdxSAW));
 
 		/*
 		 * DOM departed, INT arrival 1 Leg Duty.
@@ -125,43 +125,43 @@ public class DutyLegAggregatorDomIntTest extends AbsTestBase {
 		assertTrue(d.getLongConnDiff() == (6 * 60 + 40));
 
 		assertTrue(d.getBriefDurationInMins(hbNdxIST) == 60);
-		assertTrue(d.getBriefDurationInMins(hbNdxSAW) == 60);
+//		assertTrue(d.getBriefDurationInMins(hbNdxSAW) == 60);
 		assertTrue(d.getDebriefDurationInMins(hbNdxIST) == 30);
 
 		assertTrue(d.getBriefTime(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 11, 40)));
-		assertTrue(d.getBriefTime(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 11, 40)));
+//		assertTrue(d.getBriefTime(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 11, 40)));
 		assertTrue(d.getDebriefTime(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 2, 4, 10)));
 
 		assertTrue(d.getBriefDayBeginning(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
-		assertTrue(d.getBriefDayBeginning(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
+//		assertTrue(d.getBriefDayBeginning(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 1, 0, 0)));
 		assertTrue(d.getDebriefDayEnding(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 2, 23, 59, 59)));
 
 		assertTrue(d.getBriefDay(hbNdxIST).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
-		assertTrue(d.getBriefDay(hbNdxSAW).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
+//		assertTrue(d.getBriefDay(hbNdxSAW).isEqual(LocalDate.of(2014, Month.JANUARY, 1)));
 		assertTrue(d.getDebriefDay(hbNdxIST).isEqual(LocalDate.of(2014, Month.JANUARY, 2)));
 
 		assertTrue(d.getDutyDurationInMins(hbNdxIST) == 16 * 60 + 30);
-		assertTrue(d.getDutyDurationInMins(hbNdxSAW) == 16 * 60 + 30);
+//		assertTrue(d.getDutyDurationInMins(hbNdxSAW) == 16 * 60 + 30);
 
 		assertTrue(d.getNumOfDaysTouched(hbNdxIST) == 2);
-		assertTrue(d.getNumOfDaysTouched(hbNdxSAW) == 2);
+//		assertTrue(d.getNumOfDaysTouched(hbNdxSAW) == 2);
 
 		assertFalse(d.isEr());
 
 		assertTrue(d.getRestDurationInMins(hbNdxIST) == 17 * 60 + 30);
-		assertTrue(d.getRestDurationInMins(hbNdxSAW) == 17 * 60 + 30);
+//		assertTrue(d.getRestDurationInMins(hbNdxSAW) == 17 * 60 + 30);
 
 		assertTrue(d.getNextBriefTime(hbNdxIST).isEqual(LocalDateTime.of(2014, Month.JANUARY, 2, 4, 10).plusMinutes(17 * 60 + 30)));
-		assertTrue(d.getNextBriefTime(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 2, 4, 10).plusMinutes(17 * 60 + 30)));
+//		assertTrue(d.getNextBriefTime(hbNdxSAW).isEqual(LocalDateTime.of(2014, Month.JANUARY, 2, 4, 10).plusMinutes(17 * 60 + 30)));
 
 		assertTrue(d.getAugmented(hbNdxIST) == 2);
-		assertTrue(d.getAugmented(hbNdxSAW) == 2);
+//		assertTrue(d.getAugmented(hbNdxSAW) == 2);
 
 		assertFalse(d.isEarly(hbNdxIST));
-		assertFalse(d.isEarly(hbNdxSAW));
+//		assertFalse(d.isEarly(hbNdxSAW));
 
 		assertTrue(d.isHard(hbNdxIST));
-		assertTrue(d.isHard(hbNdxSAW));
+//		assertTrue(d.isHard(hbNdxSAW));
 
     }
 }

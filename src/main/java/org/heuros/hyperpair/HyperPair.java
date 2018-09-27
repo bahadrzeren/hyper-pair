@@ -21,6 +21,7 @@ import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
+import org.heuros.data.processor.BiDirDutyPairingChecker;
 import org.heuros.data.processor.BiDirLegPairingChecker;
 import org.heuros.data.processor.DutyGenerator;
 import org.heuros.data.repo.AirportRepository;
@@ -144,6 +145,11 @@ public class HyperPair {
 			logger.info("Opt period start: " + HeurosDatasetParam.dataPeriodStartInc);
 			HeurosDatasetParam.optPeriodEndExc = legs.get(legs.size() - 1).getSibt().withDayOfMonth(1).toLocalDate().atStartOfDay();
 			logger.info("Opt period end: " + HeurosDatasetParam.dataPeriodEndExc);
+			HeurosDatasetParam.legCoverPeriodEndExc = HeurosDatasetParam.optPeriodEndExc.plusDays(HeurosSystemParam.maxPairingLengthInDays);
+			logger.info("Leg cover period end: " + HeurosDatasetParam.legCoverPeriodEndExc);
+			HeurosDatasetParam.dutyProcessPeriodEndExc = HeurosDatasetParam.legCoverPeriodEndExc.plusDays(HeurosSystemParam.maxPairingLengthInDays - 1);
+			logger.info("Duty process period end: " + HeurosDatasetParam.dutyProcessPeriodEndExc);
+
 
 			/*
 			 * Generate context.
@@ -194,8 +200,8 @@ public class HyperPair {
 
 			List<Future<Boolean>> pairGenCalls = new ArrayList<Future<Boolean>>(HeurosSystemParam.homebases.length);
 
-//			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
-			int hbNdx = 0;
+			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
+//			int hbNdx = 1;
 
 //			UniDirDutyPairingChecker pairChecker = new UniDirDutyPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
 //																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
@@ -204,30 +210,30 @@ public class HyperPair {
 //																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 //																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
 
-
-//			BiDirDutyPairingChecker pairChecker = new BiDirDutyPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
-//																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
-//																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
-//																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
-//																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-//																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
-//																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
-
-
-			BiDirLegPairingChecker pairChecker = new BiDirLegPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+				BiDirDutyPairingChecker dutyPairChecker = new BiDirDutyPairingChecker(hbNdx, HeurosDatasetParam.dutyProcessPeriodEndExc)
+																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
 																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
-																	.setLegRepository(pairOptimizationContext.getLegRepository())
 																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
 																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
 																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
 																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+				pairGenCalls.add(executorService.submit(dutyPairChecker));
 
-				pairGenCalls.add(executorService.submit(pairChecker));
-//			}
+//				BiDirLegPairingChecker legPairChecker = new BiDirLegPairingChecker(hbNdx, HeurosDatasetParam.coverPeriodEndExc)
+//																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+//																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
+//																	.setLegRepository(pairOptimizationContext.getLegRepository())
+//																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
+//																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+//																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+//																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
+//																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
+//																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+//				pairGenCalls.add(executorService.submit(legPairChecker));
+			}
 
-//			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
+			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
 				try {
 					if (pairGenCalls.get(hbNdx).get())
 						logger.info(hbNdx + "th pairGen is completed its task!");
@@ -235,7 +241,7 @@ public class HyperPair {
 					ex.printStackTrace();
 					logger.error(ex);
 				}
-//			}
+			}
 
 			executorService.shutdown();
 

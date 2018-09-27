@@ -7,7 +7,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.heuros.core.rule.intf.Introducer;
 import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.Airport;
-import org.heuros.hyperpair.HeurosSystemParam;
 
 @RuleImplementation(ruleName = "Airport introducer", 
 					violationMessage = "Airport introducer failed", 
@@ -166,7 +165,13 @@ public class AirportIntroducer implements Introducer<Airport> {
 //				break;
 //			}
 //		}
-		m.setHbNdx(ArrayUtils.indexOf(HeurosSystemParam.homebases, m.getCode()));
+
+/*
+ * 		m.setHbNdx(ArrayUtils.indexOf(HeurosSystemParam.homebases, m.getCode()));
+ */
+		if (m.getCode().equals("IST")
+				|| m.getCode().equals("SAW"))
+			m.setHbNdx(0);
 
 		/*
 		 * Set flags that will indicate whether airport is domestic or international.

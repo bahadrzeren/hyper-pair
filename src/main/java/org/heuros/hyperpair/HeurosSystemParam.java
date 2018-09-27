@@ -4,8 +4,7 @@ public class HeurosSystemParam {
 	/*
 	 * Homebase airports. For now the problem is a single based one.
 	 */
-	public static String[] homebases = {"IST", "SAW"};
-
+	public static String[] homebases = {"IST"};	//	, "SAW"};
 
 	public static int maxPairingLengthInDays = 4;
 	public static int maxIntLay = 60 * 60;

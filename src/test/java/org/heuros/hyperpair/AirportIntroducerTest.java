@@ -35,20 +35,20 @@ public class AirportIntroducerTest extends AbsTestBase {
     	 * Homebase
     	 */
     	int istHbNdx = 0;
-    	int sawHbNdx = 1;
+//    	int sawHbNdx = 1;
 
     	assertTrue(apIST.isHb(istHbNdx));
-    	assertTrue(apSAW.isHb(sawHbNdx));
+//    	assertTrue(apSAW.isHb(sawHbNdx));
     	assertFalse(apIST.isNonHb(istHbNdx));
-    	assertFalse(apSAW.isNonHb(sawHbNdx));
+//    	assertFalse(apSAW.isNonHb(sawHbNdx));
     	assertTrue(apIST.isAnyHb());
     	assertTrue(apSAW.isAnyHb());
     	assertTrue(apESB.isNonHb(istHbNdx));
     	assertTrue(apAYT.isNonHb(istHbNdx));
     	assertTrue(apCDG.isNonHb(istHbNdx));
-    	assertTrue(apESB.isNonHb(sawHbNdx));
-    	assertTrue(apAYT.isNonHb(sawHbNdx));
-    	assertTrue(apCDG.isNonHb(sawHbNdx));
+//    	assertTrue(apESB.isNonHb(sawHbNdx));
+//    	assertTrue(apAYT.isNonHb(sawHbNdx));
+//    	assertTrue(apCDG.isNonHb(sawHbNdx));
     	assertTrue(apESB.isAnyNonHb());
     	assertTrue(apAYT.isAnyNonHb());
     	assertTrue(apCDG.isAnyNonHb());

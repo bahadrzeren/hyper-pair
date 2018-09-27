@@ -58,8 +58,8 @@ public class LegIntroducer implements Introducer<Leg> {
 
 		if (m.getDepAirport().getCode().equals(m.getArrAirport().getCode()))
    			return false;
-		if ((m.getDepAirport().getCode().equals("IST") && m.getDepAirport().getCode().equals("SAW"))
-				|| (m.getDepAirport().getCode().equals("SAW") && m.getDepAirport().getCode().equals("IST")))
+		if ((m.getDepAirport().getCode().equals("IST") && m.getArrAirport().getCode().equals("SAW"))
+				|| (m.getDepAirport().getCode().equals("SAW") && m.getArrAirport().getCode().equals("IST")))
 			return false;
 
 		if (HeurosDatasetParam.optPeriodStartInc.isAfter(m.getSobt()))
@@ -117,6 +117,9 @@ public class LegIntroducer implements Introducer<Leg> {
 
 		if (m.getFlightNo() >= LegIntroducer.maxFlightNumberToCover)
 			m.setCover(false);
+
+//		if (!m.getSobt().isBefore(HeurosDatasetParam.dataPeriodEndExc.truncatedTo(ChronoUnit.DAYS).minusDays(1)))
+//			m.setCover(false);
 
 		if (m.isCover() || m.isDeadheadable())
 			return true;

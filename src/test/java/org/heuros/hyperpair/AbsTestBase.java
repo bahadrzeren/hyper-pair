@@ -67,7 +67,7 @@ public abstract class AbsTestBase extends TestCase {
 	protected Airport apHOU = null;
 
 	protected int hbNdxIST = 0;
-	protected int hbNdxSAW = 1;
+//	protected int hbNdxSAW = 1;
 
 	/**
      * Prepare the framework for unit tests.
