@@ -220,17 +220,17 @@ public class HyperPair {
 																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
 				pairGenCalls.add(executorService.submit(dutyPairChecker));
 
-//				BiDirLegPairingChecker legPairChecker = new BiDirLegPairingChecker(hbNdx, HeurosDatasetParam.coverPeriodEndExc)
-//																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
-//																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
-//																	.setLegRepository(pairOptimizationContext.getLegRepository())
-//																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
-//																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
-//																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-//																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-//																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
-//																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
-//				pairGenCalls.add(executorService.submit(legPairChecker));
+				BiDirLegPairingChecker legPairChecker = new BiDirLegPairingChecker(hbNdx, HeurosDatasetParam.legCoverPeriodEndExc)
+																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
+																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
+																	.setLegRepository(pairOptimizationContext.getLegRepository())
+																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
+																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
+																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
+																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+				pairGenCalls.add(executorService.submit(legPairChecker));
 			}
 
 			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
@@ -250,9 +250,9 @@ public class HyperPair {
 																						.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																						.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
 																						.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
-																						.setHbDepHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepHbArrDutyIndexByLegNdx())
-																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
-																						.setHbArrDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getHbArrDutyIndexByDepAirportNdxBrieftime());
+																						.setHbDepArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepArrDutyIndexByLegNdx())
+																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
+//																						.setHbArrDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getHbArrDutyIndexByDepAirportNdxBrieftime());
 
 			PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
 																				.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
