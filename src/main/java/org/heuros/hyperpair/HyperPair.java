@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
 import org.heuros.context.PairOptimizationContext;
 import org.heuros.core.ga.GeneticIterationListener;
+import org.heuros.core.ga.chromosome.Chromosome;
 import org.heuros.core.ga.crossover.UniformCrossover;
 import org.heuros.core.ga.mutation.IntegerGeneMutator;
 import org.heuros.core.ga.selection.BinaryTournamentSelector;
@@ -196,12 +197,11 @@ public class HyperPair {
 			 */
 			pairOptimizationContext.registerDuties(duties, HeurosSystemParam.homebases.length);
 
-			ExecutorService executorService = Executors.newFixedThreadPool(HeurosSystemParam.homebases.length);
+			ExecutorService executorService = Executors.newFixedThreadPool(HeurosSystemParam.homebases.length * 2);
 
 			List<Future<Boolean>> pairGenCalls = new ArrayList<Future<Boolean>>(HeurosSystemParam.homebases.length);
 
 			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
-//			int hbNdx = 1;
 
 //			UniDirDutyPairingChecker pairChecker = new UniDirDutyPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
 //																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
@@ -233,10 +233,10 @@ public class HyperPair {
 				pairGenCalls.add(executorService.submit(legPairChecker));
 			}
 
-			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
+			for (int i = 0; i < pairGenCalls.size(); i++) {
 				try {
-					if (pairGenCalls.get(hbNdx).get())
-						logger.info(hbNdx + "th pairGen is completed its task!");
+					if (pairGenCalls.get(i).get())
+						logger.info(i + "th pairGen is completed its task!");
 				} catch(Exception ex) {
 					ex.printStackTrace();
 					logger.error(ex);
@@ -249,10 +249,13 @@ public class HyperPair {
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
 																						.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																						.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-																						.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
 																						.setHbDepArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepArrDutyIndexByLegNdx())
-																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
-//																						.setHbArrDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getHbArrDutyIndexByDepAirportNdxBrieftime());
+																						.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
+																						.setNonHbDutyIndexByLegNdx(pairOptimizationContext.getNonHbDutyIndexByLegNdx())
+																						.setHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbArrDutyIndexByLegNdx())
+																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
+																						.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+			pairChromosomeDecoder.orderLegs();
 
 			PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
 																				.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
@@ -264,11 +267,17 @@ public class HyperPair {
 																				.setPopulationSize(HeurosGaParameters.populationSize)
 																				.setSelector(new BinaryTournamentSelector<Integer>())
 																				.setCrossoverOperator(new UniformCrossover<Integer>())
-																				.setGeneticIterationListener(new GeneticIterationListener() {
+																				.setGeneticIterationListener(new GeneticIterationListener<Integer>() {
 																					@Override
-																					public void onProgress(int iteration, double elapsedTime, String info) {
+																					public void onProgress(int iteration, double elapsedTime, Chromosome<Integer> best) {
+																						HyperPair.logger.info("Progress!!! at " + iteration + ".th iteration, elapsedTime: " +
+																												elapsedTime + ", best: " + String.valueOf(best.getInfo()));
+																					}
+																					@Override
+																					public void onIterate(int iteration, double elapsedTime, Chromosome<Integer> best) {
 																						HyperPair.logger.info(iteration + ".th itearation, elapsedTime: " +
-																												elapsedTime + ", best: " + info);
+																												elapsedTime + ", best: " + String.valueOf(best.getInfo()));
+																						pairChromosomeDecoder.orderLegs();
 																					}
 																					@Override
 																					public void onException(Exception ex) {
