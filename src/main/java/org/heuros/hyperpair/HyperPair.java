@@ -20,11 +20,13 @@ import org.heuros.core.ga.crossover.UniformCrossover;
 import org.heuros.core.ga.mutation.IntegerGeneMutator;
 import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.core.rule.intf.Rule;
+import org.heuros.data.PairingPricingNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.processor.BiDirDutyPairingChecker;
 import org.heuros.data.processor.BiDirLegPairingChecker;
 import org.heuros.data.processor.DutyGenerator;
+import org.heuros.data.processor.PairingGenerator;
 import org.heuros.data.repo.AirportRepository;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
@@ -143,14 +145,15 @@ public class HyperPair {
 			logger.info("Data period end: " + HeurosDatasetParam.dataPeriodEndExc);
 
 			HeurosDatasetParam.optPeriodStartInc = legs.get(0).getSobt().withDayOfMonth(1).toLocalDate().plusMonths(1).atStartOfDay();
-			logger.info("Opt period start: " + HeurosDatasetParam.dataPeriodStartInc);
+			logger.info("Opt period start: " + HeurosDatasetParam.optPeriodStartInc);
 			HeurosDatasetParam.optPeriodEndExc = legs.get(legs.size() - 1).getSibt().withDayOfMonth(1).toLocalDate().atStartOfDay();
-			logger.info("Opt period end: " + HeurosDatasetParam.dataPeriodEndExc);
+			if (HeurosDatasetParam.optPeriodEndExc.isEqual(HeurosDatasetParam.optPeriodStartInc))
+					HeurosDatasetParam.optPeriodEndExc = HeurosDatasetParam.dataPeriodEndExc.minusDays(2 + 2 * HeurosSystemParam.maxPairingLengthInDays).toLocalDate().atStartOfDay();
+			logger.info("Opt period end: " + HeurosDatasetParam.optPeriodEndExc);
 			HeurosDatasetParam.legCoverPeriodEndExc = HeurosDatasetParam.optPeriodEndExc.plusDays(HeurosSystemParam.maxPairingLengthInDays);
 			logger.info("Leg cover period end: " + HeurosDatasetParam.legCoverPeriodEndExc);
 			HeurosDatasetParam.dutyProcessPeriodEndExc = HeurosDatasetParam.legCoverPeriodEndExc.plusDays(HeurosSystemParam.maxPairingLengthInDays - 1);
 			logger.info("Duty process period end: " + HeurosDatasetParam.dutyProcessPeriodEndExc);
-
 
 			/*
 			 * Generate context.
@@ -245,17 +248,37 @@ public class HyperPair {
 
 			executorService.shutdown();
 
+			PairingPricingNetwork pricingNetwork = new PairingPricingNetwork(HeurosDatasetParam.dutyProcessPeriodEndExc, 
+																				HeurosSystemParam.maxIdleTimeInAPairInHours, 
+																				HeurosSystemParam.maxPairingLengthInDays)
+																				.setLegRepository(pairOptimizationContext.getLegRepository())
+																				.setDutyRepository(pairOptimizationContext.getDutyRepository())
+																				.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+																				.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
+			pricingNetwork.buildNetwork();
+
+			PairingGenerator pairingGenerator = new PairingGenerator(HeurosSystemParam.maxIdleTimeInAPairInHours, 
+																		HeurosSystemParam.maxPairingLengthInDays)
+																			.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+																			.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+																			.setHbDepArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepArrDutyIndexByLegNdx())
+																			.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
+																			.setNonHbDutyIndexByLegNdx(pairOptimizationContext.getNonHbDutyIndexByLegNdx())
+																			.setHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbArrDutyIndexByLegNdx())
+																			.setPairingPricingNetwork(pricingNetwork);
+
 			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
-																						.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
-																						.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+//																						.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+//																						.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																						.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-																						.setHbDepArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepArrDutyIndexByLegNdx())
-																						.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
-																						.setNonHbDutyIndexByLegNdx(pairOptimizationContext.getNonHbDutyIndexByLegNdx())
-																						.setHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbArrDutyIndexByLegNdx())
-																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
-																						.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+//																						.setHbDepArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepArrDutyIndexByLegNdx())
+//																						.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
+//																						.setNonHbDutyIndexByLegNdx(pairOptimizationContext.getNonHbDutyIndexByLegNdx())
+//																						.setHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbArrDutyIndexByLegNdx())
+//																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
+//																						.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+																						.setPairingGenerator(pairingGenerator);
 			pairChromosomeDecoder.orderLegs();
 
 			PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
