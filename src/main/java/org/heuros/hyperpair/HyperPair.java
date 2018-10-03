@@ -247,6 +247,7 @@ public class HyperPair {
 
 			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
+																						.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																						.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																						.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
 																						.setHbDepArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepArrDutyIndexByLegNdx())
