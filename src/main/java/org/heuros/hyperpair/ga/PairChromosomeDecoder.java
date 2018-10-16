@@ -447,8 +447,6 @@ chromosome.setGeneValue(i, 0);
 		int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 		int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 
-		int[] heuristicVector = new int[HeurosSystemParam.maxPairingLengthInDays * 2];
-
 		while (true) {
 			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, numOfLegCoverings);
 			if (reOrderedLegNdx == Integer.MAX_VALUE)
@@ -458,10 +456,13 @@ chromosome.setGeneValue(i, 0);
 
 			Leg legToCover = this.reOrderedLegs.get(reOrderedLegNdx);
 
-			for (int i = 0; i < heuristicVector.length; i++)
-				heuristicVector[i] = chromosome.getGeneValue(geneNdx + i);
+			int heuristicNo = chromosome.getGeneValue(geneNdx);
 
-			Pair p = this.pairingGenerator.generatePairing(legToCover, heuristicVector, HeurosSystemParam.maxPairingLengthInDays);
+			Pair p = this.pairingGenerator.generatePairing(legToCover, 
+															heuristicNo, 
+															HeurosSystemParam.maxPairingLengthInDays,
+															numOfCoveringsInDuties,
+															blockTimeOfCoveringsInDuties);
 
 			if (p != null) {
 				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);

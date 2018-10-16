@@ -261,10 +261,7 @@ public class HyperPair {
 																		HeurosSystemParam.maxPairingLengthInDays)
 																			.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																			.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-																			.setHbDepArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepArrDutyIndexByLegNdx())
-																			.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
-																			.setNonHbDutyIndexByLegNdx(pairOptimizationContext.getNonHbDutyIndexByLegNdx())
-																			.setHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbArrDutyIndexByLegNdx())
+																			.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
 																			.setPairingPricingNetwork(pricingNetwork);
 
 			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
