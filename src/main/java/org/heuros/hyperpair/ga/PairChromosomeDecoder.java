@@ -17,10 +17,10 @@ import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
-import org.heuros.data.processor.PairingGenerator;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
 import org.heuros.hyperpair.HeurosSystemParam;
+import org.heuros.hyperpair.heuristic.PairingGenerator;
 
 public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
