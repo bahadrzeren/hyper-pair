@@ -63,8 +63,6 @@ public class PairingGenerator {
 		return this;
 	}
 
-	private 
-
 	public Pair generatePairing(Leg legToCover,
 								int heuristicNo,
 								int[] numOfCoveringsInDuties,
@@ -76,60 +74,9 @@ public class PairingGenerator {
 
 		if ((duties != null)
 				&& (duties.length > 0)) {
-
-			for (Duty duty: duties) {
-
-				LegView fl = duty.getFirstLeg();
-				LegView ll = duty.getLastLeg();
-
-				if (duty.isHbDep(this.hbNdx)) {
-					if (duty.isHbArr(this.hbNdx)) {
-			    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
-				    		if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, pair, duty, true)) {
-				    			this.pairRuleContext.getAggregatorProxy().appendFw(pair, duty);
-				    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, pair)) {
-				    				if (pair.isComplete(this.hbNdx)) {
-				    					/*
-				    					 * Set related leg flags!
-				    					 */
-				    					
-				    				} else
-				    					logger.error("Pairing " + d + " must be complete!");
-				    			}
-				    			this.pairRuleContext.getAggregatorProxy().removeLast(p);
-				    		}
-			    		}
-					} else {
-//						bestSoFar = this.fwNetworkSearch(duty, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-					}
-				} else
-					if (heuristicNo > 0) {
-						if (duty.isHbArr(this.hbNdx)) {
-							
-						} else {
-							
-						}
-					}
-			}
+			int[][] partialNetwork = this.dutyNetwork.generatePartialNetwork(duties);
 		}
 		return null;
 	}
 
-	private QualityMetric fwNetworkSearch(Pair p,
-											QualityMetric bestSoFar,
-											Duty fd, 
-											Duty ld, 
-											LegView fl, 
-											LegView ll, 
-											boolean hbDep, 
-											boolean hbArr, 
-											int dept,
-											int[] numOfCoveringsInDuties,
-											int[] blockTimeOfCoveringsInDuties) {
-		LegView[] nextLegs = this.dutyNetwork.getNextBriefLegIndexByDutyNdx().getArray(duty.getNdx());
-		for (LegView leg : nextLegs) {
-			DutyView[] nextDuties = this.dutyNetwork.getDutyIndexByDepLegNdx().getArray(leg.getNdx());
-			nextDuties.
-		}
-	}
 }
