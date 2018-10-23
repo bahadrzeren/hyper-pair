@@ -1,23 +1,16 @@
 package org.heuros.hyperpair.heuristic;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
-import org.heuros.core.data.ndx.TwoDimIndexIntXInt;
-import org.heuros.core.data.ndx.TwoDimIndexIntXLocalDateTime;
 import org.heuros.data.PairingPricingNetwork;
+import org.heuros.data.PartialPairingPricingNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
-import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
+import org.heuros.data.repo.DutyRepository;
 import org.heuros.rule.DutyRuleContext;
 import org.heuros.rule.PairRuleContext;
 
@@ -37,6 +30,8 @@ public class PairingGenerator {
 
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 	private PairingPricingNetwork dutyNetwork = null;
+
+	private List<Duty> duties = null;
 
 	public PairingGenerator(int maxIdleTimeInAPairInHours, int maxPairingLengthInDays) {
 		this.maxIdleTimeInAPairInHours = maxIdleTimeInAPairInHours;
@@ -63,20 +58,35 @@ public class PairingGenerator {
 		return this;
 	}
 
+	public PairingGenerator setDutyRepository(DutyRepository dutyRepository) {
+		this.duties = dutyRepository.getModels();
+		return this;
+	}
+
 	public Pair generatePairing(Leg legToCover,
 								int heuristicNo,
 								int[] numOfCoveringsInDuties,
 								int[] blockTimeOfCoveringsInDuties) {
-		Duty[] duties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
+
+		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
 		Pair pair = Pair.newInstance(this.hbNdx);
 		QualityMetric bestValuesSoFar = new QualityMetric();
 
-		if ((duties != null)
-				&& (duties.length > 0)) {
-			int[][] partialNetwork = this.dutyNetwork.generatePartialNetwork(duties);
+		if ((coveringDuties != null)
+				&& (coveringDuties.length > 0)) {
+			PartialPairingPricingNetwork partialNetwork = this.dutyNetwork.generatePartialNetwork(heuristicNo, coveringDuties);
+
+			partialNetwork.getSourceDuties().forEach(sdNdx -> {
+				DutyView sd = this.duties.get(sdNdx);
+				this.pairRuleContext.getAggregatorProxy().appendFw(pair, sd);
+				this.searchForPairings(pair);
+			});
 		}
 		return null;
 	}
 
+	private void searchForPairings(Pair p, DutyView ld) {
+		
+	}
 }
