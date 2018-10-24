@@ -9,6 +9,7 @@ import org.heuros.data.PartialPairingPricingNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
+import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.rule.DutyRuleContext;
@@ -70,23 +71,38 @@ public class PairingGenerator {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
-		Pair pair = Pair.newInstance(this.hbNdx);
-		QualityMetric bestValuesSoFar = new QualityMetric();
+		Pair p = Pair.newInstance(this.hbNdx);
+		QualityMetric[] bestSoFar = new QualityMetric[this.duties.size()];
+		QualityMetric bestQm = new QualityMetric();
 
 		if ((coveringDuties != null)
 				&& (coveringDuties.length > 0)) {
 			PartialPairingPricingNetwork partialNetwork = this.dutyNetwork.generatePartialNetwork(heuristicNo, coveringDuties);
 
 			partialNetwork.getSourceDuties().forEach(sdNdx -> {
-				DutyView sd = this.duties.get(sdNdx);
-				this.pairRuleContext.getAggregatorProxy().appendFw(pair, sd);
-				this.searchForPairings(pair);
+				DutyView d = this.duties.get(sdNdx);
+				this.pairRuleContext.getAggregatorProxy().appendFw(p, d);
+				if (d.isHbArr(this.hbNdx)) {
+	    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, p)) {
+	    				if (p.isComplete(this.hbNdx)) {
+	    					QualityMetric dqm = QualityMetric.calculateQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+	    					if (dqm.isBetterThan(heuristicNo, bestQm))
+	    						bestQm.injectValues(dqm);
+	    				} else
+	    					logger.error("Pairing " + d + " must be complete!");
+	    			}
+				} else
+					this.searchForPairings(heuristicNo, partialNetwork, bestSoFar, p, d, d, d.getFirstLeg(), d.getLastLeg());
+				this.pairRuleContext.getAggregatorProxy().removeLast(p);
 			});
 		}
 		return null;
 	}
 
-	private void searchForPairings(Pair p, DutyView ld) {
+	private void searchForPairings(int heuristicNo, 
+									PartialPairingPricingNetwork partialNetwork, 
+									QualityMetric[] bestSoFar, 
+									Pair p, DutyView fd, DutyView ld, LegView fl, LegView ll) {
 		
 	}
 }
