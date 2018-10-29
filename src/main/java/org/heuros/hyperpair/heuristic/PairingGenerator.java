@@ -88,11 +88,11 @@ public class PairingGenerator {
 				int dNdx = sourceDuties[i];
 				DutyView d = this.duties.get(dNdx);
 
+				if (d.isNonHbDep(this.hbNdx))
+					logger.error("Must be HB departed duty!");
+
 	    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
 	    			this.pairRuleContext.getAggregatorProxy().appendFw(p, d);
-
-					if (d.isNonHbDep(this.hbNdx))
-						logger.error("Must be HB departed duty!");
 
 					QualityMetric dqm = QualityMetric.calculateQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 
