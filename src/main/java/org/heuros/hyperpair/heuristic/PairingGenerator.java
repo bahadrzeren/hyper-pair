@@ -4,8 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
-import org.heuros.data.PairingPricingNetwork;
-import org.heuros.data.PartialPairingPricingNetwork;
+import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
@@ -30,7 +29,7 @@ public class PairingGenerator {
 	private PairRuleContext pairRuleContext = null;
 
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
-	private PairingPricingNetwork dutyNetwork = null;
+	private DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork = null;
 
 	private List<Duty> duties = null;
 
@@ -54,8 +53,8 @@ public class PairingGenerator {
 		return this;
 	}
 
-	public PairingGenerator setPairingPricingNetwork(PairingPricingNetwork dutyNetwork) {
-		this.dutyNetwork = dutyNetwork;
+	public PairingGenerator setPricingNetwork(DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork) {
+		this.dutyLegOvernightConnNetwork = dutyLegOvernightConnNetwork;
 		return this;
 	}
 
@@ -80,7 +79,12 @@ public class PairingGenerator {
 
 		if ((coveringDuties != null)
 				&& (coveringDuties.length > 0)) {
-			PartialPairingPricingNetwork partialNetwork = this.dutyNetwork.generatePartialNetwork(heuristicNo, coveringDuties);
+			PricingSubNetwork partialNetwork = new PricingSubNetwork(this.duties, 
+																		this.maxPairingLengthInDays, 
+																		this.dutyRuleContext, 
+																		this.pairRuleContext, 
+																		this.dutyLegOvernightConnNetwork)
+													.build(heuristicNo, coveringDuties);
 
 			int[] sourceDuties = partialNetwork.getSourceDuties();
 

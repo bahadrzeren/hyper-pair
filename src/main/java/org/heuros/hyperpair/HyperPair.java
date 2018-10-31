@@ -20,7 +20,7 @@ import org.heuros.core.ga.crossover.UniformCrossover;
 import org.heuros.core.ga.mutation.IntegerGeneMutator;
 import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.core.rule.intf.Rule;
-import org.heuros.data.PairingPricingNetwork;
+import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.processor.BiDirDutyPairingChecker;
@@ -248,7 +248,7 @@ public class HyperPair {
 
 			executorService.shutdown();
 
-			PairingPricingNetwork pricingNetwork = new PairingPricingNetwork(HeurosDatasetParam.dutyProcessPeriodEndExc, 
+			DutyLegOvernightConnNetwork pricingNetwork = new DutyLegOvernightConnNetwork(HeurosDatasetParam.dutyProcessPeriodEndExc, 
 																				HeurosSystemParam.maxIdleTimeInAPairInHours, 
 																				HeurosSystemParam.maxPairingLengthInDays)
 																				.setLegRepository(pairOptimizationContext.getLegRepository())
