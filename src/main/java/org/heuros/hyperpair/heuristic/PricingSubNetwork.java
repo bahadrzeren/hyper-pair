@@ -111,7 +111,7 @@ public class PricingSubNetwork {
 
 	public PricingSubNetwork build(int heuristicNo, Duty[] sourceDuties) {
 
-		int[] maxSearchDept = new int[this.duties.size()];
+//		int[] maxSearchDept = new int[this.duties.size()];
 
 		for (Duty duty: sourceDuties) {
 
@@ -123,7 +123,7 @@ public class PricingSubNetwork {
 					} else 
 						if (heuristicNo > 0) {
 							if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
-								if (this.fwNetworkSearch(duty, maxSearchDept, true, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
+								if (this.fwNetworkSearch(duty, true, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
 									this.addSourceDuty(duty);
 								}
 							}
@@ -131,10 +131,10 @@ public class PricingSubNetwork {
 				} else
 					if (heuristicNo > 0) {
 						if (duty.isHbArr(this.hbNdx)) {
-							this.bwNetworkSearch(duty, maxSearchDept, true, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 1);
+							this.bwNetworkSearch(duty, true, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 1);
 						} else {
-							if (this.fwNetworkSearch(duty, maxSearchDept, false, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 2))
-								this.bwNetworkSearch(duty, maxSearchDept, false, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 2);
+							if (this.fwNetworkSearch(duty, false, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 2))
+								this.bwNetworkSearch(duty, false, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 2);
 						}
 					}
 			}
@@ -142,14 +142,14 @@ public class PricingSubNetwork {
 		return this;
 	}
 
-	private boolean fwNetworkSearch(DutyView pd, int[] maxSearchDept, boolean hbDep, LocalDateTime rootBriefTime, int dept) {
+	private boolean fwNetworkSearch(DutyView pd, boolean hbDep, LocalDateTime rootBriefTime, int dept) {
 		boolean res = false;
 		LegView[] nextLegs = this.nextBriefLegIndexByDutyNdx.getArray(pd.getNdx());
 		for (LegView leg : nextLegs) {
 			DutyView[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
 			for (DutyView nd: nextDuties) {
 				if (nd.isValid(this.hbNdx)
-						&& (maxSearchDept[nd.getNdx()] < dept)
+//						&& (maxSearchDept[nd.getNdx()] < dept)
 						&& (nd.isHbArr(this.hbNdx) || (dept > 1))
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
@@ -165,27 +165,27 @@ public class PricingSubNetwork {
 					} else
 						if (dept > 1) {
 //							root.isHbDep(this.hbNdx)
-							if (this.fwNetworkSearch(nd, maxSearchDept, hbDep, rootBriefTime, dept - 1)) {
+							if (this.fwNetworkSearch(nd, hbDep, rootBriefTime, dept - 1)) {
 								res = true;
 								this.addDuty(pd, nd);
 							}
 						}
-					if (res)
-						maxSearchDept[nd.getNdx()] = dept;
+//					if (res)
+//						maxSearchDept[nd.getNdx()] = dept;
 				}
 			}
 		}
 		return res;
 	}
 
-	private boolean bwNetworkSearch(DutyView nd, int[] maxSearchDept, boolean hbArr, LocalDateTime rootDebriefTime, int dept) {
+	private boolean bwNetworkSearch(DutyView nd, boolean hbArr, LocalDateTime rootDebriefTime, int dept) {
 		boolean res = false;
 		LegView[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
 		for (LegView leg : prevLegs) {
 			DutyView[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
 			for (DutyView pd: prevDuties) {
 				if (pd.isValid(this.hbNdx)
-						&& (maxSearchDept[pd.getNdx()] < dept)
+//						&& (maxSearchDept[pd.getNdx()] < dept)
 						&& (pd.isHbDep(this.hbNdx) || (dept > 1))
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
@@ -204,13 +204,13 @@ public class PricingSubNetwork {
 					} else
 						if (dept > 1) {
 //							root.isHbArr(this.hbNdx)
-							if (this.bwNetworkSearch(pd, maxSearchDept, hbArr, rootDebriefTime, dept - 1)) {
+							if (this.bwNetworkSearch(pd, hbArr, rootDebriefTime, dept - 1)) {
 								res = true;
 								this.addDuty(pd, nd);
 							}
 						}
-					if (res)
-						maxSearchDept[pd.getNdx()] = dept;
+//					if (res)
+//						maxSearchDept[pd.getNdx()] = dept;
 				}
 			}
 		}
