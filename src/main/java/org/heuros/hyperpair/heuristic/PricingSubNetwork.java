@@ -150,6 +150,7 @@ public class PricingSubNetwork {
 			for (DutyView nd: nextDuties) {
 				if (nd.isValid(this.hbNdx)
 						&& (maxSearchDept[nd.getNdx()] < dept)
+						&& (nd.isHbArr(this.hbNdx) || (dept > 1))
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
 						 */
@@ -169,7 +170,8 @@ public class PricingSubNetwork {
 								this.addDuty(pd, nd);
 							}
 						}
-					maxSearchDept[nd.getNdx()] = dept;
+					if (res)
+						maxSearchDept[nd.getNdx()] = dept;
 				}
 			}
 		}
@@ -184,6 +186,7 @@ public class PricingSubNetwork {
 			for (DutyView pd: prevDuties) {
 				if (pd.isValid(this.hbNdx)
 						&& (maxSearchDept[pd.getNdx()] < dept)
+						&& (pd.isHbDep(this.hbNdx) || (dept > 1))
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
 						 */
@@ -206,7 +209,8 @@ public class PricingSubNetwork {
 								this.addDuty(pd, nd);
 							}
 						}
-					maxSearchDept[pd.getNdx()] = dept;
+					if (res)
+						maxSearchDept[pd.getNdx()] = dept;
 				}
 			}
 		}
