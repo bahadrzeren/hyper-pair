@@ -114,7 +114,7 @@ public class PricingSubNetwork {
 	public PricingSubNetwork build(Duty[] sourceDuties,
 									int heuristicNo,
 									int[] numOfCoveringsInDuties,
-									int[] blockTimeOfCoveringsInDuties) {
+									int[] blockTimeOfCoveringsInDuties) throws CloneNotSupportedException {
 		/*
 		 * Here there are two implementation options.
 		 * 1- Prevent unnecessary deeper search on the tree by checking starting date and time.
@@ -154,7 +154,8 @@ public class PricingSubNetwork {
 					} else 
 						if (heuristicNo > 0) {
 							if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
-								if (this.fwNetworkSearch(duty, true, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
+								if (this.fwNetworkSearch(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+															duty, true, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
 									this.addSourceDuty(duty);
 								}
 							}
@@ -162,10 +163,13 @@ public class PricingSubNetwork {
 				} else
 					if (heuristicNo > 0) {
 						if (duty.isHbArr(this.hbNdx)) {
-							this.bwNetworkSearch(duty, true, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 1);
+							this.bwNetworkSearch(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+													duty, true, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 1);
 						} else {
-							if (this.fwNetworkSearch(duty, false, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 2))
-								this.bwNetworkSearch(duty, false, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 2);
+							if (this.fwNetworkSearch(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+														duty, false, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 2))
+								this.bwNetworkSearch(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+														duty, false, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 2);
 						}
 					}
 			}
@@ -183,7 +187,7 @@ public class PricingSubNetwork {
 //		return res;
 //	}
 
-	private DutyNodeQualityMetric getCumulativeQuality(int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties, DutyView pd, DutyView nd) throws CloneNotSupportedException {
+	private void checkAndUpdateCumulativeQuality(int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties, DutyView pd, DutyView nd) throws CloneNotSupportedException {
 		DutyNodeQualityMetric pdQ = this.bestDutyNodeQuality[pd.getNdx()];
 		DutyNodeQualityMetric ndQ = this.bestDutyNodeQuality[nd.getNdx()];
 		if (ndQ == null) {
@@ -202,17 +206,13 @@ public class PricingSubNetwork {
 				pdQ = (DutyNodeQualityMetric) ndQ.clone();
 				this.bestDutyNodeQuality[pd.getNdx()] = pdQ;
 			}
-			ndQ.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+			ndQ.removeFromQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 		}
-		return pdQ;
 	}
 
-	private DutyNodeQualityMetric fwNetworkSearch(int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties,
-													DutyView pd, boolean hbDep, LocalDateTime rootBriefTime, int dept) {
-
-		DutyNodeQualityMetric pdQ = null;
-		DutyNodeQualityMetric ndQ = null;
-
+	private boolean fwNetworkSearch(int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties,
+													DutyView pd, boolean hbDep, LocalDateTime rootBriefTime, int dept) throws CloneNotSupportedException {
+		boolean res = false;
 		LegView[] nextLegs = this.nextBriefLegIndexByDutyNdx.getArray(pd.getNdx());
 		for (LegView leg : nextLegs) {
 			DutyView[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
@@ -230,17 +230,16 @@ public class PricingSubNetwork {
 						&& this.dutyRuleContext.getConnectionCheckerProxy().areConnectable(this.hbNdx, pd, nd)) {
 					if (nd.isHbArr(this.hbNdx)) {
 						this.addDuty(pd, nd);
-
-						pdQ = this.getDutyNodeQuality(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, pd);
-						ndQ = this.getDutyNodeQuality(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, nd);
-
+						this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
+						res = true;
 					} else
 						if (dept > 1) {
 //							root.isHbDep(this.hbNdx)
 							if (this.fwNetworkSearch(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 														nd, hbDep, rootBriefTime, dept - 1)) {
-								res = true;
 								this.addDuty(pd, nd);
+								this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
+								res = true;
 							}
 						}
 //					if (res)
@@ -251,9 +250,9 @@ public class PricingSubNetwork {
 		return res;
 	}
 
-	private DutyNodeQualityMetric bwNetworkSearch(int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties,
-													DutyView nd, boolean hbArr, LocalDateTime rootDebriefTime, int dept) {
-		DutyNodeQualityMetric res = null;
+	private boolean bwNetworkSearch(int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties,
+													DutyView nd, boolean hbArr, LocalDateTime rootDebriefTime, int dept) throws CloneNotSupportedException {
+		boolean res = false;
 		LegView[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
 		for (LegView leg : prevLegs) {
 			DutyView[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
@@ -273,6 +272,7 @@ public class PricingSubNetwork {
 						if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, pd)) {
 							this.addDuty(pd, nd);
 							this.addSourceDuty(pd);
+							this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
 							res = true;
 						}
 					} else
@@ -280,8 +280,9 @@ public class PricingSubNetwork {
 //							root.isHbArr(this.hbNdx)
 							if (this.bwNetworkSearch(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 														pd, hbArr, rootDebriefTime, dept - 1)) {
-								res = true;
 								this.addDuty(pd, nd);
+								this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
+								res = true;
 							}
 						}
 //					if (res)
