@@ -2,8 +2,7 @@ package org.heuros.hyperpair.heuristic;
 
 import org.heuros.data.model.DutyView;
 
-public class DutyNodeQualityMetric {
-	public int maxRhsDept = 0;
+public class DutyNodeQualityMetric implements Cloneable {
 	/*
 	 * Deadhead
 	 */
@@ -13,24 +12,22 @@ public class DutyNodeQualityMetric {
 	 * Dutyday
 	 */
 	public int activeBlocktimeInMins = 0;
-	public int numOfDuties = 0;
+	public int numOfDuties = Integer.MAX_VALUE;
 	/*
 	 * The last metric to check if others are equal!
 	 */
 	public int numOfIncludingDutiesOfTheSameLegs = Integer.MAX_VALUE;
 	public int numOfLegs = Integer.MAX_VALUE;
 
-//	@Override
-//    public Object clone() throws CloneNotSupportedException {
-//		QualityMetric qm = (QualityMetric) super.clone();
-//		return qm;
-//	}
+	@Override
+    public Object clone() throws CloneNotSupportedException {
+		DutyNodeQualityMetric qm = (DutyNodeQualityMetric) super.clone();
+		return qm;
+	}
 
 	public void addToQualityMetric(DutyView d,
-									int dept,
  									int[] numOfCoveringsInDuties,
 									int[] blockTimeOfCoveringsInDuties) {
-		this.maxRhsDept++;
 		this.numOfDh += (d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()]);
 		this.dhDurationInMins += (d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()]);
 		this.activeBlocktimeInMins += (d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()]);
@@ -39,11 +36,18 @@ public class DutyNodeQualityMetric {
 		this.numOfLegs += d.getNumOfLegs();
 	}
 
+	public void addToQualityMetric(DutyNodeQualityMetric dqm) {
+		this.numOfDh += dqm.numOfDh;
+		this.dhDurationInMins += dqm.dhDurationInMins;
+		this.activeBlocktimeInMins += dqm.activeBlocktimeInMins;
+		this.numOfDuties += dqm.numOfDuties;
+		this.numOfIncludingDutiesOfTheSameLegs += dqm.numOfIncludingDutiesOfTheSameLegs;
+		this.numOfLegs += dqm.numOfLegs;
+	}
+
 	public void removeFromQualityMetric(DutyView d,
-										int dept,
 										int[] numOfCoveringsInDuties,
 										int[] blockTimeOfCoveringsInDuties) {
-		this.maxRhsDept--;
 		this.numOfDh -= (d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()]);
 		this.dhDurationInMins -= (d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()]);
 		this.activeBlocktimeInMins -= (d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()]);
@@ -52,8 +56,16 @@ public class DutyNodeQualityMetric {
 		this.numOfLegs -= d.getNumOfLegs();
 	}
 
-	public boolean isBetterThan(int heuristicNo, DutyNodeQualityMetric pqm) {
-		DutyNodeQualityMetric qm = (DutyNodeQualityMetric) pqm;
+	public void removeFromQualityMetric(DutyNodeQualityMetric dqm) {
+		this.numOfDh -= dqm.numOfDh;
+		this.dhDurationInMins -= dqm.dhDurationInMins;
+		this.activeBlocktimeInMins -= dqm.activeBlocktimeInMins;
+		this.numOfDuties -= dqm.numOfDuties;
+		this.numOfIncludingDutiesOfTheSameLegs -= dqm.numOfIncludingDutiesOfTheSameLegs;
+		this.numOfLegs -= dqm.numOfLegs;
+	}
+
+	public boolean isBetterThan(int heuristicNo, DutyNodeQualityMetric qm) {
 		if (heuristicNo < 2) {	//	If layover or dh effective. 
 			if ((this.numOfDh < qm.numOfDh)
 					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
@@ -72,9 +84,7 @@ public class DutyNodeQualityMetric {
 		}
 	}
 
-	public void injectValues(DutyNodeQualityMetric pqm) {
-		DutyNodeQualityMetric qm = (DutyNodeQualityMetric) pqm;
-		this.maxRhsDept = qm.maxRhsDept;
+	public void injectValues(DutyNodeQualityMetric qm) {
 		this.numOfDh = qm.numOfDh;
 		this.dhDurationInMins = qm.dhDurationInMins;
 		this.activeBlocktimeInMins = qm.activeBlocktimeInMins;
@@ -84,10 +94,8 @@ public class DutyNodeQualityMetric {
 	}
 
 	public void injectValues(DutyView d,
-								int dept,
 								int[] numOfCoveringsInDuties,
 								int[] blockTimeOfCoveringsInDuties) {
-		this.maxRhsDept = dept;
 		this.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
 		this.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
 		this.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
@@ -100,7 +108,6 @@ public class DutyNodeQualityMetric {
 //														int[] numOfCoveringsInDuties,
 //														int[] blockTimeOfCoveringsInDuties) {
 //		QualityMetric qm = new QualityMetric();
-//		qm.dept = 0;
 //		qm.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
 //		qm.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
 //		qm.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
