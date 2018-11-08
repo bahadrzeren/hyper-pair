@@ -2,7 +2,7 @@ package org.heuros.hyperpair.heuristic;
 
 import org.heuros.data.model.DutyView;
 
-public class DutyNodeQualityMetric implements Cloneable {
+public class NodeQualityMetric implements Cloneable {
 	/*
 	 * Deadhead
 	 */
@@ -12,17 +12,16 @@ public class DutyNodeQualityMetric implements Cloneable {
 	 * Dutyday
 	 */
 	public int activeBlocktimeInMins = 0;
-	public int numOfDuties = Integer.MAX_VALUE;
+	public int numOfDuties = 4;
 	/*
 	 * The last metric to check if others are equal!
 	 */
 	public int numOfIncludingDutiesOfTheSameLegs = Integer.MAX_VALUE;
-	public int numOfLegs = Integer.MAX_VALUE;
+	public int numOfLegs = 24;
 
 	@Override
     public Object clone() throws CloneNotSupportedException {
-		DutyNodeQualityMetric qm = (DutyNodeQualityMetric) super.clone();
-		return qm;
+		return (NodeQualityMetric) super.clone();
 	}
 
 	public void addToQualityMetric(DutyView d,
@@ -36,7 +35,7 @@ public class DutyNodeQualityMetric implements Cloneable {
 		this.numOfLegs += d.getNumOfLegs();
 	}
 
-	public void addToQualityMetric(DutyNodeQualityMetric dqm) {
+	public void addToQualityMetric(NodeQualityMetric dqm) {
 		this.numOfDh += dqm.numOfDh;
 		this.dhDurationInMins += dqm.dhDurationInMins;
 		this.activeBlocktimeInMins += dqm.activeBlocktimeInMins;
@@ -56,7 +55,7 @@ public class DutyNodeQualityMetric implements Cloneable {
 		this.numOfLegs -= d.getNumOfLegs();
 	}
 
-	public void removeFromQualityMetric(DutyNodeQualityMetric dqm) {
+	public void removeFromQualityMetric(NodeQualityMetric dqm) {
 		this.numOfDh -= dqm.numOfDh;
 		this.dhDurationInMins -= dqm.dhDurationInMins;
 		this.activeBlocktimeInMins -= dqm.activeBlocktimeInMins;
@@ -65,7 +64,7 @@ public class DutyNodeQualityMetric implements Cloneable {
 		this.numOfLegs -= dqm.numOfLegs;
 	}
 
-	public boolean isBetterThan(int heuristicNo, DutyNodeQualityMetric qm) {
+	public boolean isBetterThan(int heuristicNo, NodeQualityMetric qm) {
 		if (heuristicNo < 2) {	//	If layover or dh effective. 
 			if ((this.numOfDh < qm.numOfDh)
 					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
@@ -84,7 +83,7 @@ public class DutyNodeQualityMetric implements Cloneable {
 		}
 	}
 
-	public void injectValues(DutyNodeQualityMetric qm) {
+	public void injectValues(NodeQualityMetric qm) {
 		this.numOfDh = qm.numOfDh;
 		this.dhDurationInMins = qm.dhDurationInMins;
 		this.activeBlocktimeInMins = qm.activeBlocktimeInMins;

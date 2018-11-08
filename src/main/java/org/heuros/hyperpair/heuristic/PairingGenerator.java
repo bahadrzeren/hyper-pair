@@ -8,7 +8,6 @@ import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
-import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.rule.DutyRuleContext;
@@ -63,19 +62,24 @@ public class PairingGenerator {
 		return this;
 	}
 
+	private class PairWithQuality {
+		public Pair pair = null;
+		public NodeQualityMetric pairQ = null;
+	}
+
 	public Pair generatePairing(Leg legToCover,
 								int heuristicNo,
 								int[] numOfCoveringsInDuties,
-								int[] blockTimeOfCoveringsInDuties) {
+								int[] blockTimeOfCoveringsInDuties) throws CloneNotSupportedException {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
-		Pair p = Pair.newInstance(this.hbNdx);
+		PairWithQuality currentPair = new PairWithQuality();
+		currentPair.pair = Pair.newInstance(this.hbNdx);
+		currentPair.pairQ = new NodeQualityMetric();
 
-		QualityMetric[] bestSoFar = new QualityMetric[this.duties.size()];
-		int[] maxSearchDeptSoFar = new int[this.duties.size()];
-
-		QualityMetric bestQm = new QualityMetric();
+		PairWithQuality bestPair = new PairWithQuality();
+		bestPair.pairQ = new NodeQualityMetric();
 
 		if ((coveringDuties != null)
 				&& (coveringDuties.length > 0)) {
@@ -84,9 +88,10 @@ public class PairingGenerator {
 																		this.dutyRuleContext, 
 																		this.pairRuleContext, 
 																		this.dutyLegOvernightConnNetwork)
-													.build(heuristicNo, coveringDuties);
+													.build(coveringDuties, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 
 			int[] sourceDuties = partialNetwork.getSourceDuties();
+			NodeQualityMetric[] nodeQs = partialNetwork.getBestNodeQuality();
 
 			for (int i = 0; i < sourceDuties.length; i++) {
 				int dNdx = sourceDuties[i];
@@ -96,71 +101,86 @@ public class PairingGenerator {
 					logger.error("Must be HB departed duty!");
 
 	    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
-	    			this.pairRuleContext.getAggregatorProxy().appendFw(p, d);
 
-					QualityMetric dqm = QualityMetric.calculateQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+	    			currentPair.pairQ.addToQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+	    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
 
 					if (d.isHbArr(this.hbNdx)) {
-		    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, p)) {
-		    				if (p.isComplete(this.hbNdx)) {
-		    					if (dqm.isBetterThan(heuristicNo, bestQm))
-		    						bestQm.injectValues(dqm);
-		    					this.checkAndSetDutyContributionStatus(heuristicNo, d, dqm, 0, bestSoFar, maxSearchDeptSoFar);
+		    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
+		    				if (currentPair.pair.isComplete(this.hbNdx)) {
+		    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
+		    						bestPair.pair = (Pair) currentPair.pair.clone();
+		    						bestPair.pairQ.injectValues(currentPair.pairQ);
+		    					}
 		    				} else
 		    					logger.error("Pairing " + d + " must be complete!");
 		    			}
 					} else {
-						bestQm = this.searchForPairings(heuristicNo, partialNetwork, bestQm, p, d, dqm, this.maxPairingLengthInDays - 1);
+						/*
+						 * Basic cumulative quality info which is calculated during the sub network generation is checked! 
+						 */
+						if (nodeQs[d.getNdx()].isBetterThan(heuristicNo, bestPair.pairQ)) {
+							if (this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair)) {
+								bestPair = this.searchForPairings(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, nodeQs,
+																	partialNetwork, currentPair, d, bestPair, this.maxPairingLengthInDays - 1);
+							}
+						}
 					}
-					this.pairRuleContext.getAggregatorProxy().removeLast(p);
+
+					currentPair.pairQ.removeFromQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+					this.pairRuleContext.getAggregatorProxy().removeLast(currentPair.pair);
 	    		}
 			}
 		}
 		return null;
 	}
 
-	private QualityMetric searchForPairings(int heuristicNo, 
-											PartialPairingPricingNetwork partialNetwork, QualityMetric bestQmSoFar, 
-											Pair p, DutyView ld, QualityMetric cqm, int dept) {
+	private PairWithQuality searchForPairings(int heuristicNo,
+												int[] numOfCoveringsInDuties,
+												int[] blockTimeOfCoveringsInDuties,
+												NodeQualityMetric[] nodeQs,
+												PricingSubNetwork partialNetwork,
+												PairWithQuality currentPair, DutyView ld,
+												PairWithQuality bestPair, int dept) throws CloneNotSupportedException {
+		PairWithQuality res = bestPair;
 
 		int[] nextDuties = partialNetwork.getNextDuties(ld);
 
 		for (int i = 0; i < nextDuties.length; i++) {
 			int ndNdx = nextDuties[i];
 			DutyView nd = this.duties.get(ndNdx);
-			if (this.dutyRuleContext.getConnectionCheckerProxy().areConnectable(this.hbNdx, ld, nd)) {
-				if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, p, nd, true)) {
-					pairRuleContext.getAggregatorProxy().appendFw(p, nd);
-					if (nd.isHbArr(this.hbNdx)) {
-						if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, p)) {
 
+			/*
+			 * Basic cumulative quality info which is calculated during the sub network generation is checked! 
+			 */
+			if (nodeQs[d.getNdx()].isBetterThan(heuristicNo, bestPair.pairQ)) {
+
+				if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
+
+					currentPair.pairQ.addToQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+					pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, nd);
+					if (nd.isHbArr(this.hbNdx)) {
+						if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
+		    				if (currentPair.pair.isComplete(this.hbNdx)) {
+		    					if (currentPair.pairQ.isBetterThan(heuristicNo, res.pairQ)) {
+		    						res.pair = (Pair) currentPair.pair.clone();
+		    						res.pairQ.injectValues(currentPair.pairQ);
+		    					}
+		    				} else
+		    					logger.error("Pairing " + currentPair.pair + " must be complete!");
 						}
 					} else
 						if (nd.isNonHbArr(this.hbNdx)
 								&& (dept > 1)
-								&& this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, p)) {
-							if (this.examinePairFW(p, fd, nd, fl, nd.getLastLeg(), true, false, dept - 1)) {
-								
-							}
+								&& this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair)) {
+							res = this.searchForPairings(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, nodeQs,
+															partialNetwork, currentPair, nd, res, dept - 1);
 						}
-					pairRuleContext.getAggregatorProxy().removeLast(p);
+					currentPair.pairQ.removeFromQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+					pairRuleContext.getAggregatorProxy().removeLast(currentPair.pair);
 				}
 			}
-		});
-	}
-
-	private void checkAndSetDutyContributionStatus(int heuristicNo,
-													DutyView d,
-													QualityMetric qm,
-													int dept,
-													QualityMetric[] bestSoFar,
-													int[] maxSearchDeptSoFar) {
-		if ((bestSoFar[d.getNdx()] == null)
-				|| (qm.isBetterThan(heuristicNo, bestSoFar[d.getNdx()]))) {
-			bestSoFar[d.getNdx()] = qm;
 		}
-		if (maxSearchDeptSoFar[d.getNdx()] < dept) {
-			maxSearchDeptSoFar[d.getNdx()] = dept;
-		}
+		return res;
 	}
 }

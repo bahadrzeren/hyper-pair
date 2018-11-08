@@ -41,7 +41,7 @@ public class PricingSubNetwork {
 
 	private int[] sourceDutyArray = null;
 	private int[][] dutyConnectionArray = null;
-	private DutyNodeQualityMetric[] bestDutyNodeQuality = null;
+	private NodeQualityMetric[] bestNodeQuality = null;
 
 	public PricingSubNetwork(List<Duty> duties,
 								int maxPairingLengthInDays,
@@ -53,7 +53,7 @@ public class PricingSubNetwork {
 		this.dutyConnections = new ArrayList<HashSet<Integer>>(this.duties.size());
 		this.sourceDutyArray = new int[0];
 		this.dutyConnectionArray = new int[this.duties.size()][0];
-		this.bestDutyNodeQuality = new DutyNodeQualityMetric[this.duties.size()];
+		this.bestNodeQuality = new NodeQualityMetric[this.duties.size()];
 
 		this.maxPairingLengthInDays = maxPairingLengthInDays;
 
@@ -111,7 +111,11 @@ public class PricingSubNetwork {
 		return this.dutyConnectionArray[pd.getNdx()];
 	}
 
-	public PricingSubNetwork build(Duty[] sourceDuties,
+	public NodeQualityMetric[] getBestNodeQuality() {
+		return bestNodeQuality;
+	}
+
+	public PricingSubNetwork build(Duty[] rootDuties,
 									int heuristicNo,
 									int[] numOfCoveringsInDuties,
 									int[] blockTimeOfCoveringsInDuties) throws CloneNotSupportedException {
@@ -144,7 +148,7 @@ public class PricingSubNetwork {
 
 //		int[] maxSearchDept = new int[this.duties.size()];
 
-		for (Duty duty: sourceDuties) {
+		for (Duty duty: rootDuties) {
 
 			if (duty.isValid(this.hbNdx)) {
 				if (duty.isHbDep(this.hbNdx)) {
@@ -188,23 +192,23 @@ public class PricingSubNetwork {
 //	}
 
 	private void checkAndUpdateCumulativeQuality(int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties, DutyView pd, DutyView nd) throws CloneNotSupportedException {
-		DutyNodeQualityMetric pdQ = this.bestDutyNodeQuality[pd.getNdx()];
-		DutyNodeQualityMetric ndQ = this.bestDutyNodeQuality[nd.getNdx()];
+		NodeQualityMetric ndQ = this.bestNodeQuality[nd.getNdx()];
+		NodeQualityMetric pdQ = this.bestNodeQuality[pd.getNdx()];
 		if (ndQ == null) {
-			ndQ = new DutyNodeQualityMetric();
+			ndQ = new NodeQualityMetric();
 			ndQ.addToQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-			this.bestDutyNodeQuality[nd.getNdx()] = ndQ;
+			this.bestNodeQuality[nd.getNdx()] = ndQ;
 		}
 		if (pdQ == null) {
-			pdQ = new DutyNodeQualityMetric();
+			pdQ = new NodeQualityMetric();
 			pdQ.addToQualityMetric(ndQ);
 			pdQ.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-			this.bestDutyNodeQuality[pd.getNdx()] = pdQ;
+			this.bestNodeQuality[pd.getNdx()] = pdQ;
 		} else {
 			ndQ.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			if (ndQ.isBetterThan(heuristicNo, pdQ)) {
-				pdQ = (DutyNodeQualityMetric) ndQ.clone();
-				this.bestDutyNodeQuality[pd.getNdx()] = pdQ;
+				pdQ = (NodeQualityMetric) ndQ.clone();
+				this.bestNodeQuality[pd.getNdx()] = pdQ;
 			}
 			ndQ.removeFromQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 		}
