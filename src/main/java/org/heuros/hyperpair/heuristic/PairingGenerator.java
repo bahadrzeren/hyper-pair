@@ -153,7 +153,9 @@ public class PairingGenerator {
 			/*
 			 * Basic cumulative quality info which is calculated during the sub network generation is checked! 
 			 */
-			if (nodeQs[d.getNdx()].isBetterThan(heuristicNo, bestPair.pairQ)) {
+			nodeQs[nd.getNdx()].addToQualityMetric(currentPair.pairQ);
+			if (nodeQs[nd.getNdx()].isBetterThan(heuristicNo, bestPair.pairQ)) {
+				nodeQs[nd.getNdx()].removeFromQualityMetric(currentPair.pairQ);
 
 				if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
 
@@ -179,7 +181,8 @@ public class PairingGenerator {
 					currentPair.pairQ.removeFromQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 					pairRuleContext.getAggregatorProxy().removeLast(currentPair.pair);
 				}
-			}
+			} else
+				nodeQs[nd.getNdx()].removeFromQualityMetric(currentPair.pairQ);
 		}
 		return res;
 	}
