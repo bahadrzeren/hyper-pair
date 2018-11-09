@@ -19,7 +19,6 @@ import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
-import org.heuros.hyperpair.HeurosSystemParam;
 import org.heuros.hyperpair.heuristic.PairingGenerator;
 
 public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
@@ -430,7 +429,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	}
 
 	@Override
-	public List<Pair> decode(Chromosome<Integer> chromosome) {
+	public List<Pair> decode(Chromosome<Integer> chromosome) throws CloneNotSupportedException {
 
 for (int i = 0; i < chromosome.getChromosomeLength(); i++)
 chromosome.setGeneValue(i, 0);
@@ -452,15 +451,12 @@ chromosome.setGeneValue(i, 0);
 			if (reOrderedLegNdx == Integer.MAX_VALUE)
 				break;
 
-			int dept = HeurosSystemParam.maxPairingLengthInDays;
-
 			Leg legToCover = this.reOrderedLegs.get(reOrderedLegNdx);
 
 			int heuristicNo = chromosome.getGeneValue(geneNdx);
 
 			Pair p = this.pairingGenerator.generatePairing(legToCover, 
 															heuristicNo, 
-															HeurosSystemParam.maxPairingLengthInDays,
 															numOfCoveringsInDuties,
 															blockTimeOfCoveringsInDuties);
 

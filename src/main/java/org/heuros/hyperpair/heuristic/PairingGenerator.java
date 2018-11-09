@@ -21,7 +21,7 @@ public class PairingGenerator {
 	 * TODO Single base assumption!!!
 	 */
 	private int hbNdx = 0;
-	private int maxIdleTimeInAPairInHours = 0;
+//	private int maxIdleTimeInAPairInHours = 0;
 	private int maxPairingLengthInDays = 0;
 
 	private DutyRuleContext dutyRuleContext = null;
@@ -32,8 +32,9 @@ public class PairingGenerator {
 
 	private List<Duty> duties = null;
 
-	public PairingGenerator(int maxIdleTimeInAPairInHours, int maxPairingLengthInDays) {
-		this.maxIdleTimeInAPairInHours = maxIdleTimeInAPairInHours;
+	public PairingGenerator(//int maxIdleTimeInAPairInHours, 
+			int maxPairingLengthInDays) {
+//		this.maxIdleTimeInAPairInHours = maxIdleTimeInAPairInHours;
 		this.maxPairingLengthInDays = maxPairingLengthInDays;
 	}
 
