@@ -150,7 +150,8 @@ public class PricingSubNetwork {
 
 		for (Duty duty: rootDuties) {
 
-			if (duty.isValid(this.hbNdx)) {
+			if (duty.isValid(this.hbNdx)
+					&& duty.hasPairing(this.hbNdx)) {
 				if (duty.isHbDep(this.hbNdx)) {
 					if (duty.isHbArr(this.hbNdx)) {
 						if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty))
@@ -222,6 +223,7 @@ public class PricingSubNetwork {
 			DutyView[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
 			for (DutyView nd: nextDuties) {
 				if (nd.isValid(this.hbNdx)
+						&& nd.hasPairing(this.hbNdx)
 //						&& (maxSearchDept[nd.getNdx()] < dept)
 						&& (nd.isHbArr(this.hbNdx) || (dept > 1))
 						/*
@@ -238,7 +240,6 @@ public class PricingSubNetwork {
 						res = true;
 					} else
 						if (dept > 1) {
-//							root.isHbDep(this.hbNdx)
 							if (this.fwNetworkSearch(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 														nd, hbDep, rootBriefTime, dept - 1)) {
 								this.addDuty(pd, nd);
@@ -262,6 +263,7 @@ public class PricingSubNetwork {
 			DutyView[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
 			for (DutyView pd: prevDuties) {
 				if (pd.isValid(this.hbNdx)
+						&& pd.hasPairing(this.hbNdx)
 //						&& (maxSearchDept[pd.getNdx()] < dept)
 						&& (pd.isHbDep(this.hbNdx) || (dept > 1))
 						/*
@@ -281,7 +283,6 @@ public class PricingSubNetwork {
 						}
 					} else
 						if (dept > 1) {
-//							root.isHbArr(this.hbNdx)
 							if (this.bwNetworkSearch(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 														pd, hbArr, rootDebriefTime, dept - 1)) {
 								this.addDuty(pd, nd);
