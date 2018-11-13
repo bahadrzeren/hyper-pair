@@ -196,9 +196,6 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	@Override
 	public List<Pair> decode(Chromosome<Integer> chromosome) {
 
-for (int i = 0; i < chromosome.getChromosomeLength(); i++)
-chromosome.setGeneValue(i, 0);
-
 		List<Pair> solution = new ArrayList<Pair>();
 
 		int geneNdx = 0;
@@ -219,6 +216,14 @@ chromosome.setGeneValue(i, 0);
 			Leg legToCover = this.reOrderedLegs.get(reOrderedLegNdx);
 
 			int heuristicNo = chromosome.getGeneValue(geneNdx);
+
+/*
+ * TODO Remove the lines after test!
+ */
+if (legToCover.hasHbDepDutyPair(this.hbNdx)
+		|| legToCover.hasHbArrDutyPair(this.hbNdx)
+		|| legToCover.hasNonHbDutyPair(this.hbNdx))
+heuristicNo = 1;
 
 			Pair p = null;
 			try {
