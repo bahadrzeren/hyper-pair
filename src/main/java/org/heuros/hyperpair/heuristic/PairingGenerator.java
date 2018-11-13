@@ -118,7 +118,7 @@ public class PairingGenerator {
 		    			}
 					} else {
 						/*
-						 * Basic cumulative quality info which is calculated during the sub network generation is checked! 
+						 * Basic cumulative quality info which is calculated during the sub network generation is checked!
 						 */
 						if (nodeQs[d.getNdx()].isBetterThan(heuristicNo, bestPair.pairQ)) {
 							if (this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair)) {
@@ -133,7 +133,7 @@ public class PairingGenerator {
 	    		}
 			}
 		}
-		return null;
+		return bestPair.pair;
 	}
 
 	private PairWithQuality searchForPairings(int heuristicNo,

@@ -6,18 +6,18 @@ public class NodeQualityMetric implements Cloneable {
 	/*
 	 * Deadhead
 	 */
-	public int numOfDh = Integer.MAX_VALUE;
-	public int dhDurationInMins = Integer.MAX_VALUE;
+	public int numOfDh = 0;
+	public int dhDurationInMins = 0;
 	/*
 	 * Dutyday
 	 */
 	public int activeBlocktimeInMins = 0;
-	public int numOfDuties = 4;
+	public int numOfDuties = 0;
 	/*
 	 * The last metric to check if others are equal!
 	 */
-	public int numOfIncludingDutiesOfTheSameLegs = Integer.MAX_VALUE;
-	public int numOfLegs = 24;
+	public int numOfIncludingDutiesOfTheSameLegs = 0;
+	public int numOfLegs = 0;
 
 	@Override
     public Object clone() throws CloneNotSupportedException {
@@ -66,7 +66,8 @@ public class NodeQualityMetric implements Cloneable {
 
 	public boolean isBetterThan(int heuristicNo, NodeQualityMetric qm) {
 		if (heuristicNo < 2) {	//	If layover or dh effective. 
-			if ((this.numOfDh < qm.numOfDh)
+			if ((qm.numOfLegs == 0)
+					|| (this.numOfDh < qm.numOfDh)
 					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
 					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins) 
 							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
@@ -74,7 +75,8 @@ public class NodeQualityMetric implements Cloneable {
 			} else
 				return false;
 		} else {	//	If active block time effective.
-			if ((((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
+			if ((qm.numOfLegs == 0)
+					|| (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
 					|| ((((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) == ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
 							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
 				return true;
@@ -92,27 +94,27 @@ public class NodeQualityMetric implements Cloneable {
 		this.numOfLegs = qm.numOfLegs;
 	}
 
-	public void injectValues(DutyView d,
-								int[] numOfCoveringsInDuties,
-								int[] blockTimeOfCoveringsInDuties) {
-		this.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
-		this.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
-		this.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
-		this.numOfDuties = 1;
-		this.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
-		this.numOfLegs = d.getNumOfLegs();
-	}
-
-//	public static QualityMetric calculateQualityMetric(DutyView d,
-//														int[] numOfCoveringsInDuties,
-//														int[] blockTimeOfCoveringsInDuties) {
-//		QualityMetric qm = new QualityMetric();
-//		qm.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
-//		qm.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
-//		qm.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
-//		qm.numOfDuties = 1;
-//		qm.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
-//		qm.numOfLegs = d.getNumOfLegs();
-//		return qm;
+//	public void injectValues(DutyView d,
+//								int[] numOfCoveringsInDuties,
+//								int[] blockTimeOfCoveringsInDuties) {
+//		this.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
+//		this.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
+//		this.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
+//		this.numOfDuties = 1;
+//		this.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
+//		this.numOfLegs = d.getNumOfLegs();
 //	}
+
+	public static NodeQualityMetric generateQualityMetric(DutyView d,
+															int[] numOfCoveringsInDuties,
+															int[] blockTimeOfCoveringsInDuties) {
+		NodeQualityMetric qm = new NodeQualityMetric();
+		qm.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
+		qm.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
+		qm.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
+		qm.numOfDuties = 1;
+		qm.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
+		qm.numOfLegs = d.getNumOfLegs();
+		return qm;
+	}
 }

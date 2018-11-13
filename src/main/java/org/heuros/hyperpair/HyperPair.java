@@ -261,7 +261,8 @@ public class HyperPair {
 																			.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																			.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																			.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-																			.setPricingNetwork(pricingNetwork);
+																			.setPricingNetwork(pricingNetwork)
+																			.setDutyRepository(pairOptimizationContext.getDutyRepository());
 
 			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
@@ -308,7 +309,7 @@ public class HyperPair {
 																				.setDecoder(pairChromosomeDecoder)
 																				.setMutator(new IntegerGeneMutator().setMaxGeneValueExc(pairChromosomeDecoder.getNumOfHeuristics()))
 																				/*
-																				 * TODO Chromosome length = 6000 must be parametric.
+																				 * TODO Chromosome length = 10000 must be parametric.
 																				 */
 																				.setChromosomeFactory(new PairChromosomeFactory().setChromosomeLength(10000)
 																																	.setMaxGeneValue(pairChromosomeDecoder.getNumOfHeuristics()));

@@ -154,8 +154,16 @@ public class PricingSubNetwork {
 					&& duty.hasPairing(this.hbNdx)) {
 				if (duty.isHbDep(this.hbNdx)) {
 					if (duty.isHbArr(this.hbNdx)) {
-						if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty))
+						if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
 							this.addSourceDuty(duty);
+							/*
+							 * Because of having no connection duties we must add qualityMetric here for 1day pairings.
+							 */
+							if (this.bestNodeQuality[duty.getNdx()] == null) {
+								this.bestNodeQuality[duty.getNdx()] = new NodeQualityMetric();
+								this.bestNodeQuality[duty.getNdx()].addToQualityMetric(duty, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+							}
+						}
 					} else 
 						if (heuristicNo > 0) {
 							if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
