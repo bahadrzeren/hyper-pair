@@ -2,7 +2,6 @@ package org.heuros.hyperpair.heuristic;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +36,8 @@ public class PricingSubNetwork {
 	private OneDimUniqueIndexInt<LegView> prevDebriefLegIndexByDutyNdx = null;
 
 	private Set<Integer> sourceDuties = null;
-	private List<HashSet<Integer>> dutyConnections = null;
+//	private List<HashSet<Integer>> dutyConnections = null;
+	private OneDimUniqueIndexInt<DutyView> dutyConnections = null;
 
 	private int[] sourceDutyArray = null;
 	private int[][] dutyConnectionArray = null;
@@ -50,7 +50,8 @@ public class PricingSubNetwork {
 								DutyLegOvernightConnNetwork pricingNetwork) {
 		this.duties = duties;
 		this.sourceDuties = new HashSet<Integer>();
-		this.dutyConnections = new ArrayList<HashSet<Integer>>(this.duties.size());
+//		this.dutyConnections = new ArrayList<HashSet<Integer>>(this.duties.size());
+		this.dutyConnections = new OneDimUniqueIndexInt<DutyView>(new DutyView[this.duties.size()][0]);
 		this.sourceDutyArray = new int[0];
 		this.dutyConnectionArray = new int[this.duties.size()][0];
 		this.bestNodeQuality = new NodeQualityMetric[this.duties.size()];
@@ -75,12 +76,13 @@ public class PricingSubNetwork {
 	}
 
 	private boolean addDuty(DutyView pd, DutyView nd) {
-		HashSet<Integer> nextDutyNdxs = this.dutyConnections.get(pd.getNdx());
-		if (nextDutyNdxs == null) {
-			nextDutyNdxs = new HashSet<Integer>();
-			this.dutyConnections.set(pd.getNdx(), nextDutyNdxs);
-		}
-		if (nextDutyNdxs.add(nd.getNdx())) {
+//		HashSet<Integer> nextDutyNdxs = this.dutyConnections.get(pd.getNdx());
+//		if (nextDutyNdxs == null) {
+//			nextDutyNdxs = new HashSet<Integer>();
+//			this.dutyConnections.set(pd.getNdx(), nextDutyNdxs);
+//		}
+//		if (nextDutyNdxs.add(nd.getNdx())) {
+		if (this.dutyConnections.add(pd.getNdx(), nd.getNdx(), nd)) {
 			dutyConnectionArray[pd.getNdx()] = ArrayUtils.add(dutyConnectionArray[pd.getNdx()], nd.getNdx());
 			return true;
 		}
