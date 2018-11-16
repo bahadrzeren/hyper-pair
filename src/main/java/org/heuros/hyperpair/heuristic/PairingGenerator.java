@@ -73,6 +73,8 @@ public class PairingGenerator {
 								int[] numOfCoveringsInDuties,
 								int[] blockTimeOfCoveringsInDuties) throws CloneNotSupportedException {
 
+		logger.info("Pair search is started for the leg " + legToCover);
+
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
 		PairWithQuality currentPair = new PairWithQuality();
@@ -91,12 +93,16 @@ public class PairingGenerator {
 																		this.dutyLegOvernightConnNetwork)
 													.build(coveringDuties, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 
-			int[] sourceDuties = partialNetwork.getSourceDuties();
+			logger.info("Subnetwork is built for the leg " + legToCover);
+
+//			int[] sourceDuties = partialNetwork.getSourceDuties();
+			DutyView[] sourceDuties = partialNetwork.getSourceDuties();
 			NodeQualityMetric[] nodeQs = partialNetwork.getBestNodeQuality();
 
 			for (int i = 0; i < sourceDuties.length; i++) {
-				int dNdx = sourceDuties[i];
-				DutyView d = this.duties.get(dNdx);
+//				int dNdx = sourceDuties[i];
+//				DutyView d = this.duties.get(dNdx);
+				DutyView d = sourceDuties[i];
 
 				if (d.isNonHbDep(this.hbNdx))
 					logger.error("Must be HB departed duty!");
@@ -133,6 +139,8 @@ public class PairingGenerator {
 	    		}
 			}
 		}
+
+		logger.info("Pair is generated for the leg " + legToCover);
 		return bestPair.pair;
 	}
 
@@ -145,11 +153,13 @@ public class PairingGenerator {
 												PairWithQuality bestPair, int dept) throws CloneNotSupportedException {
 		PairWithQuality res = bestPair;
 
-		int[] nextDuties = partialNetwork.getNextDuties(ld);
+//		int[] nextDuties = partialNetwork.getNextDuties(ld);
+		DutyView[] nextDuties = partialNetwork.getNextDuties(ld);
 
 		for (int i = 0; i < nextDuties.length; i++) {
-			int ndNdx = nextDuties[i];
-			DutyView nd = this.duties.get(ndNdx);
+//			int ndNdx = nextDuties[i];
+//			DutyView nd = this.duties.get(ndNdx);
+			DutyView nd = nextDuties[i];
 
 			/*
 			 * Basic cumulative quality info which is calculated during the sub network generation is checked! 

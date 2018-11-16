@@ -117,4 +117,11 @@ public class NodeQualityMetric implements Cloneable {
 		qm.numOfLegs = d.getNumOfLegs();
 		return qm;
 	}
+
+	public String toString() {
+		return "#DH:" + numOfDh + ", DHD:" + dhDurationInMins +
+				", ABT/#D:" + activeBlocktimeInMins + "/" + numOfDuties +
+				", #LD:" + numOfIncludingDutiesOfTheSameLegs +
+				", #L:" + numOfLegs;
+	}
 }
