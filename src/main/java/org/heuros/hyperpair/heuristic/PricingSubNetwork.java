@@ -1,7 +1,6 @@
 package org.heuros.hyperpair.heuristic;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +18,7 @@ import org.heuros.rule.PairRuleContext;
 
 public class PricingSubNetwork {
 
-	private static Logger logger = Logger.getLogger(PricingSubNetwork.class);
+//	private static Logger logger = Logger.getLogger(PricingSubNetwork.class);
 
 	/*
 	 * TODO Single base assumption!!!
@@ -153,7 +152,7 @@ public class PricingSubNetwork {
 		 * 
 		 */
 
-//		int[] maxSearchDept = new int[this.duties.size()];
+		int[] maxSearchDept = new int[this.duties.size()];
 
 boolean log = false;
 
@@ -172,29 +171,32 @@ boolean log = false;
 								this.bestNodeQuality[duty.getNdx()] = new NodeQualityMetric();
 								this.bestNodeQuality[duty.getNdx()].addToQualityMetric(duty, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 							}
-log = duty.getFirstLeg().getSobt().isAfter(LocalDateTime.of(2014, 1, 5, 0, 0));
-if (log)
-logger.debug(duty.getNdx() + ":" + duty.getFirstDepAirport().getCode() + "->" + duty.getLastArrAirport().getCode() + "; " + this.bestNodeQuality[duty.getNdx()]);
-//						}
+//log = duty.getFirstLeg().getSobt().isAfter(LocalDateTime.of(2014, 1, 5, 0, 0));
+//if (log)
+//logger.debug(duty.getNdx() + ":" + duty.getFirstDepAirport().getCode() + "->" + duty.getLastArrAirport().getCode() + "; " + this.bestNodeQuality[duty.getNdx()]);
+////						}
 					} else 
 						if (heuristicNo > 0) {
 //							if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
-								if (this.fwNetworkSearch(log, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+								if (this.fwNetworkSearch(log, maxSearchDept, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 															duty, true, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
 									this.addSourceDuty(duty);
 								}
+								maxSearchDept[duty.getNdx()] = this.maxPairingLengthInDays;
 //							}
 						}
 				} else
 					if (heuristicNo > 0) {
 						if (duty.isHbArr(this.hbNdx)) {
-							this.bwNetworkSearch(log, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+							this.bwNetworkSearch(log, maxSearchDept, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 													duty, true, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 1);
+							maxSearchDept[duty.getNdx()] = this.maxPairingLengthInDays;
 						} else {
-							if (this.fwNetworkSearch(log, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+							if (this.fwNetworkSearch(log, maxSearchDept, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 														duty, false, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 2))
-								this.bwNetworkSearch(log, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+								this.bwNetworkSearch(log, maxSearchDept, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 														duty, false, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 2);
+							maxSearchDept[duty.getNdx()] = this.maxPairingLengthInDays - 1;
 						}
 					}
 			}
@@ -234,12 +236,12 @@ logger.debug(duty.getNdx() + ":" + duty.getFirstDepAirport().getCode() + "->" + 
 			ndQ.removeFromQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 		}
 
-if (log)
-logger.debug(pd.getNdx() + ":" + pd.getFirstDepAirport().getCode() + "->" + pd.getLastArrAirport().getCode() + "; " + this.bestNodeQuality[pd.getNdx()] + " -->> " + 
-				nd.getNdx() + ":" + nd.getFirstDepAirport().getCode() + "->" + nd.getLastArrAirport().getCode() + "; " + this.bestNodeQuality[nd.getNdx()]);
+//if (log)
+//logger.debug(pd.getNdx() + ":" + pd.getFirstDepAirport().getCode() + "->" + pd.getLastArrAirport().getCode() + "; " + this.bestNodeQuality[pd.getNdx()] + " -->> " + 
+//				nd.getNdx() + ":" + nd.getFirstDepAirport().getCode() + "->" + nd.getLastArrAirport().getCode() + "; " + this.bestNodeQuality[nd.getNdx()]);
 	}
 
-	private boolean fwNetworkSearch(boolean log, int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties,
+	private boolean fwNetworkSearch(boolean log, int[] maxSearchDept, int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties,
 													DutyView pd, boolean hbDep, LocalDateTime rootBriefTime, int dept) throws CloneNotSupportedException {
 		boolean res = false;
 		LegView[] nextLegs = this.nextBriefLegIndexByDutyNdx.getArray(pd.getNdx());
@@ -248,16 +250,15 @@ logger.debug(pd.getNdx() + ":" + pd.getFirstDepAirport().getCode() + "->" + pd.g
 			for (DutyView nd: nextDuties) {
 				if (nd.isValid(this.hbNdx)
 						&& nd.hasPairing(this.hbNdx)
-//						&& (maxSearchDept[nd.getNdx()] < dept)
 						&& (nd.isHbArr(this.hbNdx) || (dept > 1))
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
 						 */
-						&& ((hbDep && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays))
-								|| (hbDep && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-								|| ((!hbDep) && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-								|| ((!hbDep) && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
-//						&& this.dutyRuleContext.getConnectionCheckerProxy().areConnectable(this.hbNdx, pd, nd)
+//						&& ((hbDep && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays))
+//								|| (hbDep && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
+//								|| ((!hbDep) && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
+//								|| ((!hbDep) && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
+////						&& this.dutyRuleContext.getConnectionCheckerProxy().areConnectable(this.hbNdx, pd, nd)
 						) {
 					if (nd.isHbArr(this.hbNdx)) {
 						this.addDuty(pd, nd);
@@ -265,7 +266,8 @@ logger.debug(pd.getNdx() + ":" + pd.getFirstDepAirport().getCode() + "->" + pd.g
 						res = true;
 					} else
 						if (dept > 1) {
-							if (this.fwNetworkSearch(log, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+							if ((maxSearchDept[nd.getNdx()] >= dept)
+									|| this.fwNetworkSearch(log, maxSearchDept, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 														nd, hbDep, rootBriefTime, dept - 1)) {
 								this.addDuty(pd, nd);
 								this.checkAndUpdateCumulativeQuality(log, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
@@ -273,14 +275,14 @@ logger.debug(pd.getNdx() + ":" + pd.getFirstDepAirport().getCode() + "->" + pd.g
 							}
 						}
 //					if (res)
-//						maxSearchDept[nd.getNdx()] = dept;
+						maxSearchDept[nd.getNdx()] = dept;
 				}
 			}
 		}
 		return res;
 	}
 
-	private boolean bwNetworkSearch(boolean log, int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties,
+	private boolean bwNetworkSearch(boolean log, int[] maxSearchDept, int heuristicNo, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties,
 													DutyView nd, boolean hbArr, LocalDateTime rootDebriefTime, int dept) throws CloneNotSupportedException {
 		boolean res = false;
 		LegView[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
@@ -289,16 +291,15 @@ logger.debug(pd.getNdx() + ":" + pd.getFirstDepAirport().getCode() + "->" + pd.g
 			for (DutyView pd: prevDuties) {
 				if (pd.isValid(this.hbNdx)
 						&& pd.hasPairing(this.hbNdx)
-//						&& (maxSearchDept[pd.getNdx()] < dept)
 						&& (pd.isHbDep(this.hbNdx) || (dept > 1))
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
 						 */
-						&& ((hbArr && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays))
-								|| (hbArr && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-								|| ((!hbArr) && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-								|| ((!hbArr) && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
-//						&& this.dutyRuleContext.getConnectionCheckerProxy().areConnectable(this.hbNdx, pd, nd)
+//						&& ((hbArr && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays))
+//								|| (hbArr && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
+//								|| ((!hbArr) && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
+//								|| ((!hbArr) && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
+////						&& this.dutyRuleContext.getConnectionCheckerProxy().areConnectable(this.hbNdx, pd, nd)
 						) {
 					if (pd.isHbDep(this.hbNdx)) {
 //						if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, pd)) {
@@ -309,7 +310,8 @@ logger.debug(pd.getNdx() + ":" + pd.getFirstDepAirport().getCode() + "->" + pd.g
 //						}
 					} else
 						if (dept > 1) {
-							if (this.bwNetworkSearch(log, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
+							if ((maxSearchDept[pd.getNdx()] >= dept)
+									|| this.bwNetworkSearch(log, maxSearchDept, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties,
 														pd, hbArr, rootDebriefTime, dept - 1)) {
 								this.addDuty(pd, nd);
 								this.checkAndUpdateCumulativeQuality(log, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
@@ -317,7 +319,7 @@ logger.debug(pd.getNdx() + ":" + pd.getFirstDepAirport().getCode() + "->" + pd.g
 							}
 						}
 //					if (res)
-//						maxSearchDept[pd.getNdx()] = dept;
+						maxSearchDept[pd.getNdx()] = dept;
 				}
 			}
 		}
