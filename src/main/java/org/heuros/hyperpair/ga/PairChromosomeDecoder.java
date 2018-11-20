@@ -196,6 +196,8 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	@Override
 	public List<Pair> decode(Chromosome<Integer> chromosome) {
 
+		logger.info("Decoding process is started!");
+
 		List<Pair> solution = new ArrayList<Pair>();
 
 		int geneNdx = 0;
@@ -267,6 +269,9 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		chromosome.setFitness(fitness + uncoveredLegs * 100000000);
 		chromosome.setInfo("uncoveredLegs: " + uncoveredLegs + ", numOfDeadheads: " + numOfDeadheads + ", fitness: " + fitness);
 		this.checkFitness(chromosome.getFitness(), numOfLegCoverings);
+
+		logger.info("uncoveredLegs: " + uncoveredLegs + ", numOfDeadheads: " + numOfDeadheads + ", fitness: " + fitness);
+		logger.info("Decoding process is ended!");
 		return solution;
 	}
 

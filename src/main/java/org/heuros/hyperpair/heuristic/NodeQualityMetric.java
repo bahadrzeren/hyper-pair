@@ -19,6 +19,10 @@ public class NodeQualityMetric implements Cloneable {
 	public int numOfIncludingDutiesOfTheSameLegs = 0;
 	public int numOfLegs = 0;
 
+//	public Duty nodeOwner = null;
+//	public NodeQualityMetric nextNodeMetric = null;
+//	public NodeQualityMetric prevNodeMetric = null;
+
 	@Override
     public Object clone() throws CloneNotSupportedException {
 		return (NodeQualityMetric) super.clone();
