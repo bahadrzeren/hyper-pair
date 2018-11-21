@@ -177,6 +177,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	private void udpateStateVectors(Pair p,
 									int[] numOfLegCoverings,
 									int[] numOfCoveringsInDuties,
+									int[] numOfDistinctCoveringsInDuties,
 									int[] blockTimeOfCoveringsInDuties) {
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
 			DutyView duty = p.getDuties().get(i);
@@ -187,6 +188,8 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				for (int di = 0; di < dutiesOfLeg.length; di++) {
 					DutyView dutyOfLeg = dutiesOfLeg[di];
 					numOfCoveringsInDuties[dutyOfLeg.getNdx()]++;
+					if (numOfLegCoverings[leg.getNdx()] == 1)
+						numOfDistinctCoveringsInDuties[dutyOfLeg.getNdx()]++;
 					blockTimeOfCoveringsInDuties[dutyOfLeg.getNdx()] += leg.getBlockTimeInMins();
 				}
 			}
@@ -208,6 +211,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		int reOrderedLegNdx = -1;
 		int[] numOfLegCoverings = new int[this.legRepository.getModels().size()];
 		int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
+		int[] numOfDistinctCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 		int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 
 		while (true) {
@@ -234,13 +238,14 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				p = this.pairingGenerator.generatePairing(legToCover, 
 															heuristicNo, 
 															numOfCoveringsInDuties,
+															numOfDistinctCoveringsInDuties,
 															blockTimeOfCoveringsInDuties);
 			} catch (CloneNotSupportedException ex) {
 				PairChromosomeDecoder.logger.error(ex);
 			}
 
 			if (p != null) {
-				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
 				solution.add(p);
 				geneNdx++;
 			} else {

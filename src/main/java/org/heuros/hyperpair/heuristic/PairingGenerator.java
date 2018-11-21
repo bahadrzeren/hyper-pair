@@ -71,6 +71,7 @@ public class PairingGenerator {
 	public Pair generatePairing(Leg legToCover,
 								int heuristicNo,
 								int[] numOfCoveringsInDuties,
+								int[] numOfDistinctCoveringsInDuties,
 								int[] blockTimeOfCoveringsInDuties) throws CloneNotSupportedException {
 
 //		logger.info("Pair search is started for the leg " + legToCover);
@@ -91,7 +92,7 @@ public class PairingGenerator {
 																		this.dutyRuleContext, 
 																		this.pairRuleContext, 
 																		this.dutyLegOvernightConnNetwork)
-													.build(coveringDuties, heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+													.build(coveringDuties, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
 
 //			logger.info("Subnetwork is built for the leg " + legToCover);
 
