@@ -1,6 +1,8 @@
 package org.heuros.hyperpair.heuristic;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +25,8 @@ public class PricingSubNetwork {
 	 * TODO Single base assumption!!!
 	 */
 	private int hbNdx = 0;
+
+	private int numOfEliteNodes = 3;
 
 	private List<Duty> duties = null;
 	private int maxPairingLengthInDays = 0;
@@ -76,8 +80,8 @@ public class PricingSubNetwork {
 			/*
 			 * We would like to keep the best duty node at first place in order to increase performance.  
 			 */
-			if (this.sourceDutyArray.length > 3) {
-				for (int i = 0; i < 3; i++) {
+			if (this.sourceDutyArray.length > numOfEliteNodes) {
+				for (int i = 0; i < numOfEliteNodes; i++) {
 					if (bestNodeQuality[d.getNdx()].isBetterThan(heuristicNo, bestNodeQuality[this.sourceDutyArray[i].getNdx()])) {
 						DutyView duty = this.sourceDutyArray[i];
 						this.sourceDutyArray[i] = d;
@@ -167,7 +171,21 @@ public class PricingSubNetwork {
 		 * 
 		 */
 
+//		Arrays.parallelSort(rootDuties,  new Comparator<DutyView>() {
+//			@Override
+//			public int compare(DutyView a, DutyView b) {
+//				if (a.get() < b.get())
+//					return -1;
+//				else
+//					if (a.get() > b.get())
+//						return 1;
+//				return 0;
+//			}
+//		});
+
 		int[] maxSearchDept = new int[this.duties.size()];
+		boolean[] hbArrFound = new boolean[this.duties.size()];
+		boolean[] hbDepFound = new boolean[this.duties.size()];
 
 //boolean log = false;
 
@@ -188,6 +206,8 @@ public class PricingSubNetwork {
 								this.bestNodeQuality[duty.getNdx()].addToQualityMetric(duty, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 							}
 							this.addSourceDuty(heuristicNo, duty);
+							hbDepFound[duty.getNdx()] = true;
+							hbArrFound[duty.getNdx()] = true;
 //log = duty.getFirstLeg().getSobt().isAfter(LocalDateTime.of(2014, 1, 5, 0, 0));
 //if (log)
 //logger.debug(duty.getNdx() + ":" + duty.getFirstDepAirport().getCode() + "->" + duty.getLastArrAirport().getCode() + "; " + this.bestNodeQuality[duty.getNdx()]);
@@ -195,9 +215,11 @@ public class PricingSubNetwork {
 					} else 
 						if (heuristicNo > 0) {
 //							if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
-								if (this.fwNetworkSearch(maxSearchDept, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
+								if (this.fwNetworkSearch(maxSearchDept, hbArrFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
 															duty, true, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
 									this.addSourceDuty(heuristicNo, duty);
+									hbDepFound[duty.getNdx()] = true;
+									hbArrFound[duty.getNdx()] = true;
 								}
 								maxSearchDept[duty.getNdx()] = this.maxPairingLengthInDays;
 //							}
@@ -205,14 +227,21 @@ public class PricingSubNetwork {
 				} else
 					if (heuristicNo > 0) {
 						if (duty.isHbArr(this.hbNdx)) {
-							this.bwNetworkSearch(maxSearchDept, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-													duty, true, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 1);
+							if (this.bwNetworkSearch(maxSearchDept, hbDepFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
+														duty, true, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
+								hbDepFound[duty.getNdx()] = true;
+								hbArrFound[duty.getNdx()] = true;
+							}
 							maxSearchDept[duty.getNdx()] = this.maxPairingLengthInDays;
 						} else {
-							if (this.fwNetworkSearch(maxSearchDept, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-														duty, false, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 2))
-								this.bwNetworkSearch(maxSearchDept, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-														duty, false, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 2);
+							if (this.fwNetworkSearch(maxSearchDept, hbArrFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
+														duty, false, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 2)) {
+								hbArrFound[duty.getNdx()] = true;
+								if (this.bwNetworkSearch(maxSearchDept, hbDepFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
+														duty, false, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 2)) {
+									hbDepFound[duty.getNdx()] = true;
+								}
+							}
 							maxSearchDept[duty.getNdx()] = this.maxPairingLengthInDays - 1;
 						}
 					}
@@ -259,7 +288,7 @@ public class PricingSubNetwork {
 //				nd.getNdx() + ":" + nd.getFirstDepAirport().getCode() + "->" + nd.getLastArrAirport().getCode() + "; " + this.bestNodeQuality[nd.getNdx()]);
 	}
 
-	private boolean fwNetworkSearch(int[] maxSearchDept, int heuristicNo, int[] numOfCoveringsInDuties, int[] numOfDistinctCoveringsInDuties,
+	private boolean fwNetworkSearch(int[] maxSearchDept, boolean[] hbArrFound, int heuristicNo, int[] numOfCoveringsInDuties, int[] numOfDistinctCoveringsInDuties,
 									int[] blockTimeOfCoveringsInDuties, DutyView pd, boolean hbDep, LocalDateTime rootBriefTime, int dept) throws CloneNotSupportedException {
 		boolean res = false;
 		LegView[] nextLegs = this.nextBriefLegIndexByDutyNdx.getArray(pd.getNdx());
@@ -283,14 +312,17 @@ public class PricingSubNetwork {
 					if (nd.isHbArr(this.hbNdx)) {
 						this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
 						this.addDuty(pd, nd);
+						hbArrFound[nd.getNdx()] = true;
 						res = true;
 					} else
 						if (dept > 1) {
-							if ((maxSearchDept[nd.getNdx()] >= dept)
-									|| this.fwNetworkSearch(maxSearchDept, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-														nd, hbDep, rootBriefTime, dept - 1)) {
+							if (((maxSearchDept[nd.getNdx()] >= dept) && hbArrFound[nd.getNdx()])
+									|| ((maxSearchDept[nd.getNdx()] < dept)
+											&& this.fwNetworkSearch(maxSearchDept, hbArrFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
+														nd, hbDep, rootBriefTime, dept - 1))) {
 								this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
 								this.addDuty(pd, nd);
+								hbArrFound[nd.getNdx()] = true;
 								res = true;
 							}
 						}
@@ -302,7 +334,7 @@ public class PricingSubNetwork {
 		return res;
 	}
 
-	private boolean bwNetworkSearch(int[] maxSearchDept, int heuristicNo, int[] numOfCoveringsInDuties, int[] numOfDistinctCoveringsInDuties,
+	private boolean bwNetworkSearch(int[] maxSearchDept, boolean[] hbDepFound, int heuristicNo, int[] numOfCoveringsInDuties, int[] numOfDistinctCoveringsInDuties,
 									int[] blockTimeOfCoveringsInDuties, DutyView nd, boolean hbArr, LocalDateTime rootDebriefTime, int dept) throws CloneNotSupportedException {
 		boolean res = false;
 		LegView[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
@@ -328,15 +360,18 @@ public class PricingSubNetwork {
 							this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
 							this.addDuty(pd, nd);
 							this.addSourceDuty(heuristicNo, pd);
+							hbDepFound[pd.getNdx()] = true;
 							res = true;
 //						}
 					} else
 						if (dept > 1) {
-							if ((maxSearchDept[pd.getNdx()] >= dept)
-									|| this.bwNetworkSearch(maxSearchDept, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-														pd, hbArr, rootDebriefTime, dept - 1)) {
+							if (((maxSearchDept[pd.getNdx()] >= dept) && hbDepFound[pd.getNdx()])
+									|| ((maxSearchDept[pd.getNdx()] < dept)
+											&& this.bwNetworkSearch(maxSearchDept, hbDepFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
+														pd, hbArr, rootDebriefTime, dept - 1))) {
 								this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
 								this.addDuty(pd, nd);
+								hbDepFound[pd.getNdx()] = true;
 								res = true;
 							}
 						}
