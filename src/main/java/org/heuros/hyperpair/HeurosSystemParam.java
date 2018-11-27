@@ -7,7 +7,9 @@ public class HeurosSystemParam {
 	public static String[] homebases = {"IST"};	//	, "SAW"};
 
 	public static int maxPairingLengthInDays = 4;
-	public static int maxIdleTimeInAPairInHours = 48;
+//	public static int maxIdleTimeInAPairInHours = 48;
+	public static int maxPreDutySearchDeptInHours = 48;
+	public static int maxNetDutySearchDeptInHours = 12;
 
 	public static int briefPeriodBeforeDutyHb = 60;
 	public static int briefPeriodBeforeDutyNonHb = 60;

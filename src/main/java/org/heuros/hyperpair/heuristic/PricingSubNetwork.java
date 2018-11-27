@@ -1,11 +1,8 @@
 package org.heuros.hyperpair.heuristic;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.heuros.core.data.ndx.OneDimIndexInt;
@@ -14,8 +11,6 @@ import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
-import org.heuros.rule.DutyRuleContext;
-import org.heuros.rule.PairRuleContext;
 
 public class PricingSubNetwork {
 
@@ -31,14 +26,16 @@ public class PricingSubNetwork {
 	private List<Duty> duties = null;
 	private int maxPairingLengthInDays = 0;
 
-	private DutyRuleContext dutyRuleContext = null;
-	private PairRuleContext pairRuleContext = null;
+//	private DutyRuleContext dutyRuleContext = null;
+//	private PairRuleContext pairRuleContext = null;
 	private OneDimIndexInt<DutyView> dutyIndexByDepLegNdx = null;
 	private OneDimIndexInt<DutyView> dutyIndexByArrLegNdx = null;
 	private OneDimUniqueIndexInt<LegView> nextBriefLegIndexByDutyNdx = null;
 	private OneDimUniqueIndexInt<LegView> prevDebriefLegIndexByDutyNdx = null;
 
-	private Set<Integer> sourceDuties = null;
+//	private Set<Integer> sourceDuties = null;
+	private boolean[] sourceDuties = null;
+
 //	private List<HashSet<Integer>> dutyConnections = null;
 	private OneDimUniqueIndexInt<DutyView> dutyConnections = null;
 
@@ -48,13 +45,31 @@ public class PricingSubNetwork {
 	private NodeQualityMetric[] bestNodeQuality = null;
 //	private NodeQualityMetric bestSourceNodeQuality = null;
 
+	private int numOfRecursions = 0;
+	private int numOfNodes = 0;
+	private int numOfNodesChecked = 0;
+	private int numOfNodesAdded = 0;
+
+	private int numOfFwRecursions = 0;
+	private int numOfFwNodes = 0;
+	private int numOfFwNodesChecked = 0;
+	private int numOfFwNodesAdded = 0;
+	private int maxFwDeptReached = Integer.MAX_VALUE;
+
+	private int numOfBwRecursions = 0;
+	private int numOfBwNodes = 0;
+	private int numOfBwNodesChecked = 0;
+	private int numOfBwNodesAdded = 0;
+	private int maxBwDeptReached = Integer.MAX_VALUE;
+
 	public PricingSubNetwork(List<Duty> duties,
 								int maxPairingLengthInDays,
-								DutyRuleContext dutyRuleContext,
-								PairRuleContext pairRuleContext,
+//								DutyRuleContext dutyRuleContext,
+//								PairRuleContext pairRuleContext,
 								DutyLegOvernightConnNetwork pricingNetwork) {
 		this.duties = duties;
-		this.sourceDuties = new HashSet<Integer>();
+//		this.sourceDuties = new HashSet<Integer>();
+		this.sourceDuties = new boolean[this.duties.size()];
 //		this.dutyConnections = new ArrayList<HashSet<Integer>>(this.duties.size());
 		this.dutyConnections = new OneDimUniqueIndexInt<DutyView>(new DutyView[this.duties.size()][0]);
 //		this.sourceDutyArray = new int[0];
@@ -63,9 +78,11 @@ public class PricingSubNetwork {
 		this.bestNodeQuality = new NodeQualityMetric[this.duties.size()];
 
 		this.maxPairingLengthInDays = maxPairingLengthInDays;
+		this.maxFwDeptReached = maxPairingLengthInDays;
+		this.maxBwDeptReached = maxPairingLengthInDays;
 
-		this.dutyRuleContext = dutyRuleContext;
-		this.pairRuleContext = pairRuleContext;
+//		this.dutyRuleContext = dutyRuleContext;
+//		this.pairRuleContext = pairRuleContext;
 
 		this.dutyIndexByDepLegNdx = pricingNetwork.getDutyIndexByDepLegNdx();
 		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
@@ -74,7 +91,8 @@ public class PricingSubNetwork {
 	}
 
 	private boolean addSourceDuty(int heuristicNo, DutyView d) {
-		if (this.sourceDuties.add(d.getNdx())) {
+		if (!this.sourceDuties[d.getNdx()]) {
+			this.sourceDuties[d.getNdx()] = true;
 //			this.sourceDutyArray = ArrayUtils.add(this.sourceDutyArray, d.getNdx());
 			this.sourceDutyArray = ArrayUtils.add(this.sourceDutyArray, d);
 			/*
@@ -139,7 +157,64 @@ public class PricingSubNetwork {
 		return bestNodeQuality;
 	}
 
-	public PricingSubNetwork build(Duty[] rootDuties,
+	public int getNumOfRecursions() {
+		return numOfRecursions;
+	}
+
+	public int getNumOfNodes() {
+		return numOfNodes;
+	}
+
+	public int getNumOfNodesChecked() {
+		return numOfNodesChecked;
+	}
+
+	public int getNumOfNodesAdded() {
+		return numOfNodesAdded;
+	}
+
+	public int getNumOfFwRecursions() {
+		return numOfFwRecursions;
+	}
+
+	public int getNumOfFwNodes() {
+		return numOfFwNodes;
+	}
+
+	public int getNumOfFwNodesChecked() {
+		return numOfFwNodesChecked;
+	}
+
+	public int getNumOfFwNodesAdded() {
+		return numOfFwNodesAdded;
+	}
+
+	public int getMaxFwDeptReached() {
+		return maxFwDeptReached;
+	}
+
+	public int getNumOfBwRecursions() {
+		return numOfBwRecursions;
+	}
+
+	public int getNumOfBwNodes() {
+		return numOfBwNodes;
+	}
+
+	public int getNumOfBwNodesChecked() {
+		return numOfBwNodesChecked;
+	}
+
+	public int getNumOfBwNodesAdded() {
+		return numOfBwNodesAdded;
+	}
+
+	public int getMaxBwDeptReached() {
+		return maxBwDeptReached;
+	}
+
+	public PricingSubNetwork build(LegView legToCover,
+									Duty[] rootDuties,
 									int heuristicNo,
 									int[] numOfCoveringsInDuties,
 									int[] numOfDistinctCoveringsInDuties,
@@ -171,6 +246,12 @@ public class PricingSubNetwork {
 		 * 
 		 */
 
+		/*
+		 * In new implementation we use both Dept control and Datetime control 
+		 * with the help of using legToCover's sobt and sibt values instead of duties brief and debrief parameters.
+		 * 
+		 */
+
 //		Arrays.parallelSort(rootDuties,  new Comparator<DutyView>() {
 //			@Override
 //			public int compare(DutyView a, DutyView b) {
@@ -193,8 +274,9 @@ public class PricingSubNetwork {
 
 			if (duty.isValid(this.hbNdx)
 					&& duty.hasPairing(this.hbNdx)
-					&& ((duty.getNumOfLegs() > numOfDistinctCoveringsInDuties[duty.getNdx()])
-						|| (duty.getNumOfLegs() == 1))) {
+//					&& ((duty.getNumOfLegs() > numOfDistinctCoveringsInDuties[duty.getNdx()])
+//						|| (duty.getNumOfLegs() == 1))
+					) {
 				if (duty.isHbDep(this.hbNdx)) {
 					if (duty.isHbArr(this.hbNdx)) {
 //						if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
@@ -216,7 +298,8 @@ public class PricingSubNetwork {
 						if (heuristicNo > 0) {
 //							if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, duty)) {
 								if (this.fwNetworkSearch(maxSearchDept, hbArrFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-															duty, true, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
+															duty, true, legToCover.getSobt(), //	duty.getBriefTime(this.hbNdx), 
+															this.maxPairingLengthInDays - 1)) {
 									this.addSourceDuty(heuristicNo, duty);
 									hbDepFound[duty.getNdx()] = true;
 									hbArrFound[duty.getNdx()] = true;
@@ -228,17 +311,20 @@ public class PricingSubNetwork {
 					if (heuristicNo > 0) {
 						if (duty.isHbArr(this.hbNdx)) {
 							if (this.bwNetworkSearch(maxSearchDept, hbDepFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-														duty, true, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 1)) {
+														duty, true, legToCover.getSibt(), //	duty.getDebriefTime(this.hbNdx), 
+														this.maxPairingLengthInDays - 1)) {
 								hbDepFound[duty.getNdx()] = true;
 								hbArrFound[duty.getNdx()] = true;
 							}
 							maxSearchDept[duty.getNdx()] = this.maxPairingLengthInDays;
 						} else {
 							if (this.fwNetworkSearch(maxSearchDept, hbArrFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-														duty, false, duty.getBriefTime(this.hbNdx), this.maxPairingLengthInDays - 2)) {
+														duty, false, legToCover.getSobt(), //	duty.getBriefTime(this.hbNdx), 
+														this.maxPairingLengthInDays - 2)) {
 								hbArrFound[duty.getNdx()] = true;
 								if (this.bwNetworkSearch(maxSearchDept, hbDepFound, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties,
-														duty, false, duty.getDebriefTime(this.hbNdx), this.maxPairingLengthInDays - 2)) {
+														duty, false, legToCover.getSibt(), //	duty.getDebriefTime(this.hbNdx), 
+														this.maxPairingLengthInDays - 2)) {
 									hbDepFound[duty.getNdx()] = true;
 								}
 							}
@@ -290,11 +376,17 @@ public class PricingSubNetwork {
 
 	private boolean fwNetworkSearch(int[] maxSearchDept, boolean[] hbArrFound, int heuristicNo, int[] numOfCoveringsInDuties, int[] numOfDistinctCoveringsInDuties,
 									int[] blockTimeOfCoveringsInDuties, DutyView pd, boolean hbDep, LocalDateTime rootBriefTime, int dept) throws CloneNotSupportedException {
+		if (dept < maxFwDeptReached)
+			maxFwDeptReached = dept;
+		numOfRecursions++;
+		numOfFwRecursions++;
 		boolean res = false;
 		LegView[] nextLegs = this.nextBriefLegIndexByDutyNdx.getArray(pd.getNdx());
 		for (LegView leg : nextLegs) {
 			DutyView[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
 			for (DutyView nd: nextDuties) {
+				numOfNodes++;
+				numOfFwNodes++;
 				if (nd.isValid(this.hbNdx)
 						&& nd.hasPairing(this.hbNdx)
 						&& (nd.isHbArr(this.hbNdx) || (dept > 1))
@@ -303,17 +395,21 @@ public class PricingSubNetwork {
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
 						 */
-//						&& ((hbDep && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays))
-//								|| (hbDep && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-//								|| ((!hbDep) && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-//								|| ((!hbDep) && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
+						&& ((hbDep && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays))
+								|| (hbDep && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
+								|| ((!hbDep) && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
+								|| ((!hbDep) && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
 ////						&& this.dutyRuleContext.getConnectionCheckerProxy().areConnectable(this.hbNdx, pd, nd)
 						) {
+					numOfNodesChecked++;
+					numOfFwNodesChecked++;
 					if (nd.isHbArr(this.hbNdx)) {
 						this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
 						this.addDuty(pd, nd);
 						hbArrFound[nd.getNdx()] = true;
 						res = true;
+						numOfNodesAdded++;
+						numOfFwNodesAdded++;
 					} else
 						if (dept > 1) {
 							if (((maxSearchDept[nd.getNdx()] >= dept) && hbArrFound[nd.getNdx()])
@@ -324,6 +420,8 @@ public class PricingSubNetwork {
 								this.addDuty(pd, nd);
 								hbArrFound[nd.getNdx()] = true;
 								res = true;
+								numOfNodesAdded++;
+								numOfFwNodesAdded++;
 							}
 						}
 //					if (res)
@@ -336,11 +434,17 @@ public class PricingSubNetwork {
 
 	private boolean bwNetworkSearch(int[] maxSearchDept, boolean[] hbDepFound, int heuristicNo, int[] numOfCoveringsInDuties, int[] numOfDistinctCoveringsInDuties,
 									int[] blockTimeOfCoveringsInDuties, DutyView nd, boolean hbArr, LocalDateTime rootDebriefTime, int dept) throws CloneNotSupportedException {
+		if (dept < maxBwDeptReached)
+			maxBwDeptReached = dept;
+		numOfRecursions++;
+		numOfBwRecursions++;
 		boolean res = false;
 		LegView[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
 		for (LegView leg : prevLegs) {
 			DutyView[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
 			for (DutyView pd: prevDuties) {
+				numOfNodes++;
+				numOfBwNodes++;
 				if (pd.isValid(this.hbNdx)
 						&& pd.hasPairing(this.hbNdx)
 						&& (pd.isHbDep(this.hbNdx) || (dept > 1))
@@ -349,12 +453,14 @@ public class PricingSubNetwork {
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
 						 */
-//						&& ((hbArr && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays))
-//								|| (hbArr && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-//								|| ((!hbArr) && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-//								|| ((!hbArr) && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
+						&& ((hbArr && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays))
+								|| (hbArr && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
+								|| ((!hbArr) && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
+								|| ((!hbArr) && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
 ////						&& this.dutyRuleContext.getConnectionCheckerProxy().areConnectable(this.hbNdx, pd, nd)
 						) {
+					numOfNodesChecked++;
+					numOfBwNodesChecked++;
 					if (pd.isHbDep(this.hbNdx)) {
 //						if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, pd)) {
 							this.checkAndUpdateCumulativeQuality(heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, pd, nd);
@@ -362,6 +468,8 @@ public class PricingSubNetwork {
 							this.addSourceDuty(heuristicNo, pd);
 							hbDepFound[pd.getNdx()] = true;
 							res = true;
+							numOfNodesAdded++;
+							numOfBwNodesAdded++;
 //						}
 					} else
 						if (dept > 1) {
@@ -373,6 +481,8 @@ public class PricingSubNetwork {
 								this.addDuty(pd, nd);
 								hbDepFound[pd.getNdx()] = true;
 								res = true;
+								numOfNodesAdded++;
+								numOfBwNodesAdded++;
 							}
 						}
 //					if (res)

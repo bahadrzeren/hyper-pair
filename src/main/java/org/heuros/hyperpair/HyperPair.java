@@ -215,7 +215,7 @@ public class HyperPair {
 
 				BiDirDutyPairingChecker dutyPairChecker = new BiDirDutyPairingChecker(hbNdx, HeurosDatasetParam.dutyProcessPeriodEndExc)
 																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
-																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
+																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxPreDutySearchDeptInHours)
 																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
 																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
@@ -225,7 +225,7 @@ public class HyperPair {
 
 				BiDirLegPairingChecker legPairChecker = new BiDirLegPairingChecker(hbNdx, HeurosDatasetParam.legCoverPeriodEndExc)
 																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
-																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
+																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxPreDutySearchDeptInHours)
 																	.setLegRepository(pairOptimizationContext.getLegRepository())
 																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
 																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
@@ -249,7 +249,7 @@ public class HyperPair {
 			executorService.shutdown();
 
 			DutyLegOvernightConnNetwork pricingNetwork = new DutyLegOvernightConnNetwork(HeurosDatasetParam.dutyProcessPeriodEndExc, 
-																				HeurosSystemParam.maxIdleTimeInAPairInHours, 
+																				HeurosSystemParam.maxNetDutySearchDeptInHours, 
 																				HeurosSystemParam.maxPairingLengthInDays)
 																				.setLegRepository(pairOptimizationContext.getLegRepository())
 																				.setDutyRepository(pairOptimizationContext.getDutyRepository())
@@ -258,7 +258,7 @@ public class HyperPair {
 			pricingNetwork.buildNetwork();
 
 			PairingGenerator pairingGenerator = new PairingGenerator(HeurosSystemParam.maxPairingLengthInDays)
-																			.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+//																			.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																			.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																			.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
 																			.setPricingNetwork(pricingNetwork)

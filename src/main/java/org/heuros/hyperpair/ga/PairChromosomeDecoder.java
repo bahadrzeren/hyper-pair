@@ -225,13 +225,14 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 			if (!legToCover.hasHbDepArrDutyPair(this.hbNdx))
 				heuristicNo = 1;
 
-///*
-// * TODO Remove the lines after test!
-// */
-//if (legToCover.hasHbDepDutyPair(this.hbNdx)
-//		|| legToCover.hasHbArrDutyPair(this.hbNdx)
-//		|| legToCover.hasNonHbDutyPair(this.hbNdx))
-//heuristicNo = 1;
+/*
+ * TODO Remove the lines after test!
+ */
+heuristicNo = 0;
+if (legToCover.hasHbDepDutyPair(this.hbNdx)
+		|| legToCover.hasHbArrDutyPair(this.hbNdx)
+		|| legToCover.hasNonHbDutyPair(this.hbNdx))
+heuristicNo = 1;
 
 			Pair p = null;
 			try {

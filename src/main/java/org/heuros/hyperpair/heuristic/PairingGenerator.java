@@ -10,7 +10,6 @@ import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
-import org.heuros.rule.DutyRuleContext;
 import org.heuros.rule.PairRuleContext;
 
 public class PairingGenerator {
@@ -24,7 +23,7 @@ public class PairingGenerator {
 //	private int maxIdleTimeInAPairInHours = 0;
 	private int maxPairingLengthInDays = 0;
 
-	private DutyRuleContext dutyRuleContext = null;
+//	private DutyRuleContext dutyRuleContext = null;
 	private PairRuleContext pairRuleContext = null;
 
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
@@ -38,10 +37,10 @@ public class PairingGenerator {
 		this.maxPairingLengthInDays = maxPairingLengthInDays;
 	}
 
-	public PairingGenerator setDutyRuleContext(DutyRuleContext dutyRuleContext) {
-		this.dutyRuleContext = dutyRuleContext;
-		return this;
-	}
+//	public PairingGenerator setDutyRuleContext(DutyRuleContext dutyRuleContext) {
+//		this.dutyRuleContext = dutyRuleContext;
+//		return this;
+//	}
 
 	public PairingGenerator setPairRuleContext(PairRuleContext pairRuleContext) {
 		this.pairRuleContext = pairRuleContext;
@@ -87,12 +86,17 @@ public class PairingGenerator {
 
 		if ((coveringDuties != null)
 				&& (coveringDuties.length > 0)) {
+
+			long startTime = System.nanoTime();
+
 			PricingSubNetwork partialNetwork = new PricingSubNetwork(this.duties, 
 																		this.maxPairingLengthInDays, 
-																		this.dutyRuleContext, 
-																		this.pairRuleContext, 
+//																		this.dutyRuleContext, 
+//																		this.pairRuleContext, 
 																		this.dutyLegOvernightConnNetwork)
-													.build(coveringDuties, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
+													.build(legToCover, coveringDuties, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
+
+			long subNetworkBuiltTime = System.nanoTime();
 
 //			logger.info("Subnetwork is built for the leg " + legToCover);
 
@@ -108,40 +112,62 @@ public class PairingGenerator {
 				if (d.isNonHbDep(this.hbNdx))
 					logger.error("Must be HB departed duty!");
 
-	    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
-
-	    			currentPair.pairQ.addToQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-	    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
-
-					if (d.isHbArr(this.hbNdx)) {
-		    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
-		    				if (currentPair.pair.isComplete(this.hbNdx)) {
-		    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
-		    						bestPair.pair = (Pair) currentPair.pair.clone();
-		    						bestPair.pairQ.injectValues(currentPair.pairQ);
-		    					}
-		    				} else
-		    					logger.error("Pairing " + d + " must be complete!");
-		    			}
-					} else {
-						/*
-						 * Basic cumulative quality info which is calculated during the sub network generation is checked!
-						 */
-						if (nodeQs[d.getNdx()].isBetterThan(heuristicNo, bestPair.pairQ)) {
+				if (nodeQs[d.getNdx()].isBetterThan(heuristicNo, bestPair.pairQ)) {
+		    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
+	
+		    			currentPair.pairQ.addToQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+		    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
+	
+						if (d.isHbArr(this.hbNdx)) {
+			    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
+			    				if (currentPair.pair.isComplete(this.hbNdx)) {
+			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
+			    						bestPair.pair = (Pair) currentPair.pair.clone();
+			    						bestPair.pairQ.injectValues(currentPair.pairQ);
+			    					}
+			    				} else
+			    					logger.error("Pairing " + d + " must be complete!");
+			    			}
+						} else {
+							/*
+							 * Basic cumulative quality info which is calculated during the sub network generation is checked!
+							 */
 							if (this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair)) {
 								bestPair = this.searchForPairings(heuristicNo, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, nodeQs,
 																	partialNetwork, currentPair, d, bestPair, this.maxPairingLengthInDays - 1);
 							}
 						}
-					}
-
-					currentPair.pairQ.removeFromQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-					this.pairRuleContext.getAggregatorProxy().removeLast(currentPair.pair);
-	    		}
+	
+						currentPair.pairQ.removeFromQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+						this.pairRuleContext.getAggregatorProxy().removeLast(currentPair.pair);
+		    		}
+				}
 			}
+
+			long searchCompletionTime = System.nanoTime();
+
+			logger.info(((subNetworkBuiltTime - startTime) / 1000000) + 
+							"(Roots" + coveringDuties.length + 
+							", Recs" + partialNetwork.getNumOfRecursions() + 
+							", #(" + partialNetwork.getNumOfNodes() + 
+							"/" + partialNetwork.getNumOfNodesChecked() + 
+							"/" + partialNetwork.getNumOfNodesAdded() + 
+							"), Fw(Recs" + partialNetwork.getNumOfFwRecursions() +
+							", Dept" + (this.maxPairingLengthInDays - partialNetwork.getMaxFwDeptReached()) +
+							", " + partialNetwork.getNumOfFwNodes() +
+							"/" + partialNetwork.getNumOfFwNodesChecked() +
+							"/" + partialNetwork.getNumOfFwNodesAdded() +
+							"), Bw(Recs" + partialNetwork.getNumOfBwRecursions() +
+							", Dept" + (this.maxPairingLengthInDays - partialNetwork.getMaxBwDeptReached()) +
+							", " + partialNetwork.getNumOfBwNodes() +
+							"/" + partialNetwork.getNumOfBwNodesChecked() +
+							"/" + partialNetwork.getNumOfBwNodesAdded() +
+							"))->" + 
+						((searchCompletionTime - subNetworkBuiltTime) / 1000000) + 
+							"(NetSrc" + sourceDuties.length + 
+							") - " + bestPair.pair.getNumOfDuties() + "d pair is generated for the leg " + legToCover);
 		}
 
-		logger.info("Pair is generated for the leg " + legToCover);
 		return bestPair.pair;
 	}
 
