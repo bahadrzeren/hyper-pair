@@ -102,7 +102,7 @@ public class PairingGenerator {
 
 //			int[] sourceDuties = partialNetwork.getSourceDuties();
 			DutyView[] sourceDuties = partialNetwork.getSourceDuties();
-			NodeQualityMetric[] nodeQs = partialNetwork.getBestBwNodeQuality();
+			NodeQualityMetric[] nodeQs = partialNetwork.getBestNodeQuality();
 
 			for (int i = 0; i < sourceDuties.length; i++) {
 //				int dNdx = sourceDuties[i];
