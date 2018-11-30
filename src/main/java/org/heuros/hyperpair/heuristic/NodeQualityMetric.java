@@ -89,6 +89,32 @@ public class NodeQualityMetric implements Cloneable {
 		}
 	}
 
+	public boolean doesItWorthToGoDeeper(int heuristicNo,
+											NodeQualityMetric fwCumulative,
+											DutyView d,
+											int[] numOfCoveringsInDuties,
+											int[] blockTimeOfCoveringsInDuties) {
+		if (heuristicNo < 2) {	//	If layover or dh effective. 
+			if ((qm.numOfLegs == 0)
+					|| (this.numOfDh < qm.numOfDh)
+					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
+					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins) 
+							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
+				return true;
+			} else
+				return false;
+		} else {	//	If active block time effective.
+			if ((qm.numOfLegs == 0)
+					|| (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
+					|| ((((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) == ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
+							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
+				return true;
+			} else
+				return false;
+		}
+	}
+
+
 	public void injectValues(NodeQualityMetric qm) {
 		this.numOfDh = qm.numOfDh;
 		this.dhDurationInMins = qm.dhDurationInMins;
