@@ -22,6 +22,7 @@ public class PairingGenerator {
 	private int hbNdx = 0;
 //	private int maxIdleTimeInAPairInHours = 0;
 	private int maxPairingLengthInDays = 0;
+	private int maxDutyBlockTimeInMins = 0;
 
 //	private DutyRuleContext dutyRuleContext = null;
 	private PairRuleContext pairRuleContext = null;
@@ -32,9 +33,11 @@ public class PairingGenerator {
 	private List<Duty> duties = null;
 
 	public PairingGenerator(//int maxIdleTimeInAPairInHours, 
-			int maxPairingLengthInDays) {
+			int maxPairingLengthInDays,
+			int maxDutyBlockTimeInMins) {
 //		this.maxIdleTimeInAPairInHours = maxIdleTimeInAPairInHours;
 		this.maxPairingLengthInDays = maxPairingLengthInDays;
+		this.maxDutyBlockTimeInMins = maxDutyBlockTimeInMins;
 	}
 
 //	public PairingGenerator setDutyRuleContext(DutyRuleContext dutyRuleContext) {
@@ -91,6 +94,7 @@ public class PairingGenerator {
 
 			PricingSubNetwork partialNetwork = new PricingSubNetwork(this.duties, 
 																		this.maxPairingLengthInDays, 
+																		this.maxDutyBlockTimeInMins,
 //																		this.dutyRuleContext, 
 //																		this.pairRuleContext, 
 																		this.dutyLegOvernightConnNetwork)
@@ -114,10 +118,10 @@ public class PairingGenerator {
 
 				if (nodeQs[d.getNdx()].isBetterThan(heuristicNo, bestPair.pairQ)) {
 		    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
-	
+
 		    			currentPair.pairQ.addToQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 		    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
-	
+
 						if (d.isHbArr(this.hbNdx)) {
 			    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
 			    				if (currentPair.pair.isComplete(this.hbNdx)) {
@@ -137,7 +141,7 @@ public class PairingGenerator {
 																	partialNetwork, currentPair, d, bestPair, this.maxPairingLengthInDays - 1);
 							}
 						}
-	
+
 						currentPair.pairQ.removeFromQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 						this.pairRuleContext.getAggregatorProxy().removeLast(currentPair.pair);
 		    		}
@@ -146,7 +150,10 @@ public class PairingGenerator {
 
 			long searchCompletionTime = System.nanoTime();
 
-			logger.info(((subNetworkBuiltTime - startTime) / 1000000) + 
+			logger.info("Heur" + heuristicNo + ", " + 
+							bestPair.pair.getNumOfDuties() + "d, " + bestPair.pair.getNumOfLegs() + "l, Bt" + bestPair.pair.getBlockTimeInMins() +
+							", LNdx" + legToCover.getNdx() + 
+							", " + ((subNetworkBuiltTime - startTime) / 1000000) +
 							"(Roots" + coveringDuties.length + 
 							", Recs" + partialNetwork.getNumOfRecursions() + 
 							", #(" + partialNetwork.getNumOfNodes() + 

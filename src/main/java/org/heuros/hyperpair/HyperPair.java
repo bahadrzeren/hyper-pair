@@ -257,7 +257,8 @@ public class HyperPair {
 																				.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
 			pricingNetwork.buildNetwork();
 
-			PairingGenerator pairingGenerator = new PairingGenerator(HeurosSystemParam.maxPairingLengthInDays)
+			PairingGenerator pairingGenerator = new PairingGenerator(HeurosSystemParam.maxPairingLengthInDays,
+																		HeurosSystemParam.maxDutyBlockTimeInMins)
 //																			.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																			.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																			.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())

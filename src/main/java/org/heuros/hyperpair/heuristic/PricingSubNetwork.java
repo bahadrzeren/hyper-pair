@@ -25,6 +25,7 @@ public class PricingSubNetwork {
 
 	private List<Duty> duties = null;
 	private int maxPairingLengthInDays = 0;
+	private int maxDutyBlockTimeInMins = 0;
 
 //	private DutyRuleContext dutyRuleContext = null;
 //	private PairRuleContext pairRuleContext = null;
@@ -66,6 +67,7 @@ public class PricingSubNetwork {
 
 	public PricingSubNetwork(List<Duty> duties,
 								int maxPairingLengthInDays,
+								int maxDutyBlockTimeInMins, 
 //								DutyRuleContext dutyRuleContext,
 //								PairRuleContext pairRuleContext,
 								DutyLegOvernightConnNetwork pricingNetwork) {
@@ -83,6 +85,7 @@ public class PricingSubNetwork {
 		this.maxPairingLengthInDays = maxPairingLengthInDays;
 		this.maxFwDeptReached = maxPairingLengthInDays;
 		this.maxBwDeptReached = maxPairingLengthInDays;
+		this.maxDutyBlockTimeInMins = maxDutyBlockTimeInMins;
 
 //		this.dutyRuleContext = dutyRuleContext;
 //		this.pairRuleContext = pairRuleContext;
@@ -155,7 +158,7 @@ public class PricingSubNetwork {
 		NodeQualityMetric pdQ = this.bestNodeQuality[pd.getNdx()];
 		if (pdQ == null) {
 			pdQ = new NodeQualityMetric();
-			pdQ.addToQualityMetric(bwCumulative);
+			pdQ.injectValues(bwCumulative);
 			this.bestNodeQuality[pd.getNdx()] = pdQ;
 		} else {
 			if (bwCumulative.isBetterThan(heuristicNo, pdQ)) {
@@ -443,6 +446,8 @@ public class PricingSubNetwork {
 						if (dept > 1) {
 							if (((maxSearchDept[nd.getNdx()] >= dept) && hbArrFound[nd.getNdx()])
 									|| ((maxSearchDept[nd.getNdx()] < dept)
+											&& ((sourceDutyArray.length == 0)
+													|| fwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, bestNodeQuality[sourceDutyArray[0].getNdx()]))
 											&& this.fwNetworkSearch(nd, fwCumulative, hbDep, rootBriefTime, dept - 1))) {
 								this.calculateFwQual(pd, nd);
 								this.addDuty(pd, nd);
@@ -500,6 +505,8 @@ public class PricingSubNetwork {
 						if (dept > 1) {
 							if (((maxSearchDept[pd.getNdx()] >= dept) && hbDepFound[pd.getNdx()])
 									|| ((maxSearchDept[pd.getNdx()] < dept)
+											&& ((sourceDutyArray.length == 0)
+													|| bwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, bestNodeQuality[sourceDutyArray[0].getNdx()]))
 											&& this.bwNetworkSearch(pd, bwCumulative, hbArr, rootDebriefTime, dept - 1))) {
 								this.calculateBwQual(pd, bwCumulative);
 								this.addDuty(pd, nd);
