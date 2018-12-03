@@ -232,7 +232,7 @@ heuristicNo = 0;
 if (legToCover.hasHbDepDutyPair(this.hbNdx)
 		|| legToCover.hasHbArrDutyPair(this.hbNdx)
 		|| legToCover.hasNonHbDutyPair(this.hbNdx))
-heuristicNo = 1;
+heuristicNo = 2;
 
 			Pair p = null;
 			try {
@@ -245,7 +245,7 @@ heuristicNo = 1;
 				PairChromosomeDecoder.logger.error(ex);
 			}
 
-//if (legToCover.getNdx() == 1317)
+//if (legToCover.getNdx() == 1768)
 //System.out.println(p);
 			if (p != null) {
 				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);

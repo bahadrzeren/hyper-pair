@@ -350,18 +350,14 @@ public class PricingSubNetwork {
 //			}
 //		});
 
-
-//if (legToCover.getNdx() == 1317)
+//if (legToCover.getNdx() == 1768)
 //System.out.println();
 
 		for (Duty duty: rootDuties) {
 
-//if ((legToCover.getNdx() == 1317)
-//		&& (duty.getNdx() == 11035))
-//System.out.println();
-//if ((legToCover.getNdx() == 1317)
-//		&& (duty.getNdx() == 11036))
-//System.out.println();
+if ((legToCover.getNdx() == 1768)
+		&& (duty.getNdx() == 14333))
+System.out.println();
 
 			if (duty.isValid(this.hbNdx)
 					&& duty.hasPairing(this.hbNdx)
@@ -436,6 +432,15 @@ public class PricingSubNetwork {
 		for (LegView leg : nextLegs) {
 			DutyView[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
 			for (DutyView nd: nextDuties) {
+if ((pd.getNdx() == 14333)
+&& (nd.getNdx() == 23018))
+System.out.println();
+if ((pd.getNdx() == 23018)
+&& (nd.getNdx() == 31625))
+System.out.println();
+if ((pd.getNdx() == 31625)
+&& (nd.getNdx() == 37544))
+System.out.println();
 				numOfNodes++;
 				numOfFwNodes++;
 				if (nd.isValid(this.hbNdx)
@@ -454,8 +459,6 @@ public class PricingSubNetwork {
 						) {
 					numOfNodesChecked++;
 					numOfFwNodesChecked++;
-//if (nd.getNdx() == 24592)
-//System.out.println();
 					fwCumulative.addToQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 					if (nd.isHbArr(this.hbNdx)) {
 						this.fwRegister(pd, nd);
