@@ -351,13 +351,23 @@ public class PricingSubNetwork {
 //		});
 
 
+//if (legToCover.getNdx() == 1317)
+//System.out.println();
 
 		for (Duty duty: rootDuties) {
 
+//if ((legToCover.getNdx() == 1317)
+//		&& (duty.getNdx() == 11035))
+//System.out.println();
+//if ((legToCover.getNdx() == 1317)
+//		&& (duty.getNdx() == 11036))
+//System.out.println();
+
 			if (duty.isValid(this.hbNdx)
 					&& duty.hasPairing(this.hbNdx)
-//					&& ((duty.getNumOfLegs() > numOfDistinctCoveringsInDuties[duty.getNdx()])
-//						|| (duty.getNumOfLegs() == 1))
+					&& ((sourceDutyArray.length == 0)
+							|| (duty.getNumOfLegs() > numOfDistinctCoveringsInDuties[duty.getNdx()])
+							|| (duty.getNumOfLegs() == 1))
 					) {
 				NodeQualityMetric cumulativeQual = new NodeQualityMetric();
 				cumulativeQual.addToQualityMetric(duty, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
@@ -407,7 +417,16 @@ public class PricingSubNetwork {
 		return this;
 	}
 
+	private void fwRegister(DutyView pd, DutyView nd) {
+		this.calculateFwQual(pd, nd);
+		this.addDuty(pd, nd);
+		hbArrFound[nd.getNdx()] = true;
+		numOfNodesAdded++;
+		numOfFwNodesAdded++;
+	}
+
 	private boolean fwNetworkSearch(DutyView pd, NodeQualityMetric fwCumulative, boolean hbDep, LocalDateTime rootBriefTime, int dept) throws CloneNotSupportedException {
+
 		if (dept < maxFwDeptReached)
 			maxFwDeptReached = dept;
 		numOfRecursions++;
@@ -422,7 +441,8 @@ public class PricingSubNetwork {
 				if (nd.isValid(this.hbNdx)
 						&& nd.hasPairing(this.hbNdx)
 						&& (nd.isHbArr(this.hbNdx) || (dept > 1))
-						&& ((nd.getNumOfLegs() > numOfDistinctCoveringsInDuties[nd.getNdx()])
+						&& ((sourceDutyArray.length == 0)
+								|| (nd.getNumOfLegs() > numOfDistinctCoveringsInDuties[nd.getNdx()])
 								|| (nd.getNumOfLegs() == 1))
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
@@ -434,35 +454,44 @@ public class PricingSubNetwork {
 						) {
 					numOfNodesChecked++;
 					numOfFwNodesChecked++;
+//if (nd.getNdx() == 24592)
+//System.out.println();
 					fwCumulative.addToQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 					if (nd.isHbArr(this.hbNdx)) {
-						this.calculateFwQual(pd, nd);
-						this.addDuty(pd, nd);
-						hbArrFound[nd.getNdx()] = true;
+						this.fwRegister(pd, nd);
+						maxSearchDept[nd.getNdx()] = dept;
 						res = true;
-						numOfNodesAdded++;
-						numOfFwNodesAdded++;
 					} else
 						if (dept > 1) {
-							if (((maxSearchDept[nd.getNdx()] >= dept) && hbArrFound[nd.getNdx()])
-									|| ((maxSearchDept[nd.getNdx()] < dept)
-											&& ((sourceDutyArray.length == 0)
-													|| fwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, bestNodeQuality[sourceDutyArray[0].getNdx()]))
-											&& this.fwNetworkSearch(nd, fwCumulative, hbDep, rootBriefTime, dept - 1))) {
-								this.calculateFwQual(pd, nd);
-								this.addDuty(pd, nd);
-								hbArrFound[nd.getNdx()] = true;
+							if ((maxSearchDept[nd.getNdx()] >= dept) && hbArrFound[nd.getNdx()]) {
+								this.fwRegister(pd, nd);
+								maxSearchDept[nd.getNdx()] = dept;
 								res = true;
-								numOfNodesAdded++;
-								numOfFwNodesAdded++;
-							}
+							} else
+								if (maxSearchDept[nd.getNdx()] < dept) {
+									if ((sourceDutyArray.length == 0)
+													|| fwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, bestNodeQuality[sourceDutyArray[0].getNdx()])) {
+										if (this.fwNetworkSearch(nd, fwCumulative, hbDep, rootBriefTime, dept - 1)) {
+											this.fwRegister(pd, nd);
+											res = true;
+										}
+										maxSearchDept[nd.getNdx()] = dept;
+									}
+								}
 						}
 					fwCumulative.removeFromQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-					maxSearchDept[nd.getNdx()] = dept;
 				}
 			}
 		}
 		return res;
+	}
+
+	private void bwRegister(DutyView pd, DutyView nd, NodeQualityMetric bwCumulative) {
+		this.calculateBwQual(pd, bwCumulative);
+		this.addDuty(pd, nd);
+		hbDepFound[pd.getNdx()] = true;
+		numOfNodesAdded++;
+		numOfBwNodesAdded++;
 	}
 
 	private boolean bwNetworkSearch(DutyView nd, NodeQualityMetric bwCumulative, boolean hbArr, LocalDateTime rootDebriefTime, int dept) throws CloneNotSupportedException {
@@ -480,7 +509,8 @@ public class PricingSubNetwork {
 				if (pd.isValid(this.hbNdx)
 						&& pd.hasPairing(this.hbNdx)
 						&& (pd.isHbDep(this.hbNdx) || (dept > 1))
-						&& ((pd.getNumOfLegs() > numOfDistinctCoveringsInDuties[pd.getNdx()])
+						&& ((sourceDutyArray.length == 0)
+								|| (pd.getNumOfLegs() > numOfDistinctCoveringsInDuties[pd.getNdx()])
 								|| (pd.getNumOfLegs() == 1))
 						/*
 						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
@@ -494,30 +524,29 @@ public class PricingSubNetwork {
 					numOfBwNodesChecked++;
 					bwCumulative.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 					if (pd.isHbDep(this.hbNdx)) {
-						this.calculateBwQual(pd, bwCumulative);
-						this.addDuty(pd, nd);
+						this.bwRegister(pd, nd, bwCumulative);
 						this.addSourceDuty(heuristicNo, pd);
-						hbDepFound[pd.getNdx()] = true;
+						maxSearchDept[pd.getNdx()] = dept;
 						res = true;
-						numOfNodesAdded++;
-						numOfBwNodesAdded++;
 					} else
 						if (dept > 1) {
-							if (((maxSearchDept[pd.getNdx()] >= dept) && hbDepFound[pd.getNdx()])
-									|| ((maxSearchDept[pd.getNdx()] < dept)
-											&& ((sourceDutyArray.length == 0)
-													|| bwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, bestNodeQuality[sourceDutyArray[0].getNdx()]))
-											&& this.bwNetworkSearch(pd, bwCumulative, hbArr, rootDebriefTime, dept - 1))) {
-								this.calculateBwQual(pd, bwCumulative);
-								this.addDuty(pd, nd);
-								hbDepFound[pd.getNdx()] = true;
+							if ((maxSearchDept[pd.getNdx()] >= dept) && hbDepFound[pd.getNdx()]) {
+								this.bwRegister(pd, nd, bwCumulative);
+								maxSearchDept[pd.getNdx()] = dept;
 								res = true;
-								numOfNodesAdded++;
-								numOfBwNodesAdded++;
-							}
+							} else
+								if (maxSearchDept[pd.getNdx()] < dept) {
+									if ((sourceDutyArray.length == 0)
+											|| bwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, bestNodeQuality[sourceDutyArray[0].getNdx()])) {
+										if (this.bwNetworkSearch(pd, bwCumulative, hbArr, rootDebriefTime, dept - 1)) {
+											this.bwRegister(pd, nd, bwCumulative);
+											res = true;
+										}
+										maxSearchDept[pd.getNdx()] = dept;
+									}
+								}
 						}
 					bwCumulative.removeFromQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-					maxSearchDept[pd.getNdx()] = dept;
 				}
 			}
 		}

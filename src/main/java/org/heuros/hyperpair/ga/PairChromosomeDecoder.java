@@ -245,6 +245,8 @@ heuristicNo = 1;
 				PairChromosomeDecoder.logger.error(ex);
 			}
 
+//if (legToCover.getNdx() == 1317)
+//System.out.println(p);
 			if (p != null) {
 				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
 				solution.add(p);
