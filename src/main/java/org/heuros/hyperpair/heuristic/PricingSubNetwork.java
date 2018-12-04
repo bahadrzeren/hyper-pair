@@ -136,22 +136,26 @@ public class PricingSubNetwork {
 			ndQ = new NodeQualityMetric();
 			ndQ.addToQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			this.bestNodeQuality[nd.getNdx()] = ndQ;
+			ndQ.nodeOwner = nd;
 		}
 		if (pdQ == null) {
 			pdQ = new NodeQualityMetric();
 			pdQ.addToQualityMetric(ndQ);
 			pdQ.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			this.bestNodeQuality[pd.getNdx()] = pdQ;
+			pdQ.nodeOwner = pd;
+			pdQ.nextNodeMetric = ndQ;
 		} else {
 			ndQ.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			if (ndQ.isBetterThan(heuristicNo, pdQ)) {
 				pdQ.injectValues(ndQ);
+				pdQ.nextNodeMetric = ndQ;
 			}
 			ndQ.removeFromQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 		}
 	}
 
-	private void calculateBwQual(DutyView pd, NodeQualityMetric bwCumulative) {
+	private void calculateBwQual(DutyView pd, DutyView nd, NodeQualityMetric bwCumulative) {
 		/*
 		 * Calculate quality metric.
 		 */
@@ -160,9 +164,12 @@ public class PricingSubNetwork {
 			pdQ = new NodeQualityMetric();
 			pdQ.injectValues(bwCumulative);
 			this.bestNodeQuality[pd.getNdx()] = pdQ;
+			pdQ.nodeOwner = pd;
+			pdQ.nextNodeMetric = this.bestNodeQuality[nd.getNdx()];
 		} else {
 			if (bwCumulative.isBetterThan(heuristicNo, pdQ)) {
 				pdQ.injectValues(bwCumulative);
+				pdQ.nextNodeMetric = this.bestNodeQuality[nd.getNdx()];
 			}
 		}
 	}
@@ -355,9 +362,9 @@ public class PricingSubNetwork {
 
 		for (Duty duty: rootDuties) {
 
-if ((legToCover.getNdx() == 1768)
-		&& (duty.getNdx() == 14333))
-System.out.println();
+//if ((legToCover.getNdx() == 1768)
+//		&& (duty.getNdx() == 14333))
+//System.out.println();
 
 			if (duty.isValid(this.hbNdx)
 					&& duty.hasPairing(this.hbNdx)
@@ -432,15 +439,15 @@ System.out.println();
 		for (LegView leg : nextLegs) {
 			DutyView[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
 			for (DutyView nd: nextDuties) {
-if ((pd.getNdx() == 14333)
-&& (nd.getNdx() == 23018))
-System.out.println();
-if ((pd.getNdx() == 23018)
-&& (nd.getNdx() == 31625))
-System.out.println();
-if ((pd.getNdx() == 31625)
-&& (nd.getNdx() == 37544))
-System.out.println();
+//if ((pd.getNdx() == 14333)
+//&& (nd.getNdx() == 23018))
+//System.out.println();
+//if ((pd.getNdx() == 23018)
+//&& (nd.getNdx() == 31625))
+//System.out.println();
+//if ((pd.getNdx() == 31625)
+//&& (nd.getNdx() == 37544))
+//System.out.println();
 				numOfNodes++;
 				numOfFwNodes++;
 				if (nd.isValid(this.hbNdx)
@@ -490,7 +497,7 @@ System.out.println();
 	}
 
 	private void bwRegister(DutyView pd, DutyView nd, NodeQualityMetric bwCumulative) {
-		this.calculateBwQual(pd, bwCumulative);
+		this.calculateBwQual(pd, nd, bwCumulative);
 		this.addDuty(pd, nd);
 		hbDepFound[pd.getNdx()] = true;
 		numOfNodesAdded++;

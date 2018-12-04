@@ -105,6 +105,10 @@ public class PairingGenerator {
 //			logger.info("Subnetwork is built for the leg " + legToCover);
 
 //			int[] sourceDuties = partialNetwork.getSourceDuties();
+
+//if (legToCover.getNdx() == 1768)
+//System.out.println();
+
 			DutyView[] sourceDuties = partialNetwork.getSourceDuties();
 			NodeQualityMetric[] nodeQs = partialNetwork.getBestNodeQuality();
 
@@ -112,6 +116,10 @@ public class PairingGenerator {
 //				int dNdx = sourceDuties[i];
 //				DutyView d = this.duties.get(dNdx);
 				DutyView d = sourceDuties[i];
+
+//if ((legToCover.getNdx() == 1768)
+//&& (d.getNdx() == 14334))
+//System.out.println();
 
 				if (d.isNonHbDep(this.hbNdx))
 					logger.error("Must be HB departed duty!");
@@ -194,6 +202,26 @@ public class PairingGenerator {
 //			int ndNdx = nextDuties[i];
 //			DutyView nd = this.duties.get(ndNdx);
 			DutyView nd = nextDuties[i];
+
+//if ((ld.getNdx() == 14333)
+//&& (nd.getNdx() == 23018))
+//System.out.println();
+//if ((ld.getNdx() == 23018)
+//&& (nd.getNdx() == 31625))
+//System.out.println();
+//if ((ld.getNdx() == 31625)
+//&& (nd.getNdx() == 37544))
+//System.out.println();
+
+//if ((ld.getNdx() == 14334)
+//&& (nd.getNdx() == 24425))
+//System.out.println();
+//if ((ld.getNdx() == 24425)
+//&& (nd.getNdx() == 30400))
+//System.out.println();
+//if ((ld.getNdx() == 30400)
+//&& (nd.getNdx() == 40927))
+//System.out.println();
 
 			/*
 			 * Basic cumulative quality info which is calculated during the sub network generation is checked! 
