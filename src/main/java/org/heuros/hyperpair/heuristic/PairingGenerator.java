@@ -104,10 +104,10 @@ public class PairingGenerator {
 
 //			logger.info("Subnetwork is built for the leg " + legToCover);
 
-//			int[] sourceDuties = partialNetwork.getSourceDuties();
-
 //if (legToCover.getNdx() == 1768)
 //System.out.println();
+
+//			int[] sourceDuties = partialNetwork.getSourceDuties();
 
 			DutyView[] sourceDuties = partialNetwork.getSourceDuties();
 			NodeQualityMetric[] nodeQs = partialNetwork.getBestNodeQuality();

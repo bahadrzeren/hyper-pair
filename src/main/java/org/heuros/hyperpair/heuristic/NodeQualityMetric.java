@@ -37,6 +37,8 @@ public class NodeQualityMetric implements Cloneable {
 		this.numOfDuties++;
 		this.numOfIncludingDutiesOfTheSameLegs += d.getTotalNumOfIncludingDutiesOfTheSameLegs();
 		this.numOfLegs += d.getNumOfLegs();
+//		if (this.numOfDuties > 4)
+//			System.out.println();
 	}
 
 	public void addToQualityMetric(NodeQualityMetric dqm) {
@@ -46,6 +48,8 @@ public class NodeQualityMetric implements Cloneable {
 		this.numOfDuties += dqm.numOfDuties;
 		this.numOfIncludingDutiesOfTheSameLegs += dqm.numOfIncludingDutiesOfTheSameLegs;
 		this.numOfLegs += dqm.numOfLegs;
+//		if (this.numOfDuties > 4)
+//			System.out.println();
 	}
 
 	public void removeFromQualityMetric(DutyView d,
