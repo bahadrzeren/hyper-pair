@@ -9,7 +9,7 @@ public class HeurosSystemParam {
 	public static int maxPairingLengthInDays = 4;
 //	public static int maxIdleTimeInAPairInHours = 48;
 	public static int maxPreDutySearchDeptInHours = 48;
-	public static int maxNetDutySearchDeptInHours = 12;
+	public static int maxNetDutySearchDeptInHours = 24;
 
 	public static int maxDutyBlockTimeInMins = 60 * 10;
 
