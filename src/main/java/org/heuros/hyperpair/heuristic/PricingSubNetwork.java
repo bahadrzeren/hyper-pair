@@ -297,6 +297,8 @@ public class PricingSubNetwork {
 //if (legToCover.getNdx() == 1768)
 //System.out.println();
 
+		NodeQualityMetric cumulativeQual = new NodeQualityMetric();
+
 		for (Duty duty: rootDuties) {
 
 //if ((legToCover.getNdx() == 1768)
@@ -311,14 +313,14 @@ public class PricingSubNetwork {
 							|| (duty.getNumOfLegs() > numOfDistinctCoveringsInDuties[duty.getNdx()])
 							|| (duty.getNumOfLegs() == 1))
 					) {
-				NodeQualityMetric cumulativeQual = new NodeQualityMetric();
+
 				cumulativeQual.addToQualityMetric(duty, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 				if (duty.isHbDep(this.hbNdx)) {
 					if (duty.isHbArr(this.hbNdx)) {
 						/*
 						 * Because of having no connection duties we must add qualityMetric here for 1day pairings.
 						 */
-						this.bestNodeQuality[duty.getNdx()] = cumulativeQual;
+						this.bestNodeQuality[duty.getNdx()] = new NodeQualityMetric(cumulativeQual);
 						this.addSourceDuty(heuristicNo, duty);
 						hbDepFound[duty.getNdx()] = true;
 						hbArrFound[duty.getNdx()] = true;
@@ -330,18 +332,16 @@ public class PricingSubNetwork {
 								hbDepFound[duty.getNdx()] = true;
 								hbArrFound[duty.getNdx()] = true;
 							}
-//							maxSearchNumDept[duty.getNdx()] = this.maxPairingLengthInDays;
 						}
 				} else
 					if (heuristicNo > 0) {
 						if (duty.isHbArr(this.hbNdx)) {
 							maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(this.maxPairingLengthInDays - 1);
+							this.bestNodeQuality[duty.getNdx()] = new NodeQualityMetric(cumulativeQual);
 							if (this.bwNetworkSearch(duty, cumulativeQual, true, maxMinDateDept, this.maxPairingLengthInDays - 1)) {
-								this.bestNodeQuality[duty.getNdx()] = cumulativeQual;
 								hbDepFound[duty.getNdx()] = true;
 								hbArrFound[duty.getNdx()] = true;
 							}
-//							maxSearchNumDept[duty.getNdx()] = this.maxPairingLengthInDays;
 						} else {
 							maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(this.maxPairingLengthInDays - 1);
 							if (this.fwNetworkSearch(duty, cumulativeQual, false, maxMinDateDept, this.maxPairingLengthInDays - 2)) {
@@ -354,10 +354,11 @@ public class PricingSubNetwork {
 								if (this.bwNetworkSearch(duty, cumulativeQual, false, maxMinDateDept, this.maxPairingLengthInDays - 2)) {
 									hbDepFound[duty.getNdx()] = true;
 								}
+								cumulativeQual.removeFromQualityMetric(bestNodeQuality[duty.getNdx()]);
 							}
-//							maxSearchNumDept[duty.getNdx()] = this.maxPairingLengthInDays - 1;
 						}
 					}
+				cumulativeQual.reset();
 			}
 		}
 		return this;
@@ -366,7 +367,6 @@ public class PricingSubNetwork {
 	private boolean isNodeVisited(DutyView d, int dept, LocalDate maxMinDateDept) {
 		return (maxSearchNumDept[d.getNdx()] > dept)
 				|| ((maxSearchNumDept[d.getNdx()] == dept)
-//						&& (maxSearchDayDept[d.getNdx()] != null)
 						&& (maxSearchDayDept[d.getNdx()].isEqual(maxMinDateDept)
 								|| maxSearchDayDept[d.getNdx()].isAfter(maxMinDateDept)));
 	}
@@ -389,13 +389,11 @@ public class PricingSubNetwork {
 		NodeQualityMetric ndQ = this.bestNodeQuality[nd.getNdx()];
 		NodeQualityMetric pdQ = this.bestNodeQuality[pd.getNdx()];
 		if (ndQ == null) {
-			ndQ = new NodeQualityMetric();
-			ndQ.addToQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+			ndQ = new NodeQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			this.bestNodeQuality[nd.getNdx()] = ndQ;
 		}
 		if (pdQ == null) {
-			pdQ = new NodeQualityMetric();
-			pdQ.addToQualityMetric(ndQ);
+			pdQ = new NodeQualityMetric(ndQ);
 			pdQ.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			this.bestNodeQuality[pd.getNdx()] = pdQ;
 		} else {
@@ -441,13 +439,6 @@ public class PricingSubNetwork {
 						&& ((sourceDutyArray.length == 0)
 								|| (nd.getNumOfLegs() > numOfDistinctCoveringsInDuties[nd.getNdx()])
 								|| (nd.getNumOfLegs() == 1))
-						/*
-						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
-						 */
-//						&& ((hbDep && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays))
-//								|| (hbDep && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-//								|| ((!hbDep) && nd.isHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-//								|| ((!hbDep) && nd.isNonHbArr(this.hbNdx) && (ChronoUnit.DAYS.between(rootBriefTime, nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
 						&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
 						) {
 					numOfNodesChecked++;
@@ -455,28 +446,23 @@ public class PricingSubNetwork {
 					fwCumulative.addToQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 					if (nd.isHbArr(this.hbNdx)) {
 						this.fwRegister(pd, nd);
-//						maxSearchNumDept[nd.getNdx()] = dept;
 						this.setNodeVisited(nd, dept, maxMinDateDept);
 						res = true;
 					} else
 						if (dept > 1) {
-							if (//	(maxSearchNumDept[nd.getNdx()] >= dept)
-									this.isNodeVisited(nd, dept, maxMinDateDept)
+							if (this.isNodeVisited(nd, dept, maxMinDateDept)
 									&& hbArrFound[nd.getNdx()]) {
 								this.fwRegister(pd, nd);
 								this.setNodeVisited(nd, dept, maxMinDateDept);
 								res = true;
 							} else
-								if (//	maxSearchNumDept[nd.getNdx()] < dept
-										!this.isNodeVisited(nd, dept, maxMinDateDept)
-										) {
+								if (!this.isNodeVisited(nd, dept, maxMinDateDept)) {
 									if ((sourceDutyArray.length == 0)
 													|| fwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, bestNodeQuality[sourceDutyArray[0].getNdx()])) {
 										if (this.fwNetworkSearch(nd, fwCumulative, hbDep, maxMinDateDept, dept - 1)) {
 											this.fwRegister(pd, nd);
 											res = true;
 										}
-//										maxSearchNumDept[nd.getNdx()] = dept;
 										this.setNodeVisited(nd, dept, maxMinDateDept);
 									}
 								}
@@ -494,8 +480,7 @@ public class PricingSubNetwork {
 		 */
 		NodeQualityMetric pdQ = this.bestNodeQuality[pd.getNdx()];
 		if (pdQ == null) {
-			pdQ = new NodeQualityMetric();
-			pdQ.injectValues(bwCumulative);
+			pdQ = new NodeQualityMetric(bwCumulative);
 			this.bestNodeQuality[pd.getNdx()] = pdQ;
 		} else {
 			if (bwCumulative.isBetterThan(heuristicNo, pdQ)) {
@@ -528,13 +513,6 @@ public class PricingSubNetwork {
 						&& ((sourceDutyArray.length == 0)
 								|| (pd.getNumOfLegs() > numOfDistinctCoveringsInDuties[pd.getNdx()])
 								|| (pd.getNumOfLegs() == 1))
-						/*
-						 * TODO Instead of performing minus operations all the time, debriefTime could be reduced by 1 second by default. 
-						 */
-//						&& ((hbArr && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays))
-//								|| (hbArr && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-//								|| ((!hbArr) && nd.isHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 1))
-//								|| ((!hbArr) && nd.isNonHbDep(this.hbNdx) && (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), rootDebriefTime.minusSeconds(1)) < this.maxPairingLengthInDays - 2)))
 						&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 								|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
 						) {
@@ -544,21 +522,18 @@ public class PricingSubNetwork {
 					if (pd.isHbDep(this.hbNdx)) {
 						this.bwRegister(pd, nd, bwCumulative);
 						this.addSourceDuty(heuristicNo, pd);
-//						maxSearchNumDept[pd.getNdx()] = dept;
 						this.setNodeVisited(pd, dept, maxMinDateDept);
 						res = true;
 					} else
 						if (dept > 1) {
-							if (//	(maxSearchNumDept[pd.getNdx()] >= dept)
-									this.isNodeVisited(pd, dept, maxMinDateDept)
+							if (this.isNodeVisited(pd, dept, maxMinDateDept)
 									&& hbDepFound[pd.getNdx()]
 									&& bestNodeQuality[pd.getNdx()].isBetterThan(this.heuristicNo, bwCumulative)) {
 								this.bwRegister(pd, nd, bwCumulative);
 								this.setNodeVisited(pd, dept, maxMinDateDept);
 								res = true;
 							} else
-								if (//	maxSearchNumDept[pd.getNdx()] < dept
-										(!this.isNodeVisited(pd, dept, maxMinDateDept))
+								if ((!this.isNodeVisited(pd, dept, maxMinDateDept))
 										|| (bestNodeQuality[pd.getNdx()] == null)
 										|| bwCumulative.isBetterThan(this.heuristicNo, bestNodeQuality[pd.getNdx()])
 										) {
@@ -568,7 +543,6 @@ public class PricingSubNetwork {
 											this.bwRegister(pd, nd, bwCumulative);
 											res = true;
 										}
-//										maxSearchNumDept[pd.getNdx()] = dept;
 										this.setNodeVisited(pd, dept, maxMinDateDept);
 									}
 								}
@@ -579,4 +553,50 @@ public class PricingSubNetwork {
 		}
 		return res;
 	}
+
+
+
+//	private boolean bwNetworkSearch(DutyView rootDuty, NodeQualityMetric bwCumulative, boolean hbArr, LocalDate maxMinDateDept, int dept) throws CloneNotSupportedException {
+//		boolean res = false;
+//		LinkedList<DutyView> treeDuties = new LinkedList<DutyView>();
+//		treeDuties.add(rootDuty);
+//
+//		int relativeDept = dept;
+//
+//		while (treeDuties.size() > 0) {
+//
+//			DutyView nd = treeDuties.get(0);
+//			treeDuties.remove(0);
+//			if (isNodeVisited(nd, relativeDept, maxMinDateDept)) {
+//				if (bestNodeQuality[nd.getNdx()] == null) {
+//					
+//				}
+//			} else {
+//				setNodeVisited(nd, relativeDept, maxMinDateDept);
+//			}
+//
+//			LegView[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
+//			for (LegView leg : prevLegs) {
+//				DutyView[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
+//				for (DutyView pd: prevDuties) {
+//					if (pd.isValid(this.hbNdx)
+//							&& pd.hasPairing(this.hbNdx)
+//							&& (pd.isHbDep(this.hbNdx) || (relativeDept > 1))
+//							&& ((sourceDutyArray.length == 0)
+//									|| (pd.getNumOfLegs() > numOfDistinctCoveringsInDuties[pd.getNdx()])
+//									|| (pd.getNumOfLegs() == 1))
+//							&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
+//									|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
+//							) {
+//
+//						treeDuties.add(pd);
+//					}
+//				}
+//			}
+//
+//
+//		}
+//
+//		return res;
+//	}
 }

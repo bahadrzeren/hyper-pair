@@ -2,7 +2,7 @@ package org.heuros.hyperpair.heuristic;
 
 import org.heuros.data.model.DutyView;
 
-public class NodeQualityMetric implements Cloneable {
+public class NodeQualityMetric {
 	/*
 	 * Deadhead
 	 */
@@ -23,9 +23,41 @@ public class NodeQualityMetric implements Cloneable {
 //	public NodeQualityMetric nextNodeMetric = null;
 //	public NodeQualityMetric prevNodeMetric = null;
 
-	@Override
-    public Object clone() throws CloneNotSupportedException {
-		return (NodeQualityMetric) super.clone();
+//	@Override
+//    public Object clone() throws CloneNotSupportedException {
+//		return (NodeQualityMetric) super.clone();
+//	}
+
+	public NodeQualityMetric() {
+	}
+
+	public NodeQualityMetric(NodeQualityMetric qm) {
+		this.numOfDh = qm.numOfDh;
+		this.dhDurationInMins = qm.dhDurationInMins;
+		this.activeBlocktimeInMins = qm.activeBlocktimeInMins;
+		this.numOfDuties = qm.numOfDuties;
+		this.numOfIncludingDutiesOfTheSameLegs = qm.numOfIncludingDutiesOfTheSameLegs;
+		this.numOfLegs = qm.numOfLegs;
+	}
+
+	public NodeQualityMetric(DutyView d,
+ 									int[] numOfCoveringsInDuties,
+									int[] blockTimeOfCoveringsInDuties) {
+		this.numOfDh = (d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()]);
+		this.dhDurationInMins = (d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()]);
+		this.activeBlocktimeInMins = (d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()]);
+		this.numOfDuties = 1;
+		this.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
+		this.numOfLegs = d.getNumOfLegs();
+	}
+
+	public void reset() {
+		this.numOfDh = 0;
+		this.dhDurationInMins = 0;
+		this.activeBlocktimeInMins = 0;
+		this.numOfDuties = 0;
+		this.numOfIncludingDutiesOfTheSameLegs = 0;
+		this.numOfLegs = 0;
 	}
 
 	public void addToQualityMetric(DutyView d,
@@ -37,8 +69,6 @@ public class NodeQualityMetric implements Cloneable {
 		this.numOfDuties++;
 		this.numOfIncludingDutiesOfTheSameLegs += d.getTotalNumOfIncludingDutiesOfTheSameLegs();
 		this.numOfLegs += d.getNumOfLegs();
-//		if (this.numOfDuties > 4)
-//			System.out.println();
 	}
 
 	public void addToQualityMetric(NodeQualityMetric dqm) {
@@ -48,8 +78,6 @@ public class NodeQualityMetric implements Cloneable {
 		this.numOfDuties += dqm.numOfDuties;
 		this.numOfIncludingDutiesOfTheSameLegs += dqm.numOfIncludingDutiesOfTheSameLegs;
 		this.numOfLegs += dqm.numOfLegs;
-//		if (this.numOfDuties > 4)
-//			System.out.println();
 	}
 
 	public void removeFromQualityMetric(DutyView d,
@@ -119,7 +147,6 @@ public class NodeQualityMetric implements Cloneable {
 		}
 	}
 
-
 	public void injectValues(NodeQualityMetric qm) {
 		this.numOfDh = qm.numOfDh;
 		this.dhDurationInMins = qm.dhDurationInMins;
@@ -140,18 +167,18 @@ public class NodeQualityMetric implements Cloneable {
 //		this.numOfLegs = d.getNumOfLegs();
 //	}
 
-	public static NodeQualityMetric generateQualityMetric(DutyView d,
-															int[] numOfCoveringsInDuties,
-															int[] blockTimeOfCoveringsInDuties) {
-		NodeQualityMetric qm = new NodeQualityMetric();
-		qm.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
-		qm.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
-		qm.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
-		qm.numOfDuties = 1;
-		qm.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
-		qm.numOfLegs = d.getNumOfLegs();
-		return qm;
-	}
+//	public static NodeQualityMetric generateQualityMetric(DutyView d,
+//															int[] numOfCoveringsInDuties,
+//															int[] blockTimeOfCoveringsInDuties) {
+//		NodeQualityMetric qm = new NodeQualityMetric();
+//		qm.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
+//		qm.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
+//		qm.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
+//		qm.numOfDuties = 1;
+//		qm.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
+//		qm.numOfLegs = d.getNumOfLegs();
+//		return qm;
+//	}
 
 	public String toString() {
 		return "#DH:" + numOfDh + ", DHD:" + dhDurationInMins +

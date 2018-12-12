@@ -232,7 +232,7 @@ heuristicNo = 0;
 if (legToCover.hasHbDepDutyPair(this.hbNdx)
 		|| legToCover.hasHbArrDutyPair(this.hbNdx)
 		|| legToCover.hasNonHbDutyPair(this.hbNdx))
-heuristicNo = 2;
+heuristicNo = 1;
 
 			Pair p = null;
 			try {
