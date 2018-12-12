@@ -19,8 +19,8 @@ public class NodeQualityMetric implements Cloneable {
 	public int numOfIncludingDutiesOfTheSameLegs = 0;
 	public int numOfLegs = 0;
 
-	public DutyView nodeOwner = null;
-	public NodeQualityMetric nextNodeMetric = null;
+//	public DutyView nodeOwner = null;
+//	public NodeQualityMetric nextNodeMetric = null;
 //	public NodeQualityMetric prevNodeMetric = null;
 
 	@Override

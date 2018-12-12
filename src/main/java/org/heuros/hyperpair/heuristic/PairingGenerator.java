@@ -104,7 +104,7 @@ public class PairingGenerator {
 
 //			logger.info("Subnetwork is built for the leg " + legToCover);
 
-//if (legToCover.getNdx() == 1768)
+//if (legToCover.getNdx() == 1187)
 //System.out.println();
 
 //			int[] sourceDuties = partialNetwork.getSourceDuties();
