@@ -6,18 +6,18 @@ public class NodeQualityMetric {
 	/*
 	 * Deadhead
 	 */
-	public int numOfDh = 0;
-	public int dhDurationInMins = 0;
+	private int numOfDh = 0;
+	private int dhDurationInMins = 0;
 	/*
 	 * Dutyday
 	 */
-	public int activeBlocktimeInMins = 0;
-	public int numOfDuties = 0;
+	private int activeBlocktimeInMins = 0;
+	private int numOfDuties = 0;
 	/*
 	 * The last metric to check if others are equal!
 	 */
-	public int numOfIncludingDutiesOfTheSameLegs = 0;
-	public int numOfLegs = 0;
+	private int numOfIncludingDutiesOfTheSameLegs = 0;
+	private int numOfLegs = 0;
 
 //	public DutyView nodeOwner = null;
 //	public NodeQualityMetric nextNodeMetric = null;
