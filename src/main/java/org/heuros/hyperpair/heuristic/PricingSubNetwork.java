@@ -191,7 +191,7 @@ public class PricingSubNetwork {
 	private boolean[] hbArrFound = null;
 //	private boolean[] hbDepFound = null;
 
-	private boolean addSourceDuty(int heuristicNo, DutyView d) {
+	private boolean addSourceDuty(int heuristicNo, DutyView d, boolean hasImprovement) {
 		if (!this.sourceDuties[d.getNdx()]) {
 			this.sourceDuties[d.getNdx()] = true;
 //			this.sourceDutyArray = ArrayUtils.add(this.sourceDutyArray, d.getNdx());
@@ -218,6 +218,20 @@ public class PricingSubNetwork {
 			this.sourceDutyArray = ArrayUtils.add(this.sourceDutyArray, duty);
 			return true;
 		}
+//			else
+//			if (hasImprovement) {
+//				boolean found = false;
+//				for (int i = this.sourceDutyArray.length - 1; i > 0; i--) {
+//					if (bestNodeQuality[this.sourceDutyArray[i].getNdx()].isBetterThan(heuristicNo, bestNodeQuality[this.sourceDutyArray[i - 1].getNdx()])) {
+//						DutyView hd = this.sourceDutyArray[i];
+//						this.sourceDutyArray[i] = this.sourceDutyArray[i - 1];
+//						this.sourceDutyArray[i - 1] = hd;
+//						found = true;
+//					} else
+//						if (found)
+//							break;
+//				}
+//			}
 		return false;
 	}
 
@@ -295,15 +309,15 @@ public class PricingSubNetwork {
 //			}
 //		});
 
-//if (legToCover.getNdx() == 1768)
+//if (legToCover.getNdx() == 4284)
 //System.out.println();
 
 		NodeQualityMetric cumulativeQual = new NodeQualityMetric();
 
 		for (Duty duty: rootDuties) {
 
-//if ((legToCover.getNdx() == 1768)
-//		&& (duty.getNdx() == 14333))
+//if ((legToCover.getNdx() == 4284)
+//		&& (duty.getNdx() == 36121))
 //System.out.println();
 
 			LocalDate maxMinDateDept = null;
@@ -322,14 +336,14 @@ public class PricingSubNetwork {
 						 * Because of having no connection duties we must add qualityMetric here for 1day pairings.
 						 */
 						this.bestNodeQuality[duty.getNdx()] = new NodeQualityMetric(cumulativeQual);
-						this.addSourceDuty(heuristicNo, duty);
+						this.addSourceDuty(heuristicNo, duty, false);
 //						hbDepFound[duty.getNdx()] = true;
 						hbArrFound[duty.getNdx()] = true;
 					} else 
 						if (heuristicNo > 0) {
 							maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(this.maxPairingLengthInDays);
 							if (this.fwNetworkSearch(duty, cumulativeQual, true, maxMinDateDept, this.maxPairingLengthInDays - 1)) {
-								this.addSourceDuty(heuristicNo, duty);
+								this.addSourceDuty(heuristicNo, duty, false);
 //								hbDepFound[duty.getNdx()] = true;
 								hbArrFound[duty.getNdx()] = true;
 							}
@@ -422,11 +436,11 @@ public class PricingSubNetwork {
 		for (LegView leg : nextLegs) {
 			DutyView[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
 			for (DutyView nd: nextDuties) {
-//if ((pd.getNdx() == 14333)
-//&& (nd.getNdx() == 23018))
+//if ((pd.getNdx() == 36121)
+//&& (nd.getNdx() == 43778))
 //System.out.println();
-//if ((pd.getNdx() == 23018)
-//&& (nd.getNdx() == 31625))
+//if ((pd.getNdx() == 43778)
+//&& (nd.getNdx() == 57972))
 //System.out.println();
 //if ((pd.getNdx() == 31625)
 //&& (nd.getNdx() == 37544))
@@ -492,7 +506,8 @@ public class PricingSubNetwork {
 			}
 	}
 
-	private void bwRegister(DutyView pd, DutyView nd, NodeQualityMetric bwCumulative) {
+	private boolean bwRegister(DutyView pd, DutyView nd, NodeQualityMetric bwCumulative) {
+		boolean res = false;
 		/*
 		 * Calculate quality metric.
 		 */
@@ -503,6 +518,7 @@ public class PricingSubNetwork {
 		} else {
 			if (bwCumulative.isBetterThan(heuristicNo, pdQ)) {
 				pdQ.injectValues(bwCumulative);
+				res = true;
 			}
 		}
 
@@ -511,6 +527,8 @@ public class PricingSubNetwork {
 //		hbDepFound[pd.getNdx()] = true;
 		numOfNodesAdded++;
 		numOfBwNodesAdded++;
+
+		return res;
 	}
 
 //	private boolean bwNetworkSearch_(DutyView nd, NodeQualityMetric bwCumulative, boolean hbArr, LocalDate maxMinDateDept, int dept) throws CloneNotSupportedException {
@@ -607,8 +625,7 @@ public class PricingSubNetwork {
 						bwCumulative.injectValues(this.bestNodeQuality[nd.getNdx()]);
 						bwCumulative.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 						if (pd.isHbDep(this.hbNdx)) {
-							this.bwRegister(pd, nd, bwCumulative);
-							this.addSourceDuty(heuristicNo, pd);
+							this.addSourceDuty(heuristicNo, pd, this.bwRegister(pd, nd, bwCumulative));
 							this.setNodeVisitedBw(pd, dept, maxMinDateDept);
 							res = true;
 						} else

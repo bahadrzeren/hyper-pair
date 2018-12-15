@@ -206,8 +206,6 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		int geneNdx = 0;
 		int uncoveredLegs = 0;
 
-		double fitness = 0.0;
-
 		int reOrderedLegNdx = -1;
 		int[] numOfLegCoverings = new int[this.legRepository.getModels().size()];
 		int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
@@ -232,7 +230,7 @@ heuristicNo = 0;
 if (legToCover.hasHbDepDutyPair(this.hbNdx)
 		|| legToCover.hasHbArrDutyPair(this.hbNdx)
 		|| legToCover.hasNonHbDutyPair(this.hbNdx))
-heuristicNo = 2;
+heuristicNo = 1;
 
 			Pair p = null;
 			try {
@@ -257,10 +255,18 @@ heuristicNo = 2;
 			}
 		}
 
+		double fitness = 0.0;
+		int numOfDuties = 0;
+		int numOfPairs = 0;
+
 		for (int i = 0; i < solution.size(); i++) {
 			fitness += getPairCost(2, solution.get(i));
+			numOfDuties += solution.get(i).getNumOfDuties();
+			numOfPairs++;
 		}
+
 		int numOfDeadheads = 0;
+
 		for (int i = 0; i < this.legRepository.getModels().size(); i++) {
 			if (this.legRepository.getModels().get(i).isCover()) {
 				if (numOfLegCoverings[i] > 1) {
@@ -275,10 +281,18 @@ heuristicNo = 2;
 			}
 		}
 		chromosome.setFitness(fitness + uncoveredLegs * 100000000);
-		chromosome.setInfo("uncoveredLegs: " + uncoveredLegs + ", numOfDeadheads: " + numOfDeadheads + ", fitness: " + fitness);
+		chromosome.setInfo("numOfPairs:" + numOfPairs + 
+							", numOfDuties:" + numOfDuties + 
+							", uncoveredLegs: " + uncoveredLegs + 
+							", numOfDeadheads: " + numOfDeadheads + 
+							", fitness: " + fitness);
 		this.checkFitness(chromosome.getFitness(), numOfLegCoverings);
 
-		logger.info("uncoveredLegs: " + uncoveredLegs + ", numOfDeadheads: " + numOfDeadheads + ", fitness: " + fitness);
+		logger.info("numOfPairs: " + numOfPairs + 
+					", numOfDuties: " + numOfDuties + 
+					", uncoveredLegs: " + uncoveredLegs + 
+					", numOfDeadheads: " + numOfDeadheads + 
+					", fitness: " + fitness);
 		logger.info("Decoding process is ended!");
 		return solution;
 	}
