@@ -156,16 +156,16 @@ public class NodeQualityMetric {
 		this.numOfLegs = qm.numOfLegs;
 	}
 
-//	public void injectValues(DutyView d,
-//								int[] numOfCoveringsInDuties,
-//								int[] blockTimeOfCoveringsInDuties) {
-//		this.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
-//		this.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
-//		this.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
-//		this.numOfDuties = 1;
-//		this.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
-//		this.numOfLegs = d.getNumOfLegs();
-//	}
+	public void injectValues(DutyView d,
+								int[] numOfCoveringsInDuties,
+								int[] blockTimeOfCoveringsInDuties) {
+		this.numOfDh = d.getNumOfLegsPassive() + numOfCoveringsInDuties[d.getNdx()];
+		this.dhDurationInMins = d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuties[d.getNdx()];
+		this.activeBlocktimeInMins = d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuties[d.getNdx()];
+		this.numOfDuties = 1;
+		this.numOfIncludingDutiesOfTheSameLegs = d.getTotalNumOfIncludingDutiesOfTheSameLegs();
+		this.numOfLegs = d.getNumOfLegs();
+	}
 
 //	public static NodeQualityMetric generateQualityMetric(DutyView d,
 //															int[] numOfCoveringsInDuties,

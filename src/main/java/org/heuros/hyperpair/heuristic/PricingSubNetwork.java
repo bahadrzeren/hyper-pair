@@ -41,7 +41,7 @@ public class PricingSubNetwork {
 //	private int[][] dutyConnectionArray = null;
 //	private NodeQualityMetric bestSourceNodeQuality = null;
 
-	private NodeQualityMetric[] bestNodeQuality = null;
+	private NodeQualityVector[] bestNodeQuality = null;
 
 	/*
 	 * Statistics of the network.
@@ -78,7 +78,7 @@ public class PricingSubNetwork {
 		this.sourceDutyArray = new DutyView[0];
 //		this.dutyConnectionArray = new int[this.duties.size()][0];
 
-		this.bestNodeQuality = new NodeQualityMetric[this.duties.size()];
+		this.bestNodeQuality = new NodeQualityVector[this.duties.size()];
 
 		this.maxPairingLengthInDays = maxPairingLengthInDays;
 		this.maxFwDeptReached = maxPairingLengthInDays;
@@ -119,7 +119,7 @@ public class PricingSubNetwork {
 		return this.dutyConnections.getArray(pd.getNdx());
 	}
 
-	public NodeQualityMetric[] getBestNodeQuality() {
+	public NodeQualityVector[] getBestNodeQuality() {
 		return bestNodeQuality;
 	}
 
@@ -335,7 +335,7 @@ public class PricingSubNetwork {
 						/*
 						 * Because of having no connection duties we must add qualityMetric here for 1day pairings.
 						 */
-						this.bestNodeQuality[duty.getNdx()] = new NodeQualityMetric(cumulativeQual);
+						this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(maxPairingLengthInDays, duty, cumulativeQual);
 						this.addSourceDuty(heuristicNo, duty, false);
 //						hbDepFound[duty.getNdx()] = true;
 						hbArrFound[duty.getNdx()] = true;
@@ -352,7 +352,7 @@ public class PricingSubNetwork {
 					if (heuristicNo > 0) {
 						if (duty.isHbArr(this.hbNdx)) {
 							maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(this.maxPairingLengthInDays - 1);
-							this.bestNodeQuality[duty.getNdx()] = new NodeQualityMetric(cumulativeQual);
+							this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(maxPairingLengthInDays, duty, cumulativeQual);
 							if (this.bwNetworkSearch(duty, true, maxMinDateDept, this.maxPairingLengthInDays)) {
 //								hbDepFound[duty.getNdx()] = true;
 								hbArrFound[duty.getNdx()] = true;
@@ -400,22 +400,23 @@ public class PricingSubNetwork {
 		/*
 		 * Calculate quality metric.
 		 */
-		NodeQualityMetric ndQ = this.bestNodeQuality[nd.getNdx()];
-		NodeQualityMetric pdQ = this.bestNodeQuality[pd.getNdx()];
+		NodeQualityVector ndQ = this.bestNodeQuality[nd.getNdx()];
+		NodeQualityVector pdQ = this.bestNodeQuality[pd.getNdx()];
+		/*
+		 * HB arr duty
+		 */
 		if (ndQ == null) {
-			ndQ = new NodeQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+			ndQ = new NodeQualityVector(maxPairingLengthInDays, nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 			this.bestNodeQuality[nd.getNdx()] = ndQ;
 		}
+		/*
+		 * Non HB arr duty
+		 */
 		if (pdQ == null) {
-			pdQ = new NodeQualityMetric(ndQ);
-			pdQ.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+			pdQ = new NodeQualityVector(maxPairingLengthInDays, pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, ndQ);
 			this.bestNodeQuality[pd.getNdx()] = pdQ;
 		} else {
-			ndQ.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
-			if (ndQ.isBetterThan(heuristicNo, pdQ)) {
-				pdQ.injectValues(ndQ);
-			}
-			ndQ.removeFromQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+			pdQ.checkAndMerge(this.heuristicNo, ndQ);
 		}
 
 		this.dutyConnections.add(pd.getNdx(), nd.getNdx(), nd);
@@ -506,20 +507,18 @@ public class PricingSubNetwork {
 			}
 	}
 
-	private boolean bwRegister(DutyView pd, DutyView nd, NodeQualityMetric bwCumulative) {
+	private boolean bwRegister(DutyView pd, DutyView nd) {
 		boolean res = false;
 		/*
 		 * Calculate quality metric.
 		 */
-		NodeQualityMetric pdQ = this.bestNodeQuality[pd.getNdx()];
+		NodeQualityVector ndQ = this.bestNodeQuality[nd.getNdx()];
+		NodeQualityVector pdQ = this.bestNodeQuality[pd.getNdx()];
 		if (pdQ == null) {
-			pdQ = new NodeQualityMetric(bwCumulative);
+			pdQ = new NodeQualityVector(this.maxPairingLengthInDays, pd, this.numOfCoveringsInDuties, this.blockTimeOfCoveringsInDuties, ndQ);
 			this.bestNodeQuality[pd.getNdx()] = pdQ;
 		} else {
-			if (bwCumulative.isBetterThan(heuristicNo, pdQ)) {
-				pdQ.injectValues(bwCumulative);
-				res = true;
-			}
+			res = pdQ.checkAndMerge(this.heuristicNo, ndQ);
 		}
 
 		this.dutyConnections.add(pd.getNdx(), nd.getNdx(), nd);
@@ -625,13 +624,13 @@ public class PricingSubNetwork {
 						bwCumulative.injectValues(this.bestNodeQuality[nd.getNdx()]);
 						bwCumulative.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
 						if (pd.isHbDep(this.hbNdx)) {
-							this.addSourceDuty(heuristicNo, pd, this.bwRegister(pd, nd, bwCumulative));
+							this.addSourceDuty(heuristicNo, pd, this.bwRegister(pd, nd));
 							this.setNodeVisitedBw(pd, dept, maxMinDateDept);
 							res = true;
 						} else
 							if (dept > 1) {
 								if (this.isNodeVisitedBw(pd, dept, maxMinDateDept)) {
-									this.bwRegister(pd, nd, bwCumulative);
+									this.bwRegister(pd, nd);
 									this.setNodeVisitedBw(pd, dept, maxMinDateDept);
 								} else
 									if ((bestNodeQuality[pd.getNdx()] == null)
@@ -639,7 +638,7 @@ public class PricingSubNetwork {
 											) {
 										if ((sourceDutyArray.length == 0)
 												|| bwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, bestNodeQuality[sourceDutyArray[0].getNdx()])) {
-											this.bwRegister(pd, nd, bwCumulative);
+											this.bwRegister(pd, nd);
 											this.setNodeVisitedBw(pd, dept, maxMinDateDept);
 											treeOfDuties.add(pd);
 										}
