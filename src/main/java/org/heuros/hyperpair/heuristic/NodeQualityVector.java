@@ -61,26 +61,69 @@ public class NodeQualityVector {
 		return res;
 	}
 
-	public boolean isAnyBetter(int heuristicNo, NodeQualityVector qv) {
+	/*
+	 * For fw search!
+	 */
+	public boolean doesItWorthToGoDeeperFw(int maxDutyBlockTimeInMins,
+											int heuristicNo,
+											int currentDept,
+											NodeQualityMetric qmCumulative) {
+
+		for (int i = this.quals.length - currentDept + 1; i < this.quals.length; i++) {
+			if (this.quals[i] != null) {
+				if (qmCumulative.doesItWorthToGoDeeper(maxDutyBlockTimeInMins, heuristicNo, currentDept, this.quals[i])) {
+					return true;
+				}
+			} else
+				return true;
+		}
+		return false;
+	}
+
+	/*
+	 * For bw search!
+	 */
+	public boolean doesItWorthToGoDeeperBw(int maxDutyBlockTimeInMins,
+											int heuristicNo,
+											int currentDept,
+											NodeQualityVector qmCumulative) {
+
+		for (int i = 1; i < this.quals.length - currentDept + 1; i++) {
+			if (qmCumulative.quals[i] != null) {
+				for (int j = this.quals.length - currentDept + 1; j < this.quals.length; j++) {
+					if (this.quals[j] != null) {
+						if (qmCumulative.quals[i].doesItWorthToGoDeeper(maxDutyBlockTimeInMins, heuristicNo, currentDept, this.quals[j])) {
+							return true;
+						}
+					} else
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
+	public boolean hasAnyBetter(int heuristicNo, NodeQualityVector qv) {
 		for (int i = 0; i < this.quals.length; i++) {
 			if ((this.quals[i] != null)
 					&& (qv.quals[i] != null)) {
 				if (this.quals[i].isBetterThan(heuristicNo, qv.quals[i])) {
 					return true;
 				}
-			}			
+			}
 		}
 		return false;
 	}
 
-	public boolean isAllBetter(int heuristicNo, NodeQualityVector qv) {
-		for (int i = 0; i < this.quals.length; i++) {
-			if (this.quals[i] != null) {
-				if (!this.quals[i].isBetterThan(heuristicNo, qv.quals[i])) {
-					return false;
-				}
-			}			
-		}
-		return true;
-	}
+//	public boolean hasAllBetter(int heuristicNo, NodeQualityVector qv) {
+//		for (int i = 0; i < this.quals.length; i++) {
+//			if (this.quals[i] != null) {
+//				if (!this.quals[i].isBetterThan(heuristicNo, qv.quals[i])) {
+//					return false;
+//				}
+//			}			
+//		}
+//		return true;
+//	}
 }

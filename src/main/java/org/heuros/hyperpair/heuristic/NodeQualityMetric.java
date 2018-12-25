@@ -51,6 +51,10 @@ public class NodeQualityMetric {
 		this.numOfLegs = d.getNumOfLegs();
 	}
 
+//	public int getNumOfDuties() {
+//		return this.numOfDuties;
+//	}
+
 	public void reset() {
 		this.numOfDh = 0;
 		this.dhDurationInMins = 0;
