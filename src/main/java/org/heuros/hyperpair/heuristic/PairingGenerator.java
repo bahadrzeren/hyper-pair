@@ -67,7 +67,7 @@ public class PairingGenerator {
 
 	private class PairWithQuality {
 		public Pair pair = null;
-		public NodeQualityMetric pairQ = null;
+		public QualityMetric pairQ = null;
 	}
 
 	public Pair generatePairing(Leg legToCover,
@@ -82,10 +82,10 @@ public class PairingGenerator {
 
 		PairWithQuality currentPair = new PairWithQuality();
 		currentPair.pair = Pair.newInstance(this.hbNdx);
-		currentPair.pairQ = new NodeQualityMetric();
+		currentPair.pairQ = new QualityMetric();
 
 		PairWithQuality bestPair = new PairWithQuality();
-		bestPair.pairQ = new NodeQualityMetric();
+		bestPair.pairQ = new QualityMetric();
 
 		if ((coveringDuties != null)
 				&& (coveringDuties.length > 0)) {
@@ -110,7 +110,7 @@ public class PairingGenerator {
 //			int[] sourceDuties = partialNetwork.getSourceDuties();
 
 			DutyView[] sourceDuties = partialNetwork.getSourceDuties();
-			NodeQualityMetric[] nodeQs = partialNetwork.getBestNodeQuality();
+			QualityMetric[] nodeQs = partialNetwork.getBestNodeQuality();
 
 			for (int i = 0; i < sourceDuties.length; i++) {
 //				int dNdx = sourceDuties[i];
@@ -189,7 +189,7 @@ public class PairingGenerator {
 	private PairWithQuality searchForPairings(int heuristicNo,
 												int[] numOfCoveringsInDuties,
 												int[] blockTimeOfCoveringsInDuties,
-												NodeQualityMetric[] nodeQs,
+												QualityMetric[] nodeQs,
 												PricingSubNetwork partialNetwork,
 												PairWithQuality currentPair, DutyView ld,
 												PairWithQuality bestPair, int dept) throws CloneNotSupportedException {
@@ -226,7 +226,7 @@ public class PairingGenerator {
 			/*
 			 * Basic cumulative quality info which is calculated during the sub network generation is checked! 
 			 */
-			NodeQualityMetric ndQ = nodeQs[nd.getNdx()];
+			QualityMetric ndQ = nodeQs[nd.getNdx()];
 			ndQ.addToQualityMetric(currentPair.pairQ);
 			if (ndQ.isBetterThan(heuristicNo, res.pairQ)) {
 				ndQ.removeFromQualityMetric(currentPair.pairQ);
