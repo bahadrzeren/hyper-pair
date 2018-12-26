@@ -38,6 +38,10 @@ public class NodeQualityVector {
 		}
 	}
 
+	public DutyView getNodeOwner() {
+		return nodeOwner;
+	}
+
 	public NodeQualityMetric[] getQuals() {
 		return this.nodeQuals;
 	}

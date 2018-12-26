@@ -626,7 +626,7 @@ public class PricingSubNetwork {
 		treeOfDuties.add(rootDuty);
 		this.setNodeVisitedBw(rootDuty, maxDept, maxMinDateDept);
 
-//		NodeQualityMetric bwCumulative = new NodeQualityMetric();
+		QualityMetric bwCumulative = new QualityMetric();
 
 		while (treeOfDuties.size() > 0) {
 
@@ -658,15 +658,23 @@ public class PricingSubNetwork {
 									this.bwRegister(pd, nd);
 									this.setNodeVisitedBw(pd, dept, maxMinDateDept);
 								} else {
-									this.bwRegister(pd, nd);
-									this.setNodeVisitedBw(pd, dept, maxMinDateDept);
-									if ((sourceNodeQmArray.length == 0)
-											|| bestNodeQuality[pd.getNdx()].getQuals()[maxPairingLengthInDays - dept].getQual().doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, 
-																																						heuristicNo, 
-																																						dept, 
-																																						sourceNodeQmArray[0].getQual())
+									bwCumulative.injectValues(this.bestNodeQuality[nd.getNdx()].getQuals()[maxPairingLengthInDays - dept - 1].getQual());
+									bwCumulative.addToQualityMetric(pd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+
+									if ((bestNodeQuality[pd.getNdx()] == null)
+											|| (bestNodeQuality[pd.getNdx()].getQuals()[maxPairingLengthInDays - dept] == null)
+											|| bwCumulative.isBetterThan(this.heuristicNo, bestNodeQuality[pd.getNdx()].getQuals()[maxPairingLengthInDays - dept].getQual())
 											) {
-										treeOfDuties.add(pd);
+
+										if ((sourceNodeQmArray.length == 0)
+												|| bwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, 
+																						heuristicNo, 
+																						dept, 
+																						sourceNodeQmArray[0].getQual())) {
+											this.bwRegister(pd, nd);
+											this.setNodeVisitedBw(pd, dept, maxMinDateDept);
+											treeOfDuties.add(pd);
+										}
 									}
 								}
 							}

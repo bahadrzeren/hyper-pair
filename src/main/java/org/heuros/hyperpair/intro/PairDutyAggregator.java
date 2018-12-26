@@ -60,6 +60,12 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 		incTotalizers(p, d, -1);
 	}
 
+	@Override
+	public void removeAll(Pair p) {
+		while (this.removeFirst(p) != null) {
+		}
+	}
+
 	public void incTotalizers(Pair p, DutyView d, int incAmount) {
 		p.incNumOfDuties(incAmount);
 

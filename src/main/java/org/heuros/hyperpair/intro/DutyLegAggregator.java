@@ -573,6 +573,12 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		}
 	}
 
+	@Override
+	public void removeAll(Duty p) {
+		while (this.removeFirst(p) != null) {
+		}
+	}
+
 	private void incTotalizers(Duty d, LegView l, int incAmount) {
 		/*
 		 * Totalizers
