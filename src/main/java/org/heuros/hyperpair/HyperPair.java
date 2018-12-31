@@ -289,6 +289,7 @@ public class HyperPair {
 																				.setPopulationSize(HeurosGaParameters.populationSize)
 																				.setSelector(new BinaryTournamentSelector<Integer>())
 																				.setCrossoverOperator(new UniformCrossover<Integer>())
+																				.setRunParallel(true)
 																				.setGeneticIterationListener(new GeneticIterationListener<Integer>() {
 																					@Override
 																					public void onProgress(int iteration, double elapsedTime, Chromosome<Integer> best) {

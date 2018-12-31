@@ -249,11 +249,11 @@ public class PricingSubNetwork {
 //			else
 //			if (hasImprovement) {
 //				boolean found = false;
-//				for (int i = this.sourceDutyArray.length - 1; i > 0; i--) {
-//					if (bestNodeQuality[this.sourceDutyArray[i].getNdx()].isBetterThan(heuristicNo, bestNodeQuality[this.sourceDutyArray[i - 1].getNdx()])) {
-//						DutyView hd = this.sourceDutyArray[i];
-//						this.sourceDutyArray[i] = this.sourceDutyArray[i - 1];
-//						this.sourceDutyArray[i - 1] = hd;
+//				for (int i = this.sourceNodeQmArray.length - 1; i > 0; i--) {
+//					if (this.sourceNodeQmArray[i].getQual().isBetterThan(heuristicNo, this.sourceNodeQmArray[i - 1].getQual())) {
+//						NodeQualityMetric hqm = this.sourceNodeQmArray[i];
+//						this.sourceNodeQmArray[i] = this.sourceNodeQmArray[i - 1];
+//						this.sourceNodeQmArray[i - 1] = hqm;
 //						found = true;
 //					} else
 //						if (found)
@@ -624,6 +624,17 @@ public class PricingSubNetwork {
 
 		LinkedList<DutyView> treeOfDuties = new LinkedList<DutyView>();
 		treeOfDuties.add(rootDuty);
+
+		/*
+		 * This reduce is needed because in some cases the root duty might not have a hbArr connection with desired dept.
+		 * 
+		 * RootDuty.QualVector[X, X, Q, X]
+		 * 
+		 */
+		while (this.bestNodeQuality[rootDuty.getNdx()].getQuals()[maxPairingLengthInDays - maxDept] == null) {
+			maxDept--;
+		}
+
 		this.setNodeVisitedBw(rootDuty, maxDept, maxMinDateDept);
 
 		QualityMetric bwCumulative = new QualityMetric();

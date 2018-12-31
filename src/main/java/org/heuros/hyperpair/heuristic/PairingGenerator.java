@@ -174,6 +174,9 @@ public class PairingGenerator {
 							}
 						}
 
+	    				if (!currentPair.pair.isComplete(this.hbNdx))
+	    					logger.error("Pairing " + currentPair.pair + " must be complete!");
+
 						currentPair.pairQ.reset();
 						this.pairRuleContext.getAggregatorProxy().removeAll(currentPair.pair);
 		    		}
