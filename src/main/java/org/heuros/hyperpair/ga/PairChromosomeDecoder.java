@@ -162,8 +162,9 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 			Leg legToCover = this.reOrderedLegs.get(reOrderedLegNdx);
 
 			int heuristicNo = chromosome.getGeneValue(geneNdx);
-			if (!legToCover.hasHbDepArrDutyPair(this.hbNdx))
-				heuristicNo = 1;
+			if (heuristicNo == 0)
+				if (!legToCover.hasHbDepArrDutyPair(this.hbNdx))
+					heuristicNo = 1;
 
 ///*
 // * TODO Remove the lines after test!
