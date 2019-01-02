@@ -37,23 +37,13 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 	private LegRepository legRepository = null;
 	private DutyRepository dutyRepository = null;
-//	private DutyRuleContext dutyRuleContext = null;
-//	private PairRuleContext pairRuleContext = null;
 
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
-//	private TwoDimIndexIntXInt<Duty> hbDepArrDutyIndexByLegNdx = null;
-//	private TwoDimIndexIntXInt<Duty> hbDepDutyIndexByLegNdx = null;
-//	private TwoDimIndexIntXInt<Duty> nonHbDutyIndexByLegNdx = null;
-//	private TwoDimIndexIntXInt<Duty> hbArrDutyIndexByLegNdx = null;
-//	private TwoDimIndexIntXLocalDateTime<Duty> dutyIndexByDepAirportNdxBrieftime = null;
-//	private TwoDimIndexIntXLocalDateTime<Duty> dutyIndexByArrAirportNdxNextBrieftime = null;
-////	private TwoDimIndexIntXLocalDateTime<Duty> hbArrDutyIndexByDepAirportNdxBrieftime = null;
 
 	private PairingGenerator pairingGenerator = null;
 
 	private List<Leg> reOrderedLegs = null;
 
-//	private static Random random = new Random();
 	private double difficultyScoreMax = Integer.MAX_VALUE;
 	private int[] difficultyScoreCumulative = null;
 
@@ -106,58 +96,10 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return this;
 	}
 
-//	public PairChromosomeDecoder setDutyRuleContext(DutyRuleContext dutyRuleContext) {
-//		this.dutyRuleContext = dutyRuleContext;
-//		return this;
-//	}
-//
-//	public PairChromosomeDecoder setPairRuleContext(PairRuleContext pairRuleContext) {
-//		this.pairRuleContext = pairRuleContext;
-//		return this;
-//	}
-
 	public PairChromosomeDecoder setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
 		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
 		return this;
 	}
-
-//	public PairChromosomeDecoder setHbDepArrDutyIndexByLegNdx(TwoDimIndexIntXInt<Duty> hbDepArrDutyIndexByLegNdx) {
-//		this.hbDepArrDutyIndexByLegNdx = hbDepArrDutyIndexByLegNdx;
-//		return this;
-//	}
-//
-//	public PairChromosomeDecoder setHbDepDutyIndexByLegNdx(TwoDimIndexIntXInt<Duty> hbDepDutyIndexByLegNdx) {
-//		this.hbDepDutyIndexByLegNdx = hbDepDutyIndexByLegNdx;
-//		return this;
-//	}
-//
-//	public PairChromosomeDecoder setNonHbDutyIndexByLegNdx(TwoDimIndexIntXInt<Duty> nonHbDutyIndexByLegNdx) {
-//		this.nonHbDutyIndexByLegNdx = nonHbDutyIndexByLegNdx;
-//		return this;
-//	}
-//
-//	public PairChromosomeDecoder setHbArrDutyIndexByLegNdx(TwoDimIndexIntXInt<Duty> hbArrDutyIndexByLegNdx) {
-//		this.hbArrDutyIndexByLegNdx = hbArrDutyIndexByLegNdx;
-//		return this;
-//	}
-//
-//	public PairChromosomeDecoder setDutyIndexByDepAirportNdxBrieftime(
-//			TwoDimIndexIntXLocalDateTime<Duty> dutyIndexByDepAirportNdxBrieftime) {
-//		this.dutyIndexByDepAirportNdxBrieftime = dutyIndexByDepAirportNdxBrieftime;
-//		return this;
-//	}
-//
-//	public PairChromosomeDecoder setDutyIndexByArrAirportNdxNextBrieftime(
-//			TwoDimIndexIntXLocalDateTime<Duty> dutyIndexByArrAirportNdxNextBrieftime) {
-//		this.dutyIndexByArrAirportNdxNextBrieftime = dutyIndexByArrAirportNdxNextBrieftime;
-//		return this;
-//	}
-//
-////	public PairChromosomeDecoder setHbArrDutyIndexByDepAirportNdxBrieftime(
-////			TwoDimIndexIntXLocalDateTime<Duty> hbArrDutyIndexByDepAirportNdxBrieftime) {
-////		this.hbArrDutyIndexByDepAirportNdxBrieftime = hbArrDutyIndexByDepAirportNdxBrieftime;
-////		return this;
-////	}
 
 	public PairChromosomeDecoder setPairingGenerator(PairingGenerator pairingGenerator) {
 		this.pairingGenerator = pairingGenerator;
@@ -356,7 +298,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	private double specialDhPenalty = 10000.0;
 	private double augmentionDayPenalty = 0.0;	//	4000.0;
 
-	public double getDutyCost(int cc, DutyView d, boolean hbDep, LocalDateTime nt) {
+	private double getDutyCost(int cc, DutyView d, boolean hbDep, LocalDateTime nt) {
 		LocalDateTime sh = d.getBriefTime(hbNdx);
 		LocalDateTime eh = d.getDebriefTime(hbNdx);
 
@@ -424,7 +366,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return dCost;
 	}
 
-	public double getPairCost(int cc, Pair p) {
+	private double getPairCost(int cc, Pair p) {
 		DutyView pd = p.getFirstDuty();
 		if (p.getNumOfDuties() == 1)
 			return getDutyCost(cc, pd, true, null);
