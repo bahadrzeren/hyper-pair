@@ -12,7 +12,7 @@ import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.LegView;
 
-public class PricingSubNetwork {
+public class NetworkExplorer {
 
 //	private static Logger logger = Logger.getLogger(PricingSubNetwork.class);
 
@@ -56,7 +56,7 @@ public class PricingSubNetwork {
 	private int numOfBwNodesAdded = 0;
 	private int maxBwDeptReached = Integer.MAX_VALUE;
 
-	public PricingSubNetwork(List<Duty> duties,
+	public NetworkExplorer(List<Duty> duties,
 								int maxPairingLengthInDays,
 								int maxDutyBlockTimeInMins, 
 								DutyLegOvernightConnNetwork pricingNetwork) {
@@ -197,7 +197,7 @@ public class PricingSubNetwork {
 		return false;
 	}
 
-	public PricingSubNetwork build(LegView legToCover,
+	public NetworkExplorer build(LegView legToCover,
 									Duty[] rootDuties,
 									int heuristicNo,
 									int[] numOfCoveringsInDuties,

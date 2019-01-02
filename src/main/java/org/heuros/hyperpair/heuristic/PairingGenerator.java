@@ -79,20 +79,20 @@ public class PairingGenerator {
 		if ((coveringDuties != null)
 				&& (coveringDuties.length > 0)) {
 
-			long startTime = System.nanoTime();
+//			long startTime = System.nanoTime();
 
-			PricingSubNetwork partialNetwork = new PricingSubNetwork(this.duties, 
+			NetworkExplorer networkExplorer = new NetworkExplorer(this.duties, 
 																		this.maxPairingLengthInDays, 
 																		this.maxDutyBlockTimeInMins,
 																		this.dutyLegOvernightConnNetwork)
 													.build(legToCover, coveringDuties, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
 
-			long subNetworkBuiltTime = System.nanoTime();
+//			long subNetworkBuiltTime = System.nanoTime();
 
 //if (legToCover.getNdx() == 4284)
 //System.out.println();
 
-			NodeQualityMetric[] sourceDutyNodes = partialNetwork.getSourceNodeQms();
+			NodeQualityMetric[] sourceDutyNodes = networkExplorer.getSourceNodeQms();
 
 			for (int i = 0; i < sourceDutyNodes.length; i++) {
 
@@ -156,8 +156,8 @@ public class PairingGenerator {
 							}
 						}
 
-	    				if (!currentPair.pair.isComplete(this.hbNdx))
-	    					logger.error("Pairing " + currentPair.pair + " must be complete!");
+//	    				if (!currentPair.pair.isComplete(this.hbNdx))
+//	    					logger.error("Pairing " + currentPair.pair + " must be complete!");
 
 						currentPair.pairQ.reset();
 						this.pairRuleContext.getAggregatorProxy().removeAll(currentPair.pair);
@@ -165,31 +165,31 @@ public class PairingGenerator {
 				}
 			}
 
-			long searchCompletionTime = System.nanoTime();
-
-			logger.info("Heur" + heuristicNo + ", " + 
-							bestPair.pair.getNumOfDuties() + "d, " + bestPair.pair.getNumOfLegs() + "l, Bt" + bestPair.pair.getBlockTimeInMins() +
-							", LNdx" + legToCover.getNdx() + 
-							", " + ((subNetworkBuiltTime - startTime) / 1000000) +
-							"(Roots" + coveringDuties.length + 
-							", Recs" + partialNetwork.getNumOfRecursions() + 
-							", #(" + partialNetwork.getNumOfNodes() + 
-							"/" + partialNetwork.getNumOfNodesChecked() + 
-							"/" + partialNetwork.getNumOfNodesAdded() + 
-							"), Fw(Recs" + partialNetwork.getNumOfFwRecursions() +
-							", Dept" + (this.maxPairingLengthInDays - partialNetwork.getMaxFwDeptReached()) +
-							", " + partialNetwork.getNumOfFwNodes() +
-							"/" + partialNetwork.getNumOfFwNodesChecked() +
-							"/" + partialNetwork.getNumOfFwNodesAdded() +
-							"), Bw(Recs" + partialNetwork.getNumOfBwRecursions() +
-							", Dept" + (this.maxPairingLengthInDays - partialNetwork.getMaxBwDeptReached()) +
-							", " + partialNetwork.getNumOfBwNodes() +
-							"/" + partialNetwork.getNumOfBwNodesChecked() +
-							"/" + partialNetwork.getNumOfBwNodesAdded() +
-							"))->" + 
-						((searchCompletionTime - subNetworkBuiltTime) / 1000000) + 
-							"(NetSrc" + sourceDutyNodes.length + 
-							") - " + bestPair.pair.getNumOfDuties() + "d pair is generated for the leg " + legToCover);
+//			long searchCompletionTime = System.nanoTime();
+//
+//			logger.info("Heur" + heuristicNo + ", " + 
+//							bestPair.pair.getNumOfDuties() + "d, " + bestPair.pair.getNumOfLegs() + "l, Bt" + bestPair.pair.getBlockTimeInMins() +
+//							", LNdx" + legToCover.getNdx() + 
+//							", " + ((subNetworkBuiltTime - startTime) / 1000000) +
+//							"(Roots" + coveringDuties.length + 
+//							", Recs" + networkExplorer.getNumOfRecursions() + 
+//							", #(" + networkExplorer.getNumOfNodes() + 
+//							"/" + networkExplorer.getNumOfNodesChecked() + 
+//							"/" + networkExplorer.getNumOfNodesAdded() + 
+//							"), Fw(Recs" + networkExplorer.getNumOfFwRecursions() +
+//							", Dept" + (this.maxPairingLengthInDays - networkExplorer.getMaxFwDeptReached()) +
+//							", " + networkExplorer.getNumOfFwNodes() +
+//							"/" + networkExplorer.getNumOfFwNodesChecked() +
+//							"/" + networkExplorer.getNumOfFwNodesAdded() +
+//							"), Bw(Recs" + networkExplorer.getNumOfBwRecursions() +
+//							", Dept" + (this.maxPairingLengthInDays - networkExplorer.getMaxBwDeptReached()) +
+//							", " + networkExplorer.getNumOfBwNodes() +
+//							"/" + networkExplorer.getNumOfBwNodesChecked() +
+//							"/" + networkExplorer.getNumOfBwNodesAdded() +
+//							"))->" + 
+//						((searchCompletionTime - subNetworkBuiltTime) / 1000000) + 
+//							"(NetSrc" + sourceDutyNodes.length + 
+//							") - " + bestPair.pair.getNumOfDuties() + "d pair is generated for the leg " + legToCover);
 		}
 
 		return bestPair.pair;

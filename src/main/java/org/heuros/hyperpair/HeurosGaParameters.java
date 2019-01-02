@@ -2,7 +2,7 @@ package org.heuros.hyperpair;
 
 public class HeurosGaParameters {
 
-    public static long maxElapsedTimeInNanoSecs = 6000000000000l;
+    public static long maxElapsedTimeInNanoSecs = 14 * 60 * 60 * 1000000000l;	//	hr * min * sec * ns.
 
     public static int maxNumOfIterations = 1000;
     public static int maxNumOfIterationsWOProgress = 50;

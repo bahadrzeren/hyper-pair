@@ -202,7 +202,7 @@ public class HyperPair {
 
 			ExecutorService executorService = Executors.newFixedThreadPool(HeurosSystemParam.homebases.length * 2);
 
-			List<Future<Boolean>> pairGenCalls = new ArrayList<Future<Boolean>>(HeurosSystemParam.homebases.length);
+			List<Future<Boolean>> pairInitCalls = new ArrayList<Future<Boolean>>(HeurosSystemParam.homebases.length);
 
 			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
 
@@ -221,7 +221,7 @@ public class HyperPair {
 																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
 																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
-				pairGenCalls.add(executorService.submit(dutyPairChecker));
+				pairInitCalls.add(executorService.submit(dutyPairChecker));
 
 				BiDirLegPairingChecker legPairChecker = new BiDirLegPairingChecker(hbNdx, HeurosDatasetParam.legCoverPeriodEndExc)
 																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
@@ -233,12 +233,12 @@ public class HyperPair {
 																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
 																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
 																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
-				pairGenCalls.add(executorService.submit(legPairChecker));
+				pairInitCalls.add(executorService.submit(legPairChecker));
 			}
 
-			for (int i = 0; i < pairGenCalls.size(); i++) {
+			for (int i = 0; i < pairInitCalls.size(); i++) {
 				try {
-					if (pairGenCalls.get(i).get())
+					if (pairInitCalls.get(i).get())
 						logger.info(i + "th pairGen is completed its task!");
 				} catch(Exception ex) {
 					ex.printStackTrace();
