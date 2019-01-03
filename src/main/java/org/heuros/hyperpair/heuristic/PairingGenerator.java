@@ -7,7 +7,7 @@ import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
-import org.heuros.data.model.Leg;
+import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.rule.PairRuleContext;
@@ -61,7 +61,9 @@ public class PairingGenerator {
 		public QualityMetric pairQ = null;
 	}
 
-	public Pair generatePairing(Leg legToCover,
+//	private Random random = new Random();
+
+	public Pair generatePairing(LegView legToCover,
 								int heuristicNo,
 								int[] numOfCoveringsInDuties,
 								int[] numOfDistinctCoveringsInDuties,
@@ -94,9 +96,28 @@ public class PairingGenerator {
 
 			NodeQualityMetric[] sourceDutyNodes = networkExplorer.getSourceNodeQms();
 
-			for (int i = 0; i < sourceDutyNodes.length; i++) {
+//int bitC = 0;
+//int maxLen = sourceDutyNodes.length;
+//if (maxLen > 3) maxLen = 3;
 
-				NodeQualityMetric nqm = sourceDutyNodes[i];
+			for (int i = 0; i < sourceDutyNodes.length; i++) {
+				int j = i;
+
+//if (randomize) {
+//	if (bestPair.pair != null)
+//		break;
+//	
+//	j = this.random.nextInt(maxLen);
+//	if (bitC == ((1 << maxLen) - 1)) {
+//		j = i;
+//	} else {
+//		while ((bitC & (1 << i)) > 0)
+//			i = this.random.nextInt(maxLen);
+//		bitC = bitC | (1 << i);
+//	}
+//}
+
+				NodeQualityMetric nqm = sourceDutyNodes[j];
 
 				if (nqm.getQual().isBetterThan(heuristicNo, bestPair.pairQ)) {
 
@@ -194,4 +215,14 @@ public class PairingGenerator {
 
 		return bestPair.pair;
 	}
+
+//	private boolean validatePath(int heuristicNo,
+//			int[] numOfCoveringsInDuties,
+//			int[] numOfDistinctCoveringsInDuties,
+//			int[] blockTimeOfCoveringsInDuties,
+//			NodeQualityMetric nqm,
+//			PairWithQuality currentPair,
+//			PairWithQuality bestPair) throws CloneNotSupportedException {
+//	}
+
 }

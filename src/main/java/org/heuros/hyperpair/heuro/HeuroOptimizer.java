@@ -1,16 +1,15 @@
-package org.heuros.hyperpair.ga;
+package org.heuros.hyperpair.heuro;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
-import org.heuros.core.ga.chromosome.Chromosome;
-import org.heuros.core.ga.decoder.Decoder;
 import org.heuros.data.model.AirportView;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
@@ -19,11 +18,12 @@ import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
+import org.heuros.hyperpair.HeurosGaParameters;
 import org.heuros.hyperpair.heuristic.PairingGenerator;
 
-public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
+public class HeuroOptimizer {
 
-	private static Logger logger = Logger.getLogger(PairChromosomeDecoder.class);
+	private static Logger logger = Logger.getLogger(HeuroOptimizer.class);
 
 	private int numOfHeuristics = 3;
 	public int getNumOfHeuristics() {
@@ -82,29 +82,26 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				}
 			}).collect(Collectors.toList());
 		}
-
-		this.worstFitness = 0;
-
-		PairChromosomeDecoder.logger.info("Leg list is reordered according to difficulty scores provided.");
+		HeuroOptimizer.logger.info("Leg list is reordered according to difficulty scores provided.");
 	}
 
-	public PairChromosomeDecoder setLegRepository(LegRepository legRepository) {
+	public HeuroOptimizer setLegRepository(LegRepository legRepository) {
 		this.legRepository = legRepository;
 		this.difficultyScoreCumulative = new int[legRepository.getModels().size()];
 		return this;
 	}
 
-	public PairChromosomeDecoder setDutyRepository(DutyRepository dutyRepository) {
+	public HeuroOptimizer setDutyRepository(DutyRepository dutyRepository) {
 		this.dutyRepository = dutyRepository;
 		return this;
 	}
 
-	public PairChromosomeDecoder setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
+	public HeuroOptimizer setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
 		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
 		return this;
 	}
 
-	public PairChromosomeDecoder setPairingGenerator(PairingGenerator pairingGenerator) {
+	public HeuroOptimizer setPairingGenerator(PairingGenerator pairingGenerator) {
 		this.pairingGenerator = pairingGenerator;
 		return this;
 	}
@@ -141,14 +138,12 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		}
 	}
 
-	@Override
-	public List<Pair> decode(Chromosome<Integer> chromosome) {
+	private List<Pair> initialize() {
 
-		logger.info("Decoding process is started!");
+		logger.info("Initialization process is started!");
 
 		List<Pair> solution = new ArrayList<Pair>();
 
-		int geneNdx = 0;
 		int uncoveredLegs = 0;
 
 		int reOrderedLegNdx = -1;
@@ -164,19 +159,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 			Leg legToCover = this.reOrderedLegs.get(reOrderedLegNdx);
 
-			int heuristicNo = chromosome.getGeneValue(geneNdx);
-			if (heuristicNo == 0)
-				if (!legToCover.hasHbDepArrDutyPair(this.hbNdx))
-					heuristicNo = 1;
-
-///*
-// * TODO Remove the lines after test!
-// */
-//heuristicNo = 0;
-//if (legToCover.hasHbDepDutyPair(this.hbNdx)
-//		|| legToCover.hasHbArrDutyPair(this.hbNdx)
-//		|| legToCover.hasNonHbDutyPair(this.hbNdx))
-//heuristicNo = 2;
+			int heuristicNo = 1;
 
 			Pair p = null;
 			try {
@@ -186,17 +169,14 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 															numOfDistinctCoveringsInDuties,
 															blockTimeOfCoveringsInDuties);
 			} catch (CloneNotSupportedException ex) {
-				PairChromosomeDecoder.logger.error(ex);
+				HeuroOptimizer.logger.error(ex);
 			}
 
-//if (legToCover.getNdx() == 1768)
-//System.out.println(p);
 			if (p != null) {
 				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
 				solution.add(p);
-				geneNdx++;
 			} else {
-				PairChromosomeDecoder.logger.error("Pairing could not be found for " + legToCover);
+				HeuroOptimizer.logger.error("Pairing could not be found for " + legToCover);
 				uncoveredLegs++;
 			}
 		}
@@ -226,32 +206,124 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				}
 			}
 		}
-		chromosome.setFitness(fitness + uncoveredLegs * 100000000);
-		chromosome.setInfo("numOfPairs:" + numOfPairs + 
-							", numOfDuties:" + numOfDuties + 
-							", uncoveredLegs: " + uncoveredLegs + 
-							", numOfDeadheads: " + numOfDeadheads + 
-							", fitness: " + fitness);
-		this.checkFitness(chromosome.getFitness(), numOfLegCoverings);
+
+		this.checkFitness(fitness + uncoveredLegs * 100000000, numOfLegCoverings);
 
 		logger.info("numOfPairs: " + numOfPairs + 
 					", numOfDuties: " + numOfDuties + 
 					", uncoveredLegs: " + uncoveredLegs + 
 					", numOfDeadheads: " + numOfDeadheads + 
 					", fitness: " + fitness);
-		logger.info(chromosome);
-		logger.info("Decoding process is ended!");
+		logger.info("Initialization process is ended!");
 		return solution;
 	}
 
-	private double worstFitness = 0;
+	private double bestFitness = Double.MAX_VALUE;
 	private int[] bestNumOfLegCoverings = null;
 
 	private synchronized void checkFitness(double newFitness, int[] newNumOfLegCoverings) {
-		if (newFitness > worstFitness) {
-			this.worstFitness = newFitness;
+		if (newFitness < bestFitness) {
+			this.bestFitness = newFitness;
 			this.bestNumOfLegCoverings = newNumOfLegCoverings;
 		}
+	}
+
+	private int getFirstLegNdxToCover() {
+		for (int i = 0; i < this.reOrderedLegs.size(); i++) {
+			if (this.reOrderedLegs.get(i).isCover()
+					&& (this.reOrderedLegs.get(i).hasPair(hbNdx)))
+				return i;
+		}
+		return Integer.MAX_VALUE;
+	}
+
+	private OneDimIndexInt<Pair> generateSolutionPairIndex(List<Pair> solution) {
+		OneDimIndexInt<Pair> pairIndexByLegNdx = new OneDimIndexInt<Pair>(new Pair[this.legRepository.getModels().size()][0]);
+		for (int i = 0; i < solution.size(); i++) {
+			Pair pair = solution.get(i);
+			for (int j = 0; j < pair.getDuties().size(); j++) {
+				DutyView duty = pair.getDuties().get(j);
+				for (int k = 0; k < duty.getLegs().size(); k++) {
+					LegView leg = duty.getLegs().get(k);
+					pairIndexByLegNdx.add(leg.getNdx(), pair);
+				}
+			}
+		}
+		return pairIndexByLegNdx;
+	}
+
+	public List<Pair> doMinimize() {
+		logger.info("Optimization process is started!");
+
+		this.orderLegs();
+
+		List<Pair> solution = this.initialize();
+		OneDimIndexInt<Pair> pairIndexByLegNdx = this.generateSolutionPairIndex(solution);
+
+		int numOfIterationsWOProgress = 0;
+		long optStartTime = System.nanoTime();
+
+		for (int i = 1; i <= HeurosGaParameters.maxNumOfIterations; i++) {
+
+			this.orderLegs();
+
+			int initialLegNdx = this.getFirstLegNdxToCover();
+			Leg initialLeg = this.reOrderedLegs.get(initialLegNdx);
+
+			LinkedList<LegView> legs = new LinkedList<LegView>();
+			legs.add(initialLeg);
+
+			boolean[] legAdded = new boolean[this.legRepository.getModels().size()];
+
+			int[] numOfLegCoverings = new int[this.legRepository.getModels().size()];
+			int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
+			int[] numOfDistinctCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
+			int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
+
+			solution = new ArrayList<Pair>();
+
+			while (legs.size() > 0) {
+
+				LegView legToCover = legs.removeFirst();
+				while (numOfLegCoverings[legToCover.getNdx()] > 0) {
+					legToCover = legs.removeFirst();
+				}
+
+				Pair[] pairsFromPrevSol = pairIndexByLegNdx.getArray(legToCover.getNdx());
+				for (Pair pair: pairsFromPrevSol) {
+					for (int j = 0; j < pair.getDuties().size(); j++) {
+						DutyView duty = pair.getDuties().get(j);
+						for (int k = 0; k < duty.getLegs().size(); k++) {
+							LegView leg = duty.getLegs().get(k);
+							if ((leg.getNdx() != legToCover.getNdx())
+									&& (numOfLegCoverings[leg.getNdx()] == 0)
+									&& (!legAdded[leg.getNdx()])) {
+								legs.add(leg);
+								legAdded[leg.getNdx()] = true;
+							}
+						}
+					}
+				}
+
+				Pair p = null;
+				try {
+					p = this.pairingGenerator.generatePairing(legToCover, 
+																1, 
+																numOfCoveringsInDuties,
+																numOfDistinctCoveringsInDuties,
+																blockTimeOfCoveringsInDuties);
+				} catch (CloneNotSupportedException ex) {
+					logger.error(ex);
+				}
+
+			}
+
+			if ((numOfIterationsWOProgress >= HeurosGaParameters.maxNumOfIterationsWOProgress)
+                    || ((System.nanoTime() - optStartTime) >= HeurosGaParameters.maxElapsedTimeInNanoSecs))
+                break;
+        }
+
+		return solution;
 	}
 
 	/*

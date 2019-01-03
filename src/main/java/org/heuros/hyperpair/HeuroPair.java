@@ -14,11 +14,6 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.heuros.conf.HeurosConfFactory;
 import org.heuros.context.PairOptimizationContext;
-import org.heuros.core.ga.GeneticIterationListener;
-import org.heuros.core.ga.chromosome.Chromosome;
-import org.heuros.core.ga.crossover.UniformCrossover;
-import org.heuros.core.ga.mutation.IntegerGeneMutator;
-import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.core.rule.intf.Rule;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
@@ -31,10 +26,8 @@ import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
 import org.heuros.exception.RuleAnnotationIsMissing;
 import org.heuros.exception.RuleRegistrationMatchingException;
-import org.heuros.hyperpair.ga.PairChromosomeFactory;
-import org.heuros.hyperpair.ga.PairChromosomeDecoder;
-import org.heuros.hyperpair.ga.PairOptimizer;
 import org.heuros.hyperpair.heuristic.PairingGenerator;
+import org.heuros.hyperpair.heuro.HeuroOptimizer;
 import org.heuros.hyperpair.intro.AirportIntroducer;
 import org.heuros.hyperpair.intro.DutyLegAggregator;
 import org.heuros.hyperpair.intro.LegIntroducer;
@@ -76,7 +69,7 @@ import org.heuros.rule.PairRuleContext;
  * 
  * @author bahadrzeren
  */
-public class HyperPair {
+public class HeuroPair {
 
 	private static List<Rule> rules = new ArrayList<Rule>();
 
@@ -84,39 +77,39 @@ public class HyperPair {
 		DateTimeFormatter datetimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss", Locale.ENGLISH).withZone(ZoneOffset.UTC);
 		System.setProperty("logfile.date.time", datetimeFormatter.format(LocalDateTime.now()));
 
-		HyperPair.rules.add(new AirportIntroducer());
-		HyperPair.rules.add(new DutyLegAggregator());
-		HyperPair.rules.add(new LegIntroducer());
-		HyperPair.rules.add(new PairDutyAggregator());
-		HyperPair.rules.add(new CriticalStations1());
-		HyperPair.rules.add(new CriticalStations2());
-		HyperPair.rules.add(new DutyACChange());
-		HyperPair.rules.add(new DutyAgDgFlights());
-		HyperPair.rules.add(new DutyAugmentationCheck());
-		HyperPair.rules.add(new DutyEndIfStatIsTouched());
-		HyperPair.rules.add(new DutyFlightConnectionTime());
-		HyperPair.rules.add(new DutyForceToBeFirstLayoverDuty());
-		HyperPair.rules.add(new DutyIntFlights());
-		HyperPair.rules.add(new DutyLayover());
-		HyperPair.rules.add(new DutyLength());
-		HyperPair.rules.add(new DutyMaxBlockTimeForIntLayovers());
-		HyperPair.rules.add(new DutyNumOfLegsLimit());
-		HyperPair.rules.add(new DutyOneDutyStats());
-		HyperPair.rules.add(new DutySpecEuroStats());
-		HyperPair.rules.add(new DutySpecialFlightNums1());
-		HyperPair.rules.add(new DutySpecialFlightNums2());
-		HyperPair.rules.add(new PairDutyDay());
-		HyperPair.rules.add(new PairDutyRestCheck());
-		HyperPair.rules.add(new PairEarlyDuty());
-		HyperPair.rules.add(new PairGrouping());
-		HyperPair.rules.add(new PairHardDuty());
-		HyperPair.rules.add(new PairIntDuties());
-		HyperPair.rules.add(new PairLayoverCheck());
-		HyperPair.rules.add(new PairNumOfPassiveLegsLimit());
-		HyperPair.rules.add(new PairPeriodLength());
+		HeuroPair.rules.add(new AirportIntroducer());
+		HeuroPair.rules.add(new DutyLegAggregator());
+		HeuroPair.rules.add(new LegIntroducer());
+		HeuroPair.rules.add(new PairDutyAggregator());
+		HeuroPair.rules.add(new CriticalStations1());
+		HeuroPair.rules.add(new CriticalStations2());
+		HeuroPair.rules.add(new DutyACChange());
+		HeuroPair.rules.add(new DutyAgDgFlights());
+		HeuroPair.rules.add(new DutyAugmentationCheck());
+		HeuroPair.rules.add(new DutyEndIfStatIsTouched());
+		HeuroPair.rules.add(new DutyFlightConnectionTime());
+		HeuroPair.rules.add(new DutyForceToBeFirstLayoverDuty());
+		HeuroPair.rules.add(new DutyIntFlights());
+		HeuroPair.rules.add(new DutyLayover());
+		HeuroPair.rules.add(new DutyLength());
+		HeuroPair.rules.add(new DutyMaxBlockTimeForIntLayovers());
+		HeuroPair.rules.add(new DutyNumOfLegsLimit());
+		HeuroPair.rules.add(new DutyOneDutyStats());
+		HeuroPair.rules.add(new DutySpecEuroStats());
+		HeuroPair.rules.add(new DutySpecialFlightNums1());
+		HeuroPair.rules.add(new DutySpecialFlightNums2());
+		HeuroPair.rules.add(new PairDutyDay());
+		HeuroPair.rules.add(new PairDutyRestCheck());
+		HeuroPair.rules.add(new PairEarlyDuty());
+		HeuroPair.rules.add(new PairGrouping());
+		HeuroPair.rules.add(new PairHardDuty());
+		HeuroPair.rules.add(new PairIntDuties());
+		HeuroPair.rules.add(new PairLayoverCheck());
+		HeuroPair.rules.add(new PairNumOfPassiveLegsLimit());
+		HeuroPair.rules.add(new PairPeriodLength());
 	}
 
-	private static Logger logger = Logger.getLogger(HyperPair.class);
+	private static Logger logger = Logger.getLogger(HeuroPair.class);
 
 	public static void main(String[] args) throws IOException, RuleAnnotationIsMissing, RuleRegistrationMatchingException {
     	/*
@@ -169,7 +162,7 @@ public class HyperPair {
 			/*
 			 * Register rules.
 			 */
-			pairOptimizationContext.registerRules(HyperPair.rules);
+			pairOptimizationContext.registerRules(HeuroPair.rules);
 
 			/*
 			 * Add airports and legs to repositories and generate necessary indexes.
@@ -265,59 +258,16 @@ public class HyperPair {
 																			.setPricingNetwork(pricingNetwork)
 																			.setDutyRepository(pairOptimizationContext.getDutyRepository());
 
-			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
+			HeuroOptimizer pairOptimizer = new HeuroOptimizer().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
-//																						.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
-//																						.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																						.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-//																						.setHbDepArrDutyIndexByLegNdx(pairOptimizationContext.getHbDepArrDutyIndexByLegNdx())
-//																						.setHbDepDutyIndexByLegNdx(pairOptimizationContext.getHbDepDutyIndexByLegNdx())
-//																						.setNonHbDutyIndexByLegNdx(pairOptimizationContext.getNonHbDutyIndexByLegNdx())
-//																						.setHbArrDutyIndexByLegNdx(pairOptimizationContext.getHbArrDutyIndexByLegNdx())
-//																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
-//																						.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
 																						.setPairingGenerator(pairingGenerator);
-			pairChromosomeDecoder.orderLegs();
+			pairOptimizer.orderLegs();
 
-			PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
-																				.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
-																				.setMaxNumOfIterations(HeurosGaParameters.maxNumOfIterations)
-																				.setMaxNumOfIterationsWOProgress(HeurosGaParameters.maxNumOfIterationsWOProgress)
-																				.setMinNumOfChildren(HeurosGaParameters.minNumOfChildren)
-																				.setMutationRate(HeurosGaParameters.mutationRate)
-																				.setNumOfEliteChromosomes(HeurosGaParameters.numOfEliteChromosomes)
-																				.setPopulationSize(HeurosGaParameters.populationSize)
-																				.setSelector(new BinaryTournamentSelector<Integer>())
-																				.setCrossoverOperator(new UniformCrossover<Integer>())
-																				.setRunParallel(true)
-																				.setGeneticIterationListener(new GeneticIterationListener<Integer>() {
-																					@Override
-																					public void onProgress(int iteration, double elapsedTime, Chromosome<Integer> best) {
-																						HyperPair.logger.info("Progress!!! at " + iteration + ".th iteration, elapsedTime: " +
-																												elapsedTime + ", best: " + String.valueOf(best.getInfo()));
-																					}
-																					@Override
-																					public void onIterate(int iteration, double elapsedTime, Chromosome<Integer> best) {
-																						HyperPair.logger.info(iteration + ".th itearation, elapsedTime: " +
-																												elapsedTime + ", best: " + String.valueOf(best.getInfo()));
-																						pairChromosomeDecoder.orderLegs();
-																					}
-																					@Override
-																					public void onException(Exception ex) {
-																						ex.printStackTrace();
-																						HyperPair.logger.error(ex);
-																					}
-																				})
-																				.setDecoder(pairChromosomeDecoder)
-																				.setMutator(new IntegerGeneMutator().setMaxGeneValueExc(pairChromosomeDecoder.getNumOfHeuristics()))
-																				/*
-																				 * TODO Chromosome length = 10000 must be parametric.
-																				 */
-																				.setChromosomeFactory(new PairChromosomeFactory().setChromosomeLength(legs.size() / 3)
-																																	.setSetSize(pairChromosomeDecoder.getNumOfHeuristics()));
+
 
 //			List<Pair> solution = 
-					pairOptimizer.proceed();
+					pairOptimizer.doMinimize();
 System.out.println();
 
 

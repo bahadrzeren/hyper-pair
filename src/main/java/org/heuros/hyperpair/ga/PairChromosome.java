@@ -1,5 +1,6 @@
 package org.heuros.hyperpair.ga;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.heuros.core.ga.chromosome.Chromosome;
 
 public class PairChromosome implements Chromosome<Integer>, Cloneable {
@@ -8,9 +9,14 @@ public class PairChromosome implements Chromosome<Integer>, Cloneable {
 	private double fitness = Double.MAX_VALUE;
 	private String info = null;
 
+	private int[] histogram = null;
+
 	@Override
-	public void initializeChromosome(int chromosomeLength) {
+	public void initializeChromosome(int chromosomeLength, Integer setSize) {
 		this.genes = new int[chromosomeLength];
+		this.histogram = new int[setSize];
+		for (int i = 0; i < this.genes.length; i++)
+			this.genes[i] = -1;
 	}
 
 	@Override
@@ -56,6 +62,9 @@ public class PairChromosome implements Chromosome<Integer>, Cloneable {
 
 	@Override
 	public void setGeneValue(int index, Integer value) {
+		if (this.genes[index] >= 0)
+			this.histogram[this.genes[index]]--;
+		this.histogram[value]++;
 		this.genes[index] = value;
 	}
 
@@ -63,6 +72,11 @@ public class PairChromosome implements Chromosome<Integer>, Cloneable {
 	public Object clone() throws CloneNotSupportedException {
 		PairChromosome newClone = (PairChromosome) super.clone();
 		newClone.genes = this.genes.clone();
+		newClone.histogram = this.histogram.clone();
 		return newClone;
+	}
+
+	public String toString() {
+		return ArrayUtils.toString(this.histogram);
 	}
 }

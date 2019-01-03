@@ -9,7 +9,7 @@ public class PairChromosomeFactory implements ChromosomeFactory<Integer> {
 	private static Random random = new Random();
 
 	private int chromosomeLength = 0;
-	private int maxGeneValue = 0;
+	private int setSize = 0;
 
 	@Override
 	public PairChromosomeFactory setChromosomeLength(int value) {
@@ -17,8 +17,8 @@ public class PairChromosomeFactory implements ChromosomeFactory<Integer> {
 		return this;
 	}
 
-	public PairChromosomeFactory setMaxGeneValue(int value) {
-		this.maxGeneValue = value;
+	public PairChromosomeFactory setSetSize(int value) {
+		this.setSize = value;
 		return this;
 	}
 
@@ -30,9 +30,9 @@ public class PairChromosomeFactory implements ChromosomeFactory<Integer> {
 	@Override
 	public PairChromosome createChromosome() {
 		PairChromosome newChromosome = new PairChromosome();
-		newChromosome.initializeChromosome(this.chromosomeLength);
+		newChromosome.initializeChromosome(this.chromosomeLength, this.setSize);
 		for (int i = 0; i < this.chromosomeLength; i++)
-			newChromosome.setGeneValue(i, random.nextInt(this.maxGeneValue));
+			newChromosome.setGeneValue(i, random.nextInt(this.setSize));
 		return newChromosome;
 	}
 
