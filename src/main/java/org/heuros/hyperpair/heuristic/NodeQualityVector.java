@@ -14,13 +14,13 @@ public class NodeQualityVector {
 	public NodeQualityVector(int maxPairingLengthInDays, DutyView hbArrDuty, QualityMetric hbArrDutyQm) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
-		this.nodeQuals[0] = new NodeQualityMetric(hbArrDuty, hbArrDutyQm, null);
+		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, hbArrDutyQm, null);
 	}
 
 	public NodeQualityVector(int maxPairingLengthInDays, DutyView hbArrDuty, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
-		this.nodeQuals[0] = new NodeQualityMetric(hbArrDuty, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, null);
+		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, null);
 	}
 
 	/*
@@ -32,7 +32,7 @@ public class NodeQualityVector {
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if (nextNodeQv.nodeQuals[i - 1] != null) {
-				this.nodeQuals[i] = new NodeQualityMetric(nonHbArrDuty, this.nodeOwnerQm, nextNodeQv.nodeQuals[i - 1]);
+				this.nodeQuals[i] = new NodeQualityMetric(this.nodeOwner, this.nodeOwnerQm, nextNodeQv.nodeQuals[i - 1]);
 				this.nodeQuals[i].getQual().addToQualityMetric(nextNodeQv.nodeQuals[i - 1].getQual());
 			}
 		}

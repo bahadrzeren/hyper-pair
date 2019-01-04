@@ -83,7 +83,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 			}).collect(Collectors.toList());
 		}
 
-		this.worstFitness = 0;
+		this.bestFitness = Integer.MAX_VALUE;
 
 		PairChromosomeDecoder.logger.info("Leg list is reordered according to difficulty scores provided.");
 	}
@@ -232,6 +232,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 							", uncoveredLegs: " + uncoveredLegs + 
 							", numOfDeadheads: " + numOfDeadheads + 
 							", fitness: " + fitness);
+
 		this.checkFitness(chromosome.getFitness(), numOfLegCoverings);
 
 		logger.info("numOfPairs: " + numOfPairs + 
@@ -244,12 +245,12 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		return solution;
 	}
 
-	private double worstFitness = 0;
+	private double bestFitness = Integer.MAX_VALUE;
 	private int[] bestNumOfLegCoverings = null;
 
 	private synchronized void checkFitness(double newFitness, int[] newNumOfLegCoverings) {
-		if (newFitness > worstFitness) {
-			this.worstFitness = newFitness;
+		if (newFitness < bestFitness) {
+			this.bestFitness = newFitness;
 			this.bestNumOfLegCoverings = newNumOfLegCoverings;
 		}
 	}

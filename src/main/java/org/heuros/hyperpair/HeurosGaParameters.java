@@ -9,6 +9,6 @@ public class HeurosGaParameters {
     public static int populationSize = 10;
     public static int minNumOfChildren = 2;
     public static int numOfEliteChromosomes = 2;
-    public static float mutationRate = 0.02f;
+    public static float mutationRate = 0.01f;
     public static boolean allowDublicateChromosomes = false;
 }
