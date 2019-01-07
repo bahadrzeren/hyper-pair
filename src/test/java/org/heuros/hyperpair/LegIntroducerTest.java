@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 
 import org.heuros.data.model.Leg;
+import org.heuros.pair.conf.HeurosDatasetParam;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

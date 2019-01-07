@@ -7,8 +7,9 @@ import java.time.Month;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
-import org.heuros.hyperpair.rule.PairNumOfPassiveLegsLimit;
-import org.heuros.hyperpair.rule.PairPeriodLength;
+import org.heuros.pair.conf.HeurosSystemParam;
+import org.heuros.pair.rule.PairNumOfPassiveLegsLimit;
+import org.heuros.pair.rule.PairPeriodLength;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
