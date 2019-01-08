@@ -17,18 +17,18 @@ public class NodeQualityVector {
 		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, hbArrDutyQm, null);
 	}
 
-	public NodeQualityVector(int maxPairingLengthInDays, DutyView hbArrDuty, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties) {
+	public NodeQualityVector(int maxPairingLengthInDays, DutyView hbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
-		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties, null);
+		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority, null);
 	}
 
 	/*
 	 * Only for non HB arrival duty nodes!
 	 */
-	public NodeQualityVector(int maxPairingLengthInDays, DutyView nonHbArrDuty, int[] numOfCoveringsInDuties, int[] blockTimeOfCoveringsInDuties, NodeQualityVector nextNodeQv) {
+	public NodeQualityVector(int maxPairingLengthInDays, DutyView nonHbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority, NodeQualityVector nextNodeQv) {
 		this.nodeOwner = nonHbArrDuty;
-		this.nodeOwnerQm = new QualityMetric(nonHbArrDuty, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+		this.nodeOwnerQm = new QualityMetric(nonHbArrDuty, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority);
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if (nextNodeQv.nodeQuals[i - 1] != null) {

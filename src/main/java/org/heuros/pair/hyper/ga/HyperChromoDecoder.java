@@ -156,6 +156,7 @@ public class HyperChromoDecoder implements Decoder<Integer, Pair> {
 		int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 		int[] numOfDistinctCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 		int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
+		int[] dutyPriorityCumulative = new int[this.dutyRepository.getModels().size()];
 
 		while (true) {
 			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, numOfLegCoverings);
@@ -184,7 +185,8 @@ public class HyperChromoDecoder implements Decoder<Integer, Pair> {
 															heuristicNo, 
 															numOfCoveringsInDuties,
 															numOfDistinctCoveringsInDuties,
-															blockTimeOfCoveringsInDuties);
+															blockTimeOfCoveringsInDuties,
+															dutyPriorityCumulative);
 			} catch (CloneNotSupportedException ex) {
 				HyperChromoDecoder.logger.error(ex);
 			}

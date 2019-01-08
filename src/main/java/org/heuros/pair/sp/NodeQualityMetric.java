@@ -17,10 +17,11 @@ public class NodeQualityMetric {
 	}
 
 	public NodeQualityMetric(DutyView nodeOwner,
- 									int[] numOfCoveringsInDuties,
-									int[] blockTimeOfCoveringsInDuties,
+ 									int numOfCoveringsInDuty,
+									int blockTimeOfCoveringsInDuty,
+									int priority,
 									NodeQualityMetric nextNodeMetric) {
-		this.qual = new QualityMetric(nodeOwner, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+		this.qual = new QualityMetric(nodeOwner, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority);
 		this.nodeOwner = nodeOwner;
 		this.nextNodeMetric = nextNodeMetric;
 	}

@@ -67,7 +67,8 @@ public class PairingGenerator {
 								int heuristicNo,
 								int[] numOfCoveringsInDuties,
 								int[] numOfDistinctCoveringsInDuties,
-								int[] blockTimeOfCoveringsInDuties) throws CloneNotSupportedException {
+								int[] blockTimeOfCoveringsInDuties,
+								int[] dutyPriorities) throws CloneNotSupportedException {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
@@ -87,7 +88,7 @@ public class PairingGenerator {
 																		this.maxPairingLengthInDays, 
 																		this.maxDutyBlockTimeInMins,
 																		this.dutyLegOvernightConnNetwork)
-													.build(legToCover, coveringDuties, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
+													.build(legToCover, coveringDuties, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, dutyPriorities);
 
 //			long subNetworkBuiltTime = System.nanoTime();
 
@@ -128,7 +129,7 @@ public class PairingGenerator {
 
 		    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
 
-		    			currentPair.pairQ.addToQualityMetric(d, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+		    			currentPair.pairQ.addToQualityMetric(d, numOfCoveringsInDuties[d.getNdx()], blockTimeOfCoveringsInDuties[d.getNdx()], dutyPriorities[d.getNdx()]);
 		    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
 
 						if (d.isHbArr(this.hbNdx)) {
@@ -153,7 +154,7 @@ public class PairingGenerator {
 									DutyView nd = nqm.getNodeOwner();
 
 									if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
-										currentPair.pairQ.addToQualityMetric(nd, numOfCoveringsInDuties, blockTimeOfCoveringsInDuties);
+										currentPair.pairQ.addToQualityMetric(nd, numOfCoveringsInDuties[nd.getNdx()], blockTimeOfCoveringsInDuties[nd.getNdx()], dutyPriorities[nd.getNdx()]);
 										pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, nd);
 										if (nd.isHbArr(this.hbNdx)) {
 											if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {

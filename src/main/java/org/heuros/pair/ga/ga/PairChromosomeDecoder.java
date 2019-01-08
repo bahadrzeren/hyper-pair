@@ -147,7 +147,8 @@ for (int i = 0; i < this.legs.size(); i++) {
 															heuristicNo, 
 															numOfCoveringsInDuties,
 															numOfDistinctCoveringsInDuties,
-															blockTimeOfCoveringsInDuties);
+															blockTimeOfCoveringsInDuties,
+															dutyPriorityCumulative);
 			} catch (CloneNotSupportedException ex) {
 				PairChromosomeDecoder.logger.error(ex);
 			}

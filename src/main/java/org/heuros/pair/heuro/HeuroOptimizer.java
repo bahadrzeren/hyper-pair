@@ -151,6 +151,7 @@ public class HeuroOptimizer {
 		int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 		int[] numOfDistinctCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 		int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
+		int[] dutyPriorityCumulative = new int[this.dutyRepository.getModels().size()];
 
 		while (true) {
 			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, numOfLegCoverings);
@@ -167,7 +168,8 @@ public class HeuroOptimizer {
 															heuristicNo, 
 															numOfCoveringsInDuties,
 															numOfDistinctCoveringsInDuties,
-															blockTimeOfCoveringsInDuties);
+															blockTimeOfCoveringsInDuties,
+															dutyPriorityCumulative);
 			} catch (CloneNotSupportedException ex) {
 				HeuroOptimizer.logger.error(ex);
 			}
@@ -279,6 +281,7 @@ public class HeuroOptimizer {
 			int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 			int[] numOfDistinctCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
 			int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
+			int[] dutyPriorityCumulative = new int[this.dutyRepository.getModels().size()];
 
 			solution = new ArrayList<Pair>();
 
@@ -311,7 +314,8 @@ public class HeuroOptimizer {
 																1, 
 																numOfCoveringsInDuties,
 																numOfDistinctCoveringsInDuties,
-																blockTimeOfCoveringsInDuties);
+																blockTimeOfCoveringsInDuties,
+																dutyPriorityCumulative);
 				} catch (CloneNotSupportedException ex) {
 					logger.error(ex);
 				}
