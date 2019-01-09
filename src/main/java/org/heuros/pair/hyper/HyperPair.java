@@ -281,7 +281,7 @@ public class HyperPair {
 //																						.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
 //																						.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
 																						.setPairingGenerator(pairingGenerator);
-			pairChromosomeDecoder.orderLegs();
+//			pairChromosomeDecoder.orderLegs();
 
 			PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
 																				.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
@@ -304,7 +304,7 @@ public class HyperPair {
 																					public void onIterate(int iteration, double elapsedTime, Chromosome<Integer> best) {
 																						HyperPair.logger.info(iteration + ".th itearation, elapsedTime: " +
 																												elapsedTime + ", best: " + String.valueOf(best.getInfo()));
-																						pairChromosomeDecoder.orderLegs();
+																						pairChromosomeDecoder.checkAndUpdateTheOrder();
 																					}
 																					@Override
 																					public void onException(Exception ex) {

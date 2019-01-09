@@ -125,75 +125,75 @@ public class QualityMetric {
 		this.priority -= qmToRemove.priority;
 	}
 
-	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
-		if ((qm.numOfLegs == 0)
-				|| (this.priority < qm.priority)
-				|| ((this.priority == qm.priority) && (this.numOfDh < qm.numOfDh))
-				|| ((this.priority == qm.priority) && (this.numOfDh == qm.numOfDh) && (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
-			return true;
-		} else
-			return false;
-	}
-
-	public boolean doesItWorthToGoDeeper(int maxDutyBlockTimeInMins,
-											int heuristicNo,
-											int currentDept,
-											QualityMetric bestQualSoFar) {
-			if ((bestQualSoFar == null)
-					|| (bestQualSoFar.priority > this.priority)) {
-				return true;
-			} else
-				return false;
-	}
-
 //	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
-//		if (heuristicNo < 2) {	//	If layover or dh effective. 
-//			if ((qm.numOfLegs == 0)
-//					|| (this.numOfDh < qm.numOfDh)
-//					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
-//					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins) 
-////							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
-//							&& (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
-//				return true;
-//			} else
-//				return false;
-//		} else {	//	If active block time effective.
-//			if ((qm.numOfLegs == 0)
-//					|| (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
-//					|| ((((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) == ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
-////							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
-//							&& (this.numOfDh < qm.numOfDh))) {
-//				return true;
-//			} else
-//				return false;
-//		}
+//		if ((qm.numOfLegs == 0)
+//				|| (this.priority < qm.priority)
+//				|| ((this.priority == qm.priority) && (this.numOfDh < qm.numOfDh))
+//				|| ((this.priority == qm.priority) && (this.numOfDh == qm.numOfDh) && (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
+//			return true;
+//		} else
+//			return false;
 //	}
 //
 //	public boolean doesItWorthToGoDeeper(int maxDutyBlockTimeInMins,
 //											int heuristicNo,
 //											int currentDept,
 //											QualityMetric bestQualSoFar) {
-//		if (heuristicNo < 2) {	//	If layover or dh effective.
 //			if ((bestQualSoFar == null)
-//					|| (bestQualSoFar.numOfDh > this.numOfDh)
-//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins >= this.dhDurationInMins))
-////					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins == this.dhDurationInMins) 
-////							&& (((1.0 * bestQualSoFar.numOfIncludingDutiesOfTheSameLegs) / bestQualSoFar.numOfLegs) >= ((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs)))
-//					) {
+//					|| (bestQualSoFar.priority > this.priority)) {
 //				return true;
 //			} else
 //				return false;
-//		} else {	//	If active block time effective.
-//			if ((bestQualSoFar == null)
-//					|| (((1.0 * bestQualSoFar.activeBlocktimeInMins) / bestQualSoFar.numOfDuties) <= ((1.0 * this.activeBlocktimeInMins + (currentDept - 1) * maxDutyBlockTimeInMins) / (this.numOfDuties + (currentDept - 1))))
-////					|| ((((1.0 * bestQualSoFar.activeBlocktimeInMins) / bestQualSoFar.numOfDuties) == ((1.0 * this.activeBlocktimeInMins + (currentDept - 1) * maxDutyBlockTimeInMins) / (this.numOfDuties + (currentDept - 1))))
-////							&& (((1.0 * bestQualSoFar.numOfIncludingDutiesOfTheSameLegs) / bestQualSoFar.numOfLegs) < ((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs)))
-//					) {
-//				return true;
-//			} else
-//				return false;
-//		}
 //	}
+
+	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
+		if (heuristicNo < 2) {	//	If layover or dh effective. 
+			if ((qm.numOfLegs == 0)
+					|| (this.numOfDh < qm.numOfDh)
+					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
+					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins) 
+//							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
+							&& (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
+				return true;
+			} else
+				return false;
+		} else {	//	If active block time effective.
+			if ((qm.numOfLegs == 0)
+					|| (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
+					|| ((((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) == ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
+//							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
+							&& (this.numOfDh < qm.numOfDh))) {
+				return true;
+			} else
+				return false;
+		}
+	}
+
+	public boolean doesItWorthToGoDeeper(int maxDutyBlockTimeInMins,
+											int heuristicNo,
+											int currentDept,
+											QualityMetric bestQualSoFar) {
+		if (heuristicNo < 2) {	//	If layover or dh effective.
+			if ((bestQualSoFar == null)
+					|| (bestQualSoFar.numOfDh > this.numOfDh)
+					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins >= this.dhDurationInMins))
+//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins == this.dhDurationInMins) 
+//							&& (((1.0 * bestQualSoFar.numOfIncludingDutiesOfTheSameLegs) / bestQualSoFar.numOfLegs) >= ((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs)))
+					) {
+				return true;
+			} else
+				return false;
+		} else {	//	If active block time effective.
+			if ((bestQualSoFar == null)
+					|| (((1.0 * bestQualSoFar.activeBlocktimeInMins) / bestQualSoFar.numOfDuties) <= ((1.0 * this.activeBlocktimeInMins + (currentDept - 1) * maxDutyBlockTimeInMins) / (this.numOfDuties + (currentDept - 1))))
+//					|| ((((1.0 * bestQualSoFar.activeBlocktimeInMins) / bestQualSoFar.numOfDuties) == ((1.0 * this.activeBlocktimeInMins + (currentDept - 1) * maxDutyBlockTimeInMins) / (this.numOfDuties + (currentDept - 1))))
+//							&& (((1.0 * bestQualSoFar.numOfIncludingDutiesOfTheSameLegs) / bestQualSoFar.numOfLegs) < ((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs)))
+					) {
+				return true;
+			} else
+				return false;
+		}
+	}
 
 	public String toString() {
 		return "#DH:" + numOfDh + "/" + dhDurationInMins +
