@@ -6,13 +6,13 @@ import java.time.temporal.ChronoUnit;
 import org.heuros.core.rule.intf.Aggregator;
 import org.heuros.core.rule.intf.RuleImplementation;
 import org.heuros.data.model.Duty;
-import org.heuros.data.model.LegView;
+import org.heuros.data.model.Leg;
 import org.heuros.pair.conf.HeurosSystemParam;
 
 @RuleImplementation(ruleName = "Duty Leg aggregator", 
 					violationMessage = "Duty Leg aggregator failed", 
 					description = "Leg aggregator for duties.")
-public class DutyLegAggregator implements Aggregator<Duty, LegView> {
+public class DutyLegAggregator implements Aggregator<Duty, Leg> {
 
 	/*
 	 * ER - Extended range logic.
@@ -22,12 +22,12 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	private int minFP_ER_3 = 60 * 8 + 30;
 	private int minFP_ER_3_1 = 60 * 6;
 
-	private boolean isFlightAnER(LegView l) {
+	private boolean isFlightAnER(Leg l) {
 		return ((l.getBlockTimeInMins() >= minFP_ER_1)
 				|| (Math.abs(l.getDepOffset() - l.getArrOffset()) > minTimeZoneDiffForER));
 	}
 
-	private boolean isFlightAMultiLandER(LegView l) {
+	private boolean isFlightAMultiLandER(Leg l) {
 		return (l.getBlockTimeInMins() >= minFP_ER_3_1) 
 				|| (Math.abs(l.getDepOffset() - l.getArrOffset()) > minTimeZoneDiffForER)
 				|| (l.getFlightNo() == 706)
@@ -179,7 +179,7 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
                 	res = 2;
         } else {
 
-        	LegView fl = d.getFirstLeg();
+        	Leg fl = d.getFirstLeg();
 
         	/*
         	 * TODO: Local hour calculation. Winter and Summer season difference also must be considered!!!
@@ -464,22 +464,22 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	}
 
 	@Override
-	public void appendFw(Duty d, LegView l) {
+	public void appendFw(Duty d, Leg l) {
 		d.appendFw(l);
 		this.softAppendFw(d, l);
 	}
 
 	@Override
-	public void appendBw(Duty d, LegView l) {
+	public void appendBw(Duty d, Leg l) {
 		d.appendBw(l);
 		this.softAppendBw(d, l);
 	}
 
 	@Override
-	public void softAppendFw(Duty d, LegView l) {
+	public void softAppendFw(Duty d, Leg l) {
 		d.incNumOfLegs(1);
 
-		LegView connLeg = d.getSecondToLastLeg();
+		Leg connLeg = d.getSecondToLastLeg();
 
 		this.incTotalizers(d, l, 1);
 		this.incTotalizers(d, connLeg, l, 1);
@@ -496,10 +496,10 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	}
 
 	@Override
-	public void softAppendBw(Duty d, LegView l) {
+	public void softAppendBw(Duty d, Leg l) {
 		d.incNumOfLegs(1);
 
-		LegView connLeg = d.getSecondLeg();
+		Leg connLeg = d.getSecondLeg();
 
 		this.incTotalizers(d, l, 1);
 		this.incTotalizers(d, l, connLeg, 1);
@@ -516,8 +516,8 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	}
 
 	@Override
-	public LegView removeLast(Duty d) {
-		LegView l = d.removeLast();
+	public Leg removeLast(Duty d) {
+		Leg l = d.removeLast();
 		if (l == null)
 			return null;
 
@@ -527,8 +527,8 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 	}
 
 	@Override
-	public LegView removeFirst(Duty d) {
-		LegView l = d.removeFirst();
+	public Leg removeFirst(Duty d) {
+		Leg l = d.removeFirst();
 		if (l == null)
 			return null;
 
@@ -537,10 +537,10 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
        	return l;
 	}
 
-	private void removeLast(Duty d, LegView l) {
+	private void removeLast(Duty d, Leg l) {
 		d.incNumOfLegs(-1);
 
-		LegView connLeg = d.getLastLeg();
+		Leg connLeg = d.getLastLeg();
 
 		if (connLeg == null)
 			this.reset(d);
@@ -555,10 +555,10 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		}
 	}
 
-	private void removeFirst(Duty d, LegView l) {
+	private void removeFirst(Duty d, Leg l) {
 		d.incNumOfLegs(-1);
 
-		LegView connLeg = d.getFirstLeg();
+		Leg connLeg = d.getFirstLeg();
 
 		if (connLeg == null)
 			this.reset(d);
@@ -579,7 +579,7 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 		}
 	}
 
-	private void incTotalizers(Duty d, LegView l, int incAmount) {
+	private void incTotalizers(Duty d, Leg l, int incAmount) {
 		/*
 		 * Totalizers
 		 */
@@ -606,7 +606,7 @@ public class DutyLegAggregator implements Aggregator<Duty, LegView> {
 			d.incNumOfSpecialFlights(incAmount);
 	}
 
-	private void incTotalizers(Duty d, LegView pl, LegView nl, int incAmount) {
+	private void incTotalizers(Duty d, Leg pl, Leg nl, int incAmount) {
 		/*
 		 * Totalizers
 		 */

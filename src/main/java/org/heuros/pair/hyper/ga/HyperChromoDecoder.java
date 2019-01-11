@@ -161,13 +161,13 @@ public class HyperChromoDecoder implements Decoder<Integer, Pair> {
 
 		double fitness = 0.0;
 		int numOfDuties = 0;
-		int numOfDutyDays = 0;
+		int numOfPairDays = 0;
 		int numOfPairs = 0;
 
 		for (int i = 0; i < solution.size(); i++) {
 //			fitness += getPairCost(2, solution.get(i));
 			numOfDuties += solution.get(i).getNumOfDuties();
-			numOfDutyDays += solution.get(i).getNumOfDaysTouched();
+			numOfPairDays += solution.get(i).getNumOfDaysTouched();
 			numOfPairs++;
 		}
 
@@ -176,13 +176,13 @@ public class HyperChromoDecoder implements Decoder<Integer, Pair> {
 		for (int i = 0; i < this.legs.size(); i++) {
 			if (this.legs.get(i).isCover()) {
 				if (numOfLegCoverings[i] > 1) {
-//					fitness += (2.0 * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
+//					fitness += (2.0 * (numOfLegCoverings[i] - 1) * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
 					fitness += (numOfLegCoverings[i] - 1) * 100;
 					numOfDeadheads += (numOfLegCoverings[i] - 1);
 				}
 			} else {
 				if (numOfLegCoverings[i] > 0) {
-//					fitness += (2.0 * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
+//					fitness += (2.0 * numOfLegCoverings[i] * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
 					fitness += numOfLegCoverings[i] * 100;
 					numOfDeadheads += numOfLegCoverings[i];
 				}
@@ -191,7 +191,7 @@ public class HyperChromoDecoder implements Decoder<Integer, Pair> {
 		chromosome.setFitness(fitness + uncoveredLegs * 100000000);
 		chromosome.setInfo("numOfPairs:" + numOfPairs + 
 							", numOfDuties:" + numOfDuties + 
-							", numOfDutyDays:" + numOfDutyDays + 
+							", numOfPairDays:" + numOfPairDays + 
 							", uncoveredLegs: " + uncoveredLegs + 
 							", numOfDeadheads: " + numOfDeadheads + 
 							", fitness: " + fitness);
@@ -200,7 +200,7 @@ public class HyperChromoDecoder implements Decoder<Integer, Pair> {
 
 		logger.info("numOfPairs: " + numOfPairs + 
 					", numOfDuties: " + numOfDuties + 
-					", numOfDutyDays:" + numOfDutyDays + 
+					", numOfPairDays:" + numOfPairDays +
 					", uncoveredLegs: " + uncoveredLegs + 
 					", numOfDeadheads: " + numOfDeadheads + 
 					", fitness: " + fitness);
@@ -301,6 +301,8 @@ public class HyperChromoDecoder implements Decoder<Integer, Pair> {
 
 				leg = getNdxWithMaxValue(legsConsidered);
 			}
+
+			logger.info("checkAndUpdateTheOrder: #" + reOrderNdx);
 
 			for (int i = 0; i < legsConsidered.length; i++) {
 				if (!legsConsidered[i]) {

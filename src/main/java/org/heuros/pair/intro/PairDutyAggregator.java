@@ -4,39 +4,39 @@ import java.time.temporal.ChronoUnit;
 
 import org.heuros.core.rule.intf.Aggregator;
 import org.heuros.core.rule.intf.RuleImplementation;
-import org.heuros.data.model.DutyView;
+import org.heuros.data.model.Duty;
 import org.heuros.data.model.Pair;
 
 @RuleImplementation(ruleName = "Pair duty aggregator", 
 					violationMessage = "Pair duty aggregator failed", 
 					description = "Duty aggregator for pairs.")
-public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
+public class PairDutyAggregator implements Aggregator<Pair, Duty> {
 
 	@Override
-	public void appendFw(Pair p, DutyView d) {
+	public void appendFw(Pair p, Duty d) {
 		p.appendFw(d);
 		this.softAppendFw(p, d);
 	}
 
 	@Override
-	public void appendBw(Pair p, DutyView d) {
+	public void appendBw(Pair p, Duty d) {
 		p.appendBw(d);
 		this.softAppendBw(p, d);
 	}
 
 	@Override
-	public void softAppendFw(Pair p, DutyView d) {
+	public void softAppendFw(Pair p, Duty d) {
 		incTotalizers(p, d, 1);
 	}
 
 	@Override
-	public void softAppendBw(Pair p, DutyView d) {
+	public void softAppendBw(Pair p, Duty d) {
 		incTotalizers(p, d, 1);
 	}
 
 	@Override
-	public DutyView removeLast(Pair p) {
-		DutyView d = p.removeLast();
+	public Duty removeLast(Pair p) {
+		Duty d = p.removeLast();
 		if (d == null)
 			return null;
 
@@ -46,8 +46,8 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 	}
 
 	@Override
-	public DutyView removeFirst(Pair p) {
-		DutyView d = p.removeFirst();
+	public Duty removeFirst(Pair p) {
+		Duty d = p.removeFirst();
 		if (d == null)
 			return null;
 
@@ -56,7 +56,7 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 		return d;
 	}
 
-	private void remove(Pair p, DutyView d) {
+	private void remove(Pair p, Duty d) {
 		incTotalizers(p, d, -1);
 	}
 
@@ -66,7 +66,7 @@ public class PairDutyAggregator implements Aggregator<Pair, DutyView> {
 		}
 	}
 
-	public void incTotalizers(Pair p, DutyView d, int incAmount) {
+	public void incTotalizers(Pair p, Duty d, int incAmount) {
 		p.incNumOfDuties(incAmount);
 
 		if (p.getNumOfDuties() == 0) {

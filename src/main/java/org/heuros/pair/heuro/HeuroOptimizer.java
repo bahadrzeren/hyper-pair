@@ -35,64 +35,23 @@ public class HeuroOptimizer {
 	 */
 	private int hbNdx = 0;
 
-	private LegRepository legRepository = null;
-	private DutyRepository dutyRepository = null;
+//	private LegRepository legRepository = null;
+//	private DutyRepository dutyRepository = null;
 
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 
 	private PairingGenerator pairingGenerator = null;
 
-	private List<Leg> reOrderedLegs = null;
-
-	private double difficultyScoreMax = Integer.MAX_VALUE;
-	private int[] difficultyScoreCumulative = null;
-
-	public void orderLegs() {
-		if (this.bestNumOfLegCoverings != null) {
-			this.difficultyScoreMax = 0;
-			for (int i = 0; i < this.bestNumOfLegCoverings.length; i++) {
-				if (this.legRepository.getModel(i).isCover()) {
-					if (this.bestNumOfLegCoverings[i] > 1)
-						this.difficultyScoreCumulative[i]++;
-					if (this.difficultyScoreCumulative[i] > this.difficultyScoreMax)
-						this.difficultyScoreMax = this.difficultyScoreCumulative[i];
-				}
-			}
-			this.reOrderedLegs = this.legRepository.getModels().parallelStream().sorted(new Comparator<Leg>() {
-				@Override
-				public int compare(Leg a, Leg b) {
-					if (difficultyScoreCumulative[a.getNdx()]/difficultyScoreMax > difficultyScoreCumulative[b.getNdx()]/difficultyScoreMax)
-						return -1;
-					else
-						if (difficultyScoreCumulative[a.getNdx()]/difficultyScoreMax < difficultyScoreCumulative[b.getNdx()]/difficultyScoreMax)
-							return 1;
-					return 0;
-				}
-			}).collect(Collectors.toList());
-		} else {
-			this.reOrderedLegs = this.legRepository.getModels().parallelStream().sorted(new Comparator<Leg>() {
-				@Override
-				public int compare(Leg a, Leg b) {
-					if (a.getNdx() < b.getNdx())
-						return -1;
-					else
-						if (a.getNdx() > b.getNdx())
-							return 1;
-					return 0;
-				}
-			}).collect(Collectors.toList());
-		}
-		HeuroOptimizer.logger.info("Leg list is reordered according to difficulty scores provided.");
-	}
+	private List<Leg> legs = null;
+	private List<Duty> duties = null;
 
 	public HeuroOptimizer setLegRepository(LegRepository legRepository) {
-		this.legRepository = legRepository;
-		this.difficultyScoreCumulative = new int[legRepository.getModels().size()];
+		this.legs = legRepository.getModels();
 		return this;
 	}
 
 	public HeuroOptimizer setDutyRepository(DutyRepository dutyRepository) {
-		this.dutyRepository = dutyRepository;
+		this.duties = dutyRepository.getModels();
 		return this;
 	}
 
@@ -106,11 +65,11 @@ public class HeuroOptimizer {
 		return this;
 	}
 
-	private int getNextLegNdxToCover(int prevReOrderedLegNdx, int[] numOfLegCoverings) {
-		for (int i = prevReOrderedLegNdx + 1; i < this.reOrderedLegs.size(); i++) {
-			if (this.reOrderedLegs.get(i).isCover()
-					&& (this.reOrderedLegs.get(i).hasPair(hbNdx))
-					&& (numOfLegCoverings[this.reOrderedLegs.get(i).getNdx()] == 0))
+	private int getNextLegNdxToCover(int prevReOrderedLegNdx, List<Leg> reOrderedLegs, int[] numOfLegCoverings) {
+		for (int i = prevReOrderedLegNdx + 1; i < reOrderedLegs.size(); i++) {
+			if (reOrderedLegs.get(i).isCover()
+					&& reOrderedLegs.get(i).hasPair(hbNdx)
+					&& (numOfLegCoverings[reOrderedLegs.get(i).getNdx()] == 0))
 				return i;
 		}
 		return Integer.MAX_VALUE;
@@ -122,13 +81,13 @@ public class HeuroOptimizer {
 									int[] numOfDistinctCoveringsInDuties,
 									int[] blockTimeOfCoveringsInDuties) {
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
-			DutyView duty = p.getDuties().get(i);
+			Duty duty = p.getDuties().get(i);
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
-				LegView leg = duty.getLegs().get(j);
+				Leg leg = duty.getLegs().get(j);
 				numOfLegCoverings[leg.getNdx()]++;
-				DutyView[] dutiesOfLeg = this.dutyIndexByLegNdx.getArray(leg.getNdx());
+				Duty[] dutiesOfLeg = this.dutyIndexByLegNdx.getArray(leg.getNdx());
 				for (int di = 0; di < dutiesOfLeg.length; di++) {
-					DutyView dutyOfLeg = dutiesOfLeg[di];
+					Duty dutyOfLeg = dutiesOfLeg[di];
 					numOfCoveringsInDuties[dutyOfLeg.getNdx()]++;
 					if (numOfLegCoverings[leg.getNdx()] == 1)
 						numOfDistinctCoveringsInDuties[dutyOfLeg.getNdx()]++;
@@ -138,7 +97,7 @@ public class HeuroOptimizer {
 		}
 	}
 
-	private List<Pair> initialize() {
+	private List<Pair> generateSolution(List<Leg> reOrderedLegs) {
 
 		logger.info("Initialization process is started!");
 
@@ -147,18 +106,18 @@ public class HeuroOptimizer {
 		int uncoveredLegs = 0;
 
 		int reOrderedLegNdx = -1;
-		int[] numOfLegCoverings = new int[this.legRepository.getModels().size()];
-		int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-		int[] numOfDistinctCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-		int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-		int[] dutyPriorityCumulative = new int[this.dutyRepository.getModels().size()];
+		int[] numOfLegCoverings = new int[this.legs.size()];
+		int[] numOfCoveringsInDuties = new int[this.duties.size()];
+		int[] numOfDistinctCoveringsInDuties = new int[this.duties.size()];
+		int[] blockTimeOfCoveringsInDuties = new int[this.duties.size()];
+		int[] dutyPriorityCumulative = new int[this.duties.size()];
 
 		while (true) {
-			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, numOfLegCoverings);
+			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, reOrderedLegs, numOfLegCoverings);
 			if (reOrderedLegNdx == Integer.MAX_VALUE)
 				break;
 
-			Leg legToCover = this.reOrderedLegs.get(reOrderedLegNdx);
+			Leg legToCover = reOrderedLegs.get(reOrderedLegNdx);
 
 			int heuristicNo = 1;
 
@@ -185,34 +144,37 @@ public class HeuroOptimizer {
 
 		double fitness = 0.0;
 		int numOfDuties = 0;
+		int numOfPairDays = 0;
 		int numOfPairs = 0;
 
 		for (int i = 0; i < solution.size(); i++) {
-			fitness += getPairCost(2, solution.get(i));
+//			fitness += getPairCost(2, solution.get(i));
 			numOfDuties += solution.get(i).getNumOfDuties();
+			numOfPairDays += solution.get(i).getNumOfDaysTouched();
 			numOfPairs++;
 		}
 
 		int numOfDeadheads = 0;
 
-		for (int i = 0; i < this.legRepository.getModels().size(); i++) {
-			if (this.legRepository.getModels().get(i).isCover()) {
+		for (int i = 0; i < this.legs.size(); i++) {
+			if (this.legs.get(i).isCover()) {
 				if (numOfLegCoverings[i] > 1) {
-					fitness += (2.0 * (this.legRepository.getModels().get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
-					numOfDeadheads++;
+//					fitness += (2.0 * (numOfLegCoverings[i] - 1) * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
+					fitness += (numOfLegCoverings[i] - 1) * 100;
+					numOfDeadheads += (numOfLegCoverings[i] - 1);
 				}
 			} else {
 				if (numOfLegCoverings[i] > 0) {
-					fitness += (2.0 * (this.legRepository.getModels().get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
-					numOfDeadheads++;
+//					fitness += (2.0 * numOfLegCoverings[i] * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
+					fitness += numOfLegCoverings[i] * 100;
+					numOfDeadheads += numOfLegCoverings[i];
 				}
 			}
 		}
 
-		this.checkFitness(fitness + uncoveredLegs * 100000000, numOfLegCoverings);
-
 		logger.info("numOfPairs: " + numOfPairs + 
-					", numOfDuties: " + numOfDuties + 
+					", numOfDuties: " + numOfDuties +
+					", numOfPairDays:" + numOfPairDays +
 					", uncoveredLegs: " + uncoveredLegs + 
 					", numOfDeadheads: " + numOfDeadheads + 
 					", fitness: " + fitness);
@@ -220,27 +182,8 @@ public class HeuroOptimizer {
 		return solution;
 	}
 
-	private double bestFitness = Double.MAX_VALUE;
-	private int[] bestNumOfLegCoverings = null;
-
-	private synchronized void checkFitness(double newFitness, int[] newNumOfLegCoverings) {
-		if (newFitness < bestFitness) {
-			this.bestFitness = newFitness;
-			this.bestNumOfLegCoverings = newNumOfLegCoverings;
-		}
-	}
-
-	private int getFirstLegNdxToCover() {
-		for (int i = 0; i < this.reOrderedLegs.size(); i++) {
-			if (this.reOrderedLegs.get(i).isCover()
-					&& (this.reOrderedLegs.get(i).hasPair(hbNdx)))
-				return i;
-		}
-		return Integer.MAX_VALUE;
-	}
-
 	private OneDimIndexInt<Pair> generateSolutionPairIndex(List<Pair> solution) {
-		OneDimIndexInt<Pair> pairIndexByLegNdx = new OneDimIndexInt<Pair>(new Pair[this.legRepository.getModels().size()][0]);
+		OneDimIndexInt<Pair> pairIndexByLegNdx = new OneDimIndexInt<Pair>(new Pair[this.legs.size()][0]);
 		for (int i = 0; i < solution.size(); i++) {
 			Pair pair = solution.get(i);
 			for (int j = 0; j < pair.getDuties().size(); j++) {
@@ -257,17 +200,17 @@ public class HeuroOptimizer {
 	public List<Pair> doMinimize() {
 		logger.info("Optimization process is started!");
 
-		this.orderLegs();
-
-		List<Pair> solution = this.initialize();
-		OneDimIndexInt<Pair> pairIndexByLegNdx = this.generateSolutionPairIndex(solution);
+		List<Leg> reOrderedLegs = new ArrayList<Leg>();
+		for (int i = 0; i < this.legs.size(); i++)
+			reOrderedLegs.add(this.legs.get(i));
 
 		int numOfIterationsWOProgress = 0;
 		long optStartTime = System.nanoTime();
 
 		for (int i = 1; i <= HeurosGaParameters.maxNumOfIterations; i++) {
 
-			this.orderLegs();
+			List<Pair> solution = this.generateSolution(reOrderedLegs);
+			OneDimIndexInt<Pair> pairIndexByLegNdx = this.generateSolutionPairIndex(solution);
 
 			int initialLegNdx = this.getFirstLegNdxToCover();
 			Leg initialLeg = this.reOrderedLegs.get(initialLegNdx);
@@ -275,13 +218,13 @@ public class HeuroOptimizer {
 			LinkedList<LegView> legs = new LinkedList<LegView>();
 			legs.add(initialLeg);
 
-			boolean[] legAdded = new boolean[this.legRepository.getModels().size()];
+			boolean[] legAdded = new boolean[this.legs.size()];
 
-			int[] numOfLegCoverings = new int[this.legRepository.getModels().size()];
-			int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-			int[] numOfDistinctCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-			int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-			int[] dutyPriorityCumulative = new int[this.dutyRepository.getModels().size()];
+			int[] numOfLegCoverings = new int[this.legs.size()];
+			int[] numOfCoveringsInDuties = new int[this.duties.size()];
+			int[] numOfDistinctCoveringsInDuties = new int[this.duties.size()];
+			int[] blockTimeOfCoveringsInDuties = new int[this.duties.size()];
+			int[] dutyPriorityCumulative = new int[this.duties.size()];
 
 			solution = new ArrayList<Pair>();
 
