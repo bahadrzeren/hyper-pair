@@ -6,8 +6,7 @@ import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
-import org.heuros.data.model.DutyView;
-import org.heuros.data.model.LegView;
+import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.rule.PairRuleContext;
@@ -63,7 +62,7 @@ public class PairingGenerator {
 
 //	private Random random = new Random();
 
-	public Pair generatePairing(LegView legToCover,
+	public Pair generatePairing(Leg legToCover,
 								int heuristicNo,
 								int[] numOfCoveringsInDuties,
 								int[] numOfDistinctCoveringsInDuties,
@@ -122,7 +121,7 @@ public class PairingGenerator {
 
 				if (nqm.getQual().isBetterThan(heuristicNo, bestPair.pairQ)) {
 
-					DutyView d = nqm.getNodeOwner();
+					Duty d = nqm.getNodeOwner();
 
 					if (d.isNonHbDep(this.hbNdx))
 						logger.error("Must be HB departed duty!");
@@ -151,7 +150,7 @@ public class PairingGenerator {
 								int dept = this.maxPairingLengthInDays - 1;
 								while (nqm.getNextNodeMetric() != null) {
 									nqm = nqm.getNextNodeMetric();
-									DutyView nd = nqm.getNodeOwner();
+									Duty nd = nqm.getNodeOwner();
 
 									if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
 										currentPair.pairQ.addToQualityMetric(nd, numOfCoveringsInDuties[nd.getNdx()], blockTimeOfCoveringsInDuties[nd.getNdx()], dutyPriorities[nd.getNdx()]);

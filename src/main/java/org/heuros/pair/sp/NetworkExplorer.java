@@ -9,8 +9,7 @@ import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
-import org.heuros.data.model.DutyView;
-import org.heuros.data.model.LegView;
+import org.heuros.data.model.Leg;
 
 public class NetworkExplorer {
 
@@ -25,10 +24,10 @@ public class NetworkExplorer {
 	private int maxPairingLengthInDays = 0;
 	private int maxDutyBlockTimeInMins = 0;
 
-	private OneDimIndexInt<DutyView> dutyIndexByDepLegNdx = null;
-	private OneDimIndexInt<DutyView> dutyIndexByArrLegNdx = null;
-	private OneDimUniqueIndexInt<LegView> nextBriefLegIndexByDutyNdx = null;
-	private OneDimUniqueIndexInt<LegView> prevDebriefLegIndexByDutyNdx = null;
+	private OneDimIndexInt<Duty> dutyIndexByDepLegNdx = null;
+	private OneDimIndexInt<Duty> dutyIndexByArrLegNdx = null;
+	private OneDimUniqueIndexInt<Leg> nextBriefLegIndexByDutyNdx = null;
+	private OneDimUniqueIndexInt<Leg> prevDebriefLegIndexByDutyNdx = null;
 
 	private boolean[] sourceDuties = null;
 
@@ -152,7 +151,7 @@ public class NetworkExplorer {
 	private LocalDate[] maxSearchDayDept = null;
 	private boolean[] hbArrFound = null;
 
-	private boolean addSourceDuty(int heuristicNo, DutyView d, boolean hasImprovement) {
+	private boolean addSourceDuty(int heuristicNo, Duty d, boolean hasImprovement) {
 		if (!this.sourceDuties[d.getNdx()]) {
 			this.sourceDuties[d.getNdx()] = true;
 			/*
@@ -198,7 +197,7 @@ public class NetworkExplorer {
 		return false;
 	}
 
-	public NetworkExplorer build(LegView legToCover,
+	public NetworkExplorer build(Leg legToCover,
 									Duty[] rootDuties,
 									int heuristicNo,
 									int[] numOfCoveringsInDuties,
@@ -322,14 +321,14 @@ public class NetworkExplorer {
 		return this;
 	}
 
-	private boolean isNodeVisitedFw(DutyView d, int dept, LocalDate maxMinDateDept) {
+	private boolean isNodeVisitedFw(Duty d, int dept, LocalDate maxMinDateDept) {
 		return (maxSearchNumDept[d.getNdx()] > dept)
 				|| ((maxSearchNumDept[d.getNdx()] == dept)
 						&& (maxSearchDayDept[d.getNdx()].isEqual(maxMinDateDept)
 								|| maxSearchDayDept[d.getNdx()].isAfter(maxMinDateDept)));
 	}
 
-	private void setNodeVisitedFw(DutyView d, int dept, LocalDate maxMinDateDept) {
+	private void setNodeVisitedFw(Duty d, int dept, LocalDate maxMinDateDept) {
 		if (maxSearchNumDept[d.getNdx()] < dept) {
 			maxSearchNumDept[d.getNdx()] = dept;
 			maxSearchDayDept[d.getNdx()] = maxMinDateDept;
@@ -340,7 +339,7 @@ public class NetworkExplorer {
 			}
 	}
 
-	private void fwRegister(DutyView pd, DutyView nd) {
+	private void fwRegister(Duty pd, Duty nd) {
 		/*
 		 * Calculate quality metric.
 		 */
@@ -368,17 +367,17 @@ public class NetworkExplorer {
 		numOfFwNodesAdded++;
 	}
 
-	private boolean fwNetworkSearch(DutyView pd, QualityMetric fwCumulative, boolean hbDep, LocalDate maxMinDateDept, int dept) throws CloneNotSupportedException {
+	private boolean fwNetworkSearch(Duty pd, QualityMetric fwCumulative, boolean hbDep, LocalDate maxMinDateDept, int dept) throws CloneNotSupportedException {
 
 		if (dept < maxFwDeptReached)
 			maxFwDeptReached = dept;
 		numOfRecursions++;
 		numOfFwRecursions++;
 		boolean res = false;
-		LegView[] nextLegs = this.nextBriefLegIndexByDutyNdx.getArray(pd.getNdx());
-		for (LegView leg : nextLegs) {
-			DutyView[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
-			for (DutyView nd: nextDuties) {
+		Leg[] nextLegs = this.nextBriefLegIndexByDutyNdx.getArray(pd.getNdx());
+		for (Leg leg : nextLegs) {
+			Duty[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
+			for (Duty nd: nextDuties) {
 //if ((pd.getNdx() == 36121)
 //&& (nd.getNdx() == 43778))
 //System.out.println();
@@ -431,14 +430,14 @@ public class NetworkExplorer {
 		return res;
 	}
 
-	private boolean isNodeVisitedBw(DutyView d, int dept, LocalDate maxMinDateDept) {
+	private boolean isNodeVisitedBw(Duty d, int dept, LocalDate maxMinDateDept) {
 		return (maxSearchNumDept[d.getNdx()] > dept)
 				|| ((maxSearchNumDept[d.getNdx()] == dept)
 						&& (maxSearchDayDept[d.getNdx()].isEqual(maxMinDateDept)
 								|| maxSearchDayDept[d.getNdx()].isBefore(maxMinDateDept)));
 	}
 
-	private void setNodeVisitedBw(DutyView d, int dept, LocalDate maxMinDateDept) {
+	private void setNodeVisitedBw(Duty d, int dept, LocalDate maxMinDateDept) {
 		if (maxSearchNumDept[d.getNdx()] < dept) {
 			maxSearchNumDept[d.getNdx()] = dept;
 			maxSearchDayDept[d.getNdx()] = maxMinDateDept;
@@ -449,7 +448,7 @@ public class NetworkExplorer {
 			}
 	}
 
-	private boolean bwRegister(DutyView pd, DutyView nd) {
+	private boolean bwRegister(Duty pd, Duty nd) {
 		boolean res = false;
 		/*
 		 * Calculate quality metric.
@@ -469,10 +468,10 @@ public class NetworkExplorer {
 		return res;
 	}
 
-	private boolean bwNetworkSearch(DutyView rootDuty, boolean hbArr, LocalDate maxMinDateDept, int maxDept) throws CloneNotSupportedException {
+	private boolean bwNetworkSearch(Duty rootDuty, boolean hbArr, LocalDate maxMinDateDept, int maxDept) throws CloneNotSupportedException {
 		boolean res = false;
 
-		LinkedList<DutyView> treeOfDuties = new LinkedList<DutyView>();
+		LinkedList<Duty> treeOfDuties = new LinkedList<Duty>();
 		treeOfDuties.add(rootDuty);
 
 		/*
@@ -491,14 +490,14 @@ public class NetworkExplorer {
 
 		while (treeOfDuties.size() > 0) {
 
-			DutyView nd = treeOfDuties.removeFirst();
+			Duty nd = treeOfDuties.removeFirst();
 
 			int dept = this.maxSearchNumDept[nd.getNdx()] - 1;
 
-			LegView[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
-			for (LegView leg : prevLegs) {
-				DutyView[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
-				for (DutyView pd: prevDuties) {
+			Leg[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
+			for (Leg leg : prevLegs) {
+				Duty[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
+				for (Duty pd: prevDuties) {
 					if (pd.isValid(this.hbNdx)
 							&& pd.hasPairing(this.hbNdx)
 							&& (pd.isHbDep(this.hbNdx) || (dept > 1))

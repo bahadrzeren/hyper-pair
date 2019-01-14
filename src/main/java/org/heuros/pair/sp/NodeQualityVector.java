@@ -1,23 +1,23 @@
 package org.heuros.pair.sp;
 
-import org.heuros.data.model.DutyView;
+import org.heuros.data.model.Duty;
 
 public class NodeQualityVector {
 
-	private DutyView nodeOwner = null;
+	private Duty nodeOwner = null;
 	private QualityMetric nodeOwnerQm = null;
 	private NodeQualityMetric[] nodeQuals = null;
 
 	/*
 	 * Only for HB arrival duty nodes!
 	 */
-	public NodeQualityVector(int maxPairingLengthInDays, DutyView hbArrDuty, QualityMetric hbArrDutyQm) {
+	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, QualityMetric hbArrDutyQm) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, hbArrDutyQm, null);
 	}
 
-	public NodeQualityVector(int maxPairingLengthInDays, DutyView hbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority) {
+	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority, null);
@@ -26,7 +26,7 @@ public class NodeQualityVector {
 	/*
 	 * Only for non HB arrival duty nodes!
 	 */
-	public NodeQualityVector(int maxPairingLengthInDays, DutyView nonHbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority, NodeQualityVector nextNodeQv) {
+	public NodeQualityVector(int maxPairingLengthInDays, Duty nonHbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority, NodeQualityVector nextNodeQv) {
 		this.nodeOwner = nonHbArrDuty;
 		this.nodeOwnerQm = new QualityMetric(nonHbArrDuty, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority);
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
@@ -38,7 +38,7 @@ public class NodeQualityVector {
 		}
 	}
 
-	public DutyView getNodeOwner() {
+	public Duty getNodeOwner() {
 		return nodeOwner;
 	}
 

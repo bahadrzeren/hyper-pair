@@ -1,14 +1,14 @@
 package org.heuros.pair.sp;
 
-import org.heuros.data.model.DutyView;
+import org.heuros.data.model.Duty;
 
 public class NodeQualityMetric {
 
-	private DutyView nodeOwner = null;
+	private Duty nodeOwner = null;
 	private NodeQualityMetric nextNodeMetric = null;
 	private QualityMetric qual = null;
 
-	public NodeQualityMetric(DutyView nodeOwner,
+	public NodeQualityMetric(Duty nodeOwner,
 								QualityMetric nodeQm,
 								NodeQualityMetric nextNodeMetric) {
 		this.qual = new QualityMetric(nodeQm);
@@ -16,11 +16,11 @@ public class NodeQualityMetric {
 		this.nextNodeMetric = nextNodeMetric;
 	}
 
-	public NodeQualityMetric(DutyView nodeOwner,
- 									int numOfCoveringsInDuty,
-									int blockTimeOfCoveringsInDuty,
-									int priority,
-									NodeQualityMetric nextNodeMetric) {
+	public NodeQualityMetric(Duty nodeOwner,
+								int numOfCoveringsInDuty,
+								int blockTimeOfCoveringsInDuty,
+								int priority,
+								NodeQualityMetric nextNodeMetric) {
 		this.qual = new QualityMetric(nodeOwner, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority);
 		this.nodeOwner = nodeOwner;
 		this.nextNodeMetric = nextNodeMetric;
@@ -32,7 +32,7 @@ public class NodeQualityMetric {
 		this.nextNodeMetric = null;
 	}
 
-	public DutyView getNodeOwner() {
+	public Duty getNodeOwner() {
 		return nodeOwner;
 	}
 
