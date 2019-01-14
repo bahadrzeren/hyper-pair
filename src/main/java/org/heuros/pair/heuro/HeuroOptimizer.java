@@ -195,10 +195,19 @@ public class HeuroOptimizer {
 		int max = 0;
 		int res = -1;
 		for (int i = 0; i < numOfLegCoverings.length; i++) {
-			if ((!legsConsidered[i])
-					&& (numOfLegCoverings[i] > max)) {
-				res = i;
-				max = numOfLegCoverings[i];
+			if (!legsConsidered[i]) {
+				
+				if (this.legs.get(i).isCover()) {
+					if (numOfLegCoverings[i] - 1 > max) {
+						res = i;
+						max = numOfLegCoverings[i] - 1;
+					}
+				} else
+					if (numOfLegCoverings[i] > max) {
+						res = i;
+						max = numOfLegCoverings[i];
+					}
+
 			}
 		}
 		if (res >= 0) {
@@ -207,16 +216,26 @@ public class HeuroOptimizer {
 		return null;
 	}
 
-	private int enhanceReOrderedLegs(int startingNdx, Pair p, boolean[] legsConsidered, List<Leg> reOrderedLegs) {
+	private int enhanceReOrderedLegs(int startingNdx, Pair p, boolean[] legsConsidered, int[] numOfLegCoverings, LinkedList<Leg> rootLegList, List<Leg> reOrderedLegs) {
 		int res = startingNdx;
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
-			DutyView duty = p.getDuties().get(i);
+			Duty duty = p.getDuties().get(i);
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
-				LegView leg = duty.getLegs().get(j);
+				Leg leg = duty.getLegs().get(j);
 				if (!legsConsidered[leg.getNdx()]) {
 					reOrderedLegs.set(res, (Leg) leg);
 					res++;
 					legsConsidered[leg.getNdx()] = true;
+
+if (leg.isCover()) {
+	if (numOfLegCoverings[i] > 1) {
+		rootLegList.add(leg);
+	}
+} else
+	if (numOfLegCoverings[i] > 0) {
+		rootLegList.add(leg);
+	}
+
 				}
 			}
 		}
@@ -233,25 +252,32 @@ public class HeuroOptimizer {
 		int reOrderNdx = 0;
 
 		Leg leg = this.getLegWithMaxCoverage(numOfLegCoverings, legsConsidered);
-		logger.info("Max numOfDh: " + numOfLegCoverings[leg.getNdx()]);
+		if (leg.isCover())
+			logger.info("Max numOfDh: " + (numOfLegCoverings[leg.getNdx()] - 1));
+		else
+			logger.info("Max numOfDh: " + numOfLegCoverings[leg.getNdx()]);
 
-LinkedList<Leg> legList = new LinkedList<Leg>();
-legList.add(leg);
+		LinkedList<Leg> rootLegList = new LinkedList<Leg>();
 
-//		while (leg != null) {
-while (legList.size() > 0) {
+		while (leg != null) {
+			rootLegList.add(leg);
 
-			legsConsidered[leg.getNdx()] = true;
-			reOrderedLegs.set(reOrderNdx, leg);
-			reOrderNdx++;
+			while (rootLegList.size() > 0) {
 
-			Pair[] pairs = pairIndexByLegNdx.getArray(leg.getNdx());
-			for (Pair pair : pairs) {
-				reOrderNdx = this.enhanceReOrderedLegs(reOrderNdx, pair, legsConsidered, reOrderedLegs);
-			}
+				leg = rootLegList.removeFirst();
+
+				legsConsidered[leg.getNdx()] = true;
+				reOrderedLegs.set(reOrderNdx, leg);
+				reOrderNdx++;
+
+				Pair[] pairs = pairIndexByLegNdx.getArray(leg.getNdx());
+				for (Pair pair : pairs) {
+					reOrderNdx = this.enhanceReOrderedLegs(reOrderNdx, pair, legsConsidered, numOfLegCoverings, rootLegList, reOrderedLegs);
+				}
 
 //				logger.info("checkAndUpdateTheOrder: " + leg.toString() + " #" + reOrderNdx);
 
+			}
 			leg = this.getLegWithMaxCoverage(numOfLegCoverings, legsConsidered);
 		}
 
