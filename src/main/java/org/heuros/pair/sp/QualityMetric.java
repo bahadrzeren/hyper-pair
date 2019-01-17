@@ -152,8 +152,8 @@ public class QualityMetric {
 					|| (this.numOfDh < qm.numOfDh)
 					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
 					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins) 
-//							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
-							&& (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
+							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
+//							&& (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
 				return true;
 			} else
 				return false;
@@ -161,8 +161,8 @@ public class QualityMetric {
 			if ((qm.numOfLegs == 0)
 					|| (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
 					|| ((((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) == ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
-//							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
-							&& (this.numOfDh < qm.numOfDh))) {
+							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
+//							&& (this.numOfDh < qm.numOfDh))) {
 				return true;
 			} else
 				return false;
@@ -193,6 +193,16 @@ public class QualityMetric {
 			} else
 				return false;
 		}
+	}
+
+	public boolean isNotEmpty() {
+		return ((numOfDh > 0)
+			|| (dhDurationInMins > 0)
+			|| (activeBlocktimeInMins > 0)
+			|| (numOfDuties > 0)
+			|| (numOfIncludingDutiesOfTheSameLegs > 0)
+			|| (numOfLegs > 0)
+			|| (priority < Integer.MAX_VALUE));
 	}
 
 	public String toString() {

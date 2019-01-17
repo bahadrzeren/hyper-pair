@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
@@ -13,7 +14,7 @@ import org.heuros.data.model.Leg;
 
 public class NetworkExplorer {
 
-//	private static Logger logger = Logger.getLogger(PricingSubNetwork.class);
+	private static Logger logger = Logger.getLogger(NetworkExplorer.class);
 
 	/*
 	 * TODO Single base assumption!!!
@@ -316,6 +317,9 @@ public class NetworkExplorer {
 						}
 					}
 				cumulativeQual.removeFromQualityMetric(duty, numOfCoveringsInDuties[duty.getNdx()], blockTimeOfCoveringsInDuties[duty.getNdx()], dutyPriorities[duty.getNdx()]);
+
+//if (cumulativeQual.isNotEmpty())
+//	logger.error("CumulativeQual is not empty!");
 			}
 		}
 		return this;

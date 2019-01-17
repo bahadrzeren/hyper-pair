@@ -1,11 +1,15 @@
 package org.heuros.pair.heuro;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
+import org.heuros.core.data.ndx.TwoDimIndexIntXInt;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
@@ -176,7 +180,7 @@ public class HeuroOptimizer {
 		return fitness;
 	}
 
-	private OneDimIndexInt<Pair> generateSolutionPairIndex(List<Pair> solution) {
+	private OneDimIndexInt<Pair> generateSolutionPairIndex(List<Pair> solution, int itrNr, TwoDimIndexIntXInt<Pair> pairIndexByItrNrLegNdx) {
 		OneDimIndexInt<Pair> pairIndexByLegNdx = new OneDimIndexInt<Pair>(new Pair[this.legs.size()][0]);
 		for (int i = 0; i < solution.size(); i++) {
 			Pair pair = solution.get(i);
@@ -185,18 +189,19 @@ public class HeuroOptimizer {
 				for (int k = 0; k < duty.getLegs().size(); k++) {
 					LegView leg = duty.getLegs().get(k);
 					pairIndexByLegNdx.add(leg.getNdx(), pair);
+					pairIndexByItrNrLegNdx.add(itrNr, leg.getNdx(), pair);
 				}
 			}
 		}
 		return pairIndexByLegNdx;
 	}
 
-	private Leg getLegWithMaxCoverage(int[] numOfLegCoverings, boolean[] legsConsidered) {
+	private Leg getLegWithMaxCoverage(int[] numOfLegCoverings, boolean[] rooted) {
 		int max = 0;
 		int res = -1;
 		for (int i = 0; i < numOfLegCoverings.length; i++) {
-			if (!legsConsidered[i]) {
-				
+			if (!rooted[i]) {
+
 				if (this.legs.get(i).isCover()) {
 					if (numOfLegCoverings[i] - 1 > max) {
 						res = i;
@@ -216,25 +221,28 @@ public class HeuroOptimizer {
 		return null;
 	}
 
-	private int enhanceReOrderedLegs(int startingNdx, Pair p, boolean[] legsConsidered, int[] numOfLegCoverings, LinkedList<Leg> rootLegList, List<Leg> reOrderedLegs) {
+	private int enhanceReOrderedLegs(int startingNdx, Pair p, boolean[] ordered, boolean[] rooted, int[] numOfLegCoverings, LinkedList<Leg> rootLegList, List<Leg> reOrderedLegs) {
 		int res = startingNdx;
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
 			Duty duty = p.getDuties().get(i);
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
 				Leg leg = duty.getLegs().get(j);
-				if (!legsConsidered[leg.getNdx()]) {
-					reOrderedLegs.set(res, (Leg) leg);
+				if (!ordered[leg.getNdx()]) {
+					reOrderedLegs.set(res, leg);
 					res++;
-					legsConsidered[leg.getNdx()] = true;
-
-if (leg.isCover()) {
-	if (numOfLegCoverings[i] > 1) {
-		rootLegList.add(leg);
-	}
-} else
-	if (numOfLegCoverings[i] > 0) {
-		rootLegList.add(leg);
-	}
+					ordered[leg.getNdx()] = true;
+				}
+				if (!rooted[leg.getNdx()]) {
+					if (leg.isCover()) {
+						if (numOfLegCoverings[i] > 1) {
+							rootLegList.add(leg);
+							rooted[leg.getNdx()] = true;
+						}
+					} else
+						if (numOfLegCoverings[i] > 0) {
+							rootLegList.add(leg);
+							rooted[leg.getNdx()] = true;
+						}
 
 				}
 			}
@@ -245,46 +253,49 @@ if (leg.isCover()) {
 	private void checkAndUpdateTheOrder(OneDimIndexInt<Pair> pairIndexByLegNdx, int[] numOfLegCoverings, List<Leg> reOrderedLegs) {
 		logger.info("checkAndUpdateTheOrder");
 
-		boolean[] legsConsidered = new boolean[this.legs.size()];
+		boolean[] rooted = new boolean[this.legs.size()];
+		boolean[] ordered = new boolean[this.legs.size()];
 		/*
 		 * TODO: Deadheads from other fleets needs to be considered!
 		 */
 		int reOrderNdx = 0;
 
-		Leg leg = this.getLegWithMaxCoverage(numOfLegCoverings, legsConsidered);
+		Leg leg = this.getLegWithMaxCoverage(numOfLegCoverings, rooted);
 		if (leg.isCover())
-			logger.info("Max numOfDh: " + (numOfLegCoverings[leg.getNdx()] - 1));
+			logger.info("Max numOfDh: " + (numOfLegCoverings[leg.getNdx()] - 1) + " - " + leg);
 		else
-			logger.info("Max numOfDh: " + numOfLegCoverings[leg.getNdx()]);
+			logger.info("Max numOfDh: " + numOfLegCoverings[leg.getNdx()] + " - " + leg);
 
 		LinkedList<Leg> rootLegList = new LinkedList<Leg>();
 
 		while (leg != null) {
 			rootLegList.add(leg);
+			rooted[leg.getNdx()] = true;
 
 			while (rootLegList.size() > 0) {
 
 				leg = rootLegList.removeFirst();
-
-				legsConsidered[leg.getNdx()] = true;
-				reOrderedLegs.set(reOrderNdx, leg);
-				reOrderNdx++;
+				if (!ordered[leg.getNdx()]) {
+					reOrderedLegs.set(reOrderNdx, leg);
+					reOrderNdx++;
+					ordered[leg.getNdx()] = true;
+				}
 
 				Pair[] pairs = pairIndexByLegNdx.getArray(leg.getNdx());
 				for (Pair pair : pairs) {
-					reOrderNdx = this.enhanceReOrderedLegs(reOrderNdx, pair, legsConsidered, numOfLegCoverings, rootLegList, reOrderedLegs);
+					reOrderNdx = this.enhanceReOrderedLegs(reOrderNdx, pair, ordered, rooted, numOfLegCoverings, rootLegList, reOrderedLegs);
 				}
 
 //				logger.info("checkAndUpdateTheOrder: " + leg.toString() + " #" + reOrderNdx);
 
 			}
-			leg = this.getLegWithMaxCoverage(numOfLegCoverings, legsConsidered);
+			leg = this.getLegWithMaxCoverage(numOfLegCoverings, rooted);
 		}
 
 		logger.info("checkAndUpdateTheOrder: #" + reOrderNdx);
 
-		for (int i = 0; i < legsConsidered.length; i++) {
-			if (!legsConsidered[i]) {
+		for (int i = 0; i < ordered.length; i++) {
+			if (!ordered[i]) {
 				reOrderedLegs.set(reOrderNdx, this.legs.get(i));
 				reOrderNdx++;
 			}
@@ -292,6 +303,8 @@ if (leg.isCover()) {
 
 		logger.info("checkAndUpdateTheOrder: #" + reOrderNdx);
 	}
+
+	private Random random = new Random();
 
 	public List<Pair> doMinimize() {
 		logger.info("Optimization process is started!");
@@ -311,6 +324,13 @@ if (leg.isCover()) {
 		int numOfIterationsWOProgress = 0;
 		long optStartTime = System.nanoTime();
 
+		/*
+		 * CUMULATIVES
+		 */
+		TwoDimIndexIntXInt<Pair> pairIndexByItrNrLegNdx = new TwoDimIndexIntXInt<Pair>(new Pair[HeurosGaParameters.maxNumOfIterations][this.legs.size()][0]);
+		int[] numOfLegCoveringsCumulative = new int[this.legs.size()];
+		int[][] numOfLegCoveringsHistory = new int[HeurosGaParameters.maxNumOfIterations][this.legs.size()];
+
 		for (int i = 0; i < HeurosGaParameters.maxNumOfIterations; i++) {
 
 			List<Pair> solution = new ArrayList<Pair>();
@@ -327,6 +347,12 @@ if (leg.isCover()) {
 												numOfDistinctCoveringsInDuties,
 												blockTimeOfCoveringsInDuties,
 												dutyPriorityCumulative);
+
+			for (int j = 0; j < numOfLegCoverings.length; j++) {
+				numOfLegCoveringsCumulative[j] += numOfLegCoverings[j] * (i + 1);
+				numOfLegCoveringsHistory[i][j] = numOfLegCoverings[j];
+			}
+
 			if (cost < bestCost) {
 				bestCost = cost;
 				bestSolution = solution;
@@ -336,14 +362,73 @@ if (leg.isCover()) {
 				bestBlockTimeOfCoveringsInDuties = blockTimeOfCoveringsInDuties;
 				bestDutyPriorityCumulative = dutyPriorityCumulative;
 			}
-			OneDimIndexInt<Pair> pairIndexByLegNdx = this.generateSolutionPairIndex(solution);
 
-			this.checkAndUpdateTheOrder(pairIndexByLegNdx, bestNumOfLegCoverings, reOrderedLegs);
+			/*
+			 * DH HEURISTIC SEARCH ORDER
+			 */
+			OneDimIndexInt<Pair> pairIndexByLegNdx = this.generateSolutionPairIndex(solution, i, pairIndexByItrNrLeg Ndx);
+			this.checkAndUpdateTheOrder(pairIndexByLegNdx, numOfLegCoverings, reOrderedLegs);
+
+			/*
+			 * RANDOM ORDER
+			 */
+//			for (int j = 0; j < reOrderedLegs.size(); j++) {
+//				int fNdx = random.nextInt(reOrderedLegs.size());
+//				int sNdx = random.nextInt(reOrderedLegs.size());
+//				while (fNdx == sNdx)
+//					sNdx = random.nextInt(reOrderedLegs.size());
+//				Leg hL = reOrderedLegs.get(sNdx);
+//				reOrderedLegs.set(sNdx, reOrderedLegs.get(fNdx));
+//				reOrderedLegs.set(fNdx, hL);
+//			}
+
+			/*
+			 * DH CUMULATIVE ORDER
+			 */
+//			Collections.sort(reOrderedLegs, new Comparator<Leg>() {
+//				@Override
+//				public int compare(Leg o1, Leg o2) {
+//					if (numOfLegCoveringsCumulative[o1.getNdx()] > numOfLegCoveringsCumulative[o2.getNdx()])
+//						return -1;
+//					else
+//						if (numOfLegCoveringsCumulative[o1.getNdx()] < numOfLegCoveringsCumulative[o2.getNdx()])
+//							return 1;
+//						else
+//							return 0;
+//				}
+//			});
 
 			if ((numOfIterationsWOProgress >= HeurosGaParameters.maxNumOfIterationsWOProgress)
                     || ((System.nanoTime() - optStartTime) >= HeurosGaParameters.maxElapsedTimeInNanoSecs))
 				break;
         }
+
+		/*
+		 * REPORT
+		 */
+//		for (int j = 0; j < this.legs.size(); j++) {
+//			boolean log = false;
+//			StringBuilder sb = new StringBuilder();
+//			sb.append(this.legs.get(j))
+//				.append(": ");
+//			for (int i = 0; i < numOfLegCoveringsHistory.length; i++) {
+//				if (this.legs.get(j).isCover()) {
+//					if (numOfLegCoveringsHistory[i][j] > 1)
+//						log = true;
+//					sb.append(", ");
+//					if (numOfLegCoveringsHistory[i][j] > 0)
+//						sb.append(numOfLegCoveringsHistory[i][j] - 1);
+//					else
+//						sb.append(0);
+//				} else {
+//					if (numOfLegCoveringsHistory[i][j] > 0)
+//						log = true;
+//					sb.append(", ").append(numOfLegCoveringsHistory[i][j]);
+//				}
+//			}
+//			if (log)
+//				logger.info(sb.toString());
+//		}			
 
 		return bestSolution;
 	}
