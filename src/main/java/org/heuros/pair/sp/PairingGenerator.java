@@ -87,7 +87,13 @@ public class PairingGenerator {
 																		this.maxPairingLengthInDays, 
 																		this.maxDutyBlockTimeInMins,
 																		this.dutyLegOvernightConnNetwork)
-													.build(legToCover, coveringDuties, heuristicNo, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, dutyPriorities);
+													.build(legToCover, 
+															coveringDuties, 
+															heuristicNo, 
+															numOfCoveringsInDuties, 
+															numOfDistinctCoveringsInDuties, 
+															blockTimeOfCoveringsInDuties, 
+															dutyPriorities);
 
 //			long subNetworkBuiltTime = System.nanoTime();
 

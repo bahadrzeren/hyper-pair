@@ -28,7 +28,7 @@ public class NodeQualityVector {
 	 */
 	public NodeQualityVector(int maxPairingLengthInDays, Duty nonHbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority, NodeQualityVector nextNodeQv) {
 		this.nodeOwner = nonHbArrDuty;
-		this.nodeOwnerQm = new QualityMetric(nonHbArrDuty, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority);
+		this.nodeOwnerQm = new QualityMetric(this.nodeOwner, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority);
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if (nextNodeQv.nodeQuals[i - 1] != null) {

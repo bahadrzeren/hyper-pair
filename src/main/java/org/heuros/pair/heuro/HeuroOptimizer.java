@@ -64,21 +64,37 @@ public class HeuroOptimizer {
 		return this;
 	}
 
-	private int getNextLegNdxToCover(int prevReOrderedLegNdx, List<Leg> reOrderedLegs, int[] numOfLegCoverings) {
-		for (int i = prevReOrderedLegNdx + 1; i < reOrderedLegs.size(); i++) {
-			if (reOrderedLegs.get(i).isCover()
-					&& reOrderedLegs.get(i).hasPair(hbNdx)
-					&& (numOfLegCoverings[reOrderedLegs.get(i).getNdx()] == 0))
-				return i;
+//	private int getNextLegNdxToCover(int prevReOrderedLegNdx, List<Leg> reOrderedLegs, int[] numOfLegCoverings) {
+//		for (int i = prevReOrderedLegNdx + 1; i < reOrderedLegs.size(); i++) {
+//			if (reOrderedLegs.get(i).isCover()
+//					&& reOrderedLegs.get(i).hasPair(hbNdx)
+//					&& (numOfLegCoverings[reOrderedLegs.get(i).getNdx()] == 0))
+//				return i;
+//		}
+//		return Integer.MAX_VALUE;
+//	}
+	private int getNextLegNdxToCover(int[] numOfLegCoverings, int[] numOfDutiesWoDh) {
+		int res = -1;
+		int minNumOfDutiesWoDh = Integer.MAX_VALUE;
+		for (int i = 0; i < this.legs.size(); i++) {
+			if (this.legs.get(i).isCover()
+					&& this.legs.get(i).hasPair(hbNdx)
+					&& (numOfLegCoverings[i] == 0)) {
+				if (minNumOfDutiesWoDh > numOfDutiesWoDh[i]) {
+					minNumOfDutiesWoDh = numOfDutiesWoDh[i];
+					res = i;
+				}
+			}
 		}
-		return Integer.MAX_VALUE;
+		return res;
 	}
 
 	private void udpateStateVectors(Pair p,
 									int[] numOfLegCoverings,
 									int[] numOfCoveringsInDuties,
 									int[] numOfDistinctCoveringsInDuties,
-									int[] blockTimeOfCoveringsInDuties) {
+									int[] blockTimeOfCoveringsInDuties,
+									int[] numOfDutiesWoDh) {
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
 			Duty duty = p.getDuties().get(i);
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
@@ -91,6 +107,10 @@ public class HeuroOptimizer {
 					if (numOfLegCoverings[leg.getNdx()] == 1)
 						numOfDistinctCoveringsInDuties[dutyOfLeg.getNdx()]++;
 					blockTimeOfCoveringsInDuties[dutyOfLeg.getNdx()] += leg.getBlockTimeInMins();
+
+for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
+numOfDutiesWoDh[dutyOfLeg.getLegs().get(li).getNdx()]--;
+}
 				}
 			}
 		}
@@ -110,12 +130,26 @@ public class HeuroOptimizer {
 
 		int reOrderedLegNdx = -1;
 
-		while (true) {
-			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, reOrderedLegs, numOfLegCoverings);
-			if (reOrderedLegNdx == Integer.MAX_VALUE)
-				break;
+int[] numOfDutiesWoDh = new int[this.legs.size()];
+for (int i = 0; i < this.duties.size(); i++) {
+	Duty duty = this.duties.get(i);
+	if (duty.getNumOfLegsPassive() == 0) {
+		for (int j = 0; j < duty.getNumOfLegs(); j++) {
+			numOfDutiesWoDh[j]++; 
+		}
+	}
+}
 
-			Leg legToCover = reOrderedLegs.get(reOrderedLegNdx);
+		while (true) {
+//			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, reOrderedLegs, numOfLegCoverings);
+//			if (reOrderedLegNdx == Integer.MAX_VALUE)
+//				break;
+//			Leg legToCover = reOrderedLegs.get(reOrderedLegNdx);
+
+reOrderedLegNdx = this.getNextLegNdxToCover(numOfLegCoverings, numOfDutiesWoDh);
+if (reOrderedLegNdx < 0)
+	break;
+Leg legToCover = this.legs.get(reOrderedLegNdx);
 
 			int heuristicNo = 1;
 
@@ -132,7 +166,7 @@ public class HeuroOptimizer {
 			}
 
 			if (p != null) {
-				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
+				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties, numOfDutiesWoDh);
 				solution.add(p);
 			} else {
 				HeuroOptimizer.logger.error("Pairing could not be found for " + legToCover);
@@ -180,7 +214,8 @@ public class HeuroOptimizer {
 		return fitness;
 	}
 
-	private OneDimIndexInt<Pair> generateSolutionPairIndex(List<Pair> solution, int itrNr, TwoDimIndexIntXInt<Pair> pairIndexByItrNrLegNdx) {
+	private OneDimIndexInt<Pair> generateSolutionPairIndex(List<Pair> solution//	, int itrNr, TwoDimIndexIntXInt<Pair> pairIndexByItrNrLegNdx
+															) {
 		OneDimIndexInt<Pair> pairIndexByLegNdx = new OneDimIndexInt<Pair>(new Pair[this.legs.size()][0]);
 		for (int i = 0; i < solution.size(); i++) {
 			Pair pair = solution.get(i);
@@ -189,7 +224,7 @@ public class HeuroOptimizer {
 				for (int k = 0; k < duty.getLegs().size(); k++) {
 					LegView leg = duty.getLegs().get(k);
 					pairIndexByLegNdx.add(leg.getNdx(), pair);
-					pairIndexByItrNrLegNdx.add(itrNr, leg.getNdx(), pair);
+//					pairIndexByItrNrLegNdx.add(itrNr, leg.getNdx(), pair);
 				}
 			}
 		}
@@ -366,8 +401,8 @@ public class HeuroOptimizer {
 			/*
 			 * DH HEURISTIC SEARCH ORDER
 			 */
-			OneDimIndexInt<Pair> pairIndexByLegNdx = this.generateSolutionPairIndex(solution, i, pairIndexByItrNrLeg Ndx);
-			this.checkAndUpdateTheOrder(pairIndexByLegNdx, numOfLegCoverings, reOrderedLegs);
+//			OneDimIndexInt<Pair> pairIndexByLegNdx = this.generateSolutionPairIndex(solution, i, pairIndexByItrNrLegNdx);
+//			this.checkAndUpdateTheOrder(pairIndexByLegNdx, numOfLegCoverings, reOrderedLegs);
 
 			/*
 			 * RANDOM ORDER
