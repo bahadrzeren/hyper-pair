@@ -10,6 +10,7 @@ import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
+import org.heuros.pair.heuro.DutyParam;
 
 public class NetworkExplorer {
 
@@ -142,10 +143,7 @@ public class NetworkExplorer {
 	}
 
 	private int heuristicNo = 0;
-	private int[] numOfCoveringsInDuties = null;
-	private int[] numOfDistinctCoveringsInDuties = null;
-	private int[] blockTimeOfCoveringsInDuties = null;
-	private int[] dutyPriorities = null;
+	private DutyParam[] dps = null;
 
 	private int[] maxSearchNumDept = null;
 	private LocalDate[] maxSearchDayDept = null;
@@ -200,15 +198,9 @@ public class NetworkExplorer {
 	public NetworkExplorer build(Leg legToCover,
 									Duty[] rootDuties,
 									int heuristicNo,
-									int[] numOfCoveringsInDuties,
-									int[] numOfDistinctCoveringsInDuties,
-									int[] blockTimeOfCoveringsInDuties,
-									int[] dutyPriorities) throws CloneNotSupportedException {
+									DutyParam[] dps) throws CloneNotSupportedException {
 		this.heuristicNo = heuristicNo;
-		this.numOfCoveringsInDuties = numOfCoveringsInDuties;
-		this.numOfDistinctCoveringsInDuties = numOfDistinctCoveringsInDuties;
-		this.blockTimeOfCoveringsInDuties = blockTimeOfCoveringsInDuties;
-		this.dutyPriorities = dutyPriorities;
+		this.dps = dps;
 
 		/*
 		 * Here there are two implementation options.
@@ -274,11 +266,11 @@ public class NetworkExplorer {
 			if (duty.isValid(this.hbNdx)
 					&& duty.hasPairing(this.hbNdx)
 					&& ((sourceNodeQmArray.length == 0)
-							|| (duty.getNumOfLegs() > numOfDistinctCoveringsInDuties[duty.getNdx()])
+							|| (duty.getNumOfLegs() > dps[duty.getNdx()].numOfDistinctCoverings)
 							|| (duty.getNumOfLegs() == 1))
 					) {
 
-				cumulativeQual.addToQualityMetric(duty, numOfCoveringsInDuties[duty.getNdx()], blockTimeOfCoveringsInDuties[duty.getNdx()], dutyPriorities[duty.getNdx()]);
+				cumulativeQual.addToQualityMetric(duty, dps[duty.getNdx()]);
 				if (duty.isHbDep(this.hbNdx)) {
 					if (duty.isHbArr(this.hbNdx)) {
 						/*
@@ -315,7 +307,7 @@ public class NetworkExplorer {
 							}
 						}
 					}
-				cumulativeQual.removeFromQualityMetric(duty, numOfCoveringsInDuties[duty.getNdx()], blockTimeOfCoveringsInDuties[duty.getNdx()], dutyPriorities[duty.getNdx()]);
+				cumulativeQual.removeFromQualityMetric(duty, dps[duty.getNdx()]);
 
 //if (cumulativeQual.isNotEmpty())
 //	logger.error("CumulativeQual is not empty!");
@@ -352,14 +344,14 @@ public class NetworkExplorer {
 		 * HB arr duty
 		 */
 		if (nQv == null) {
-			nQv = new NodeQualityVector(maxPairingLengthInDays, nd, numOfCoveringsInDuties[nd.getNdx()], blockTimeOfCoveringsInDuties[nd.getNdx()], dutyPriorities[nd.getNdx()]);
+			nQv = new NodeQualityVector(maxPairingLengthInDays, nd, dps[nd.getNdx()]);
 			this.bestNodeQuality[nd.getNdx()] = nQv;
 		}
 		/*
 		 * Non HB arr duty
 		 */
 		if (pQv == null) {
-			pQv = new NodeQualityVector(maxPairingLengthInDays, pd, numOfCoveringsInDuties[pd.getNdx()], blockTimeOfCoveringsInDuties[pd.getNdx()], dutyPriorities[pd.getNdx()], nQv);
+			pQv = new NodeQualityVector(maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
 			this.bestNodeQuality[pd.getNdx()] = pQv;
 		} else {
 			pQv.checkAndMerge(this.heuristicNo, nQv);
@@ -396,7 +388,7 @@ public class NetworkExplorer {
 						&& nd.hasPairing(this.hbNdx)
 						&& (nd.isHbArr(this.hbNdx) || (dept > 1))
 						&& ((sourceNodeQmArray.length == 0)
-								|| (nd.getNumOfLegs() > numOfDistinctCoveringsInDuties[nd.getNdx()])
+								|| (nd.getNumOfLegs() > dps[nd.getNdx()].numOfDistinctCoverings)
 								|| (nd.getNumOfLegs() == 1))
 						&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
 						) {
@@ -415,7 +407,7 @@ public class NetworkExplorer {
 								res = true;
 							} else
 								if (!this.isNodeVisitedFw(nd, dept, maxMinDateDept)) {
-									fwCumulative.addToQualityMetric(nd, numOfCoveringsInDuties[nd.getNdx()], blockTimeOfCoveringsInDuties[nd.getNdx()], dutyPriorities[nd.getNdx()]);
+									fwCumulative.addToQualityMetric(nd, dps[nd.getNdx()]);
 									if ((sourceNodeQmArray.length == 0)
 													|| fwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, sourceNodeQmArray[0].getQual())) {
 										if (this.fwNetworkSearch(nd, fwCumulative, hbDep, maxMinDateDept, dept - 1)) {
@@ -424,7 +416,7 @@ public class NetworkExplorer {
 										}
 										this.setNodeVisitedFw(nd, dept, maxMinDateDept);
 									}
-									fwCumulative.removeFromQualityMetric(nd, numOfCoveringsInDuties[nd.getNdx()], blockTimeOfCoveringsInDuties[nd.getNdx()], dutyPriorities[nd.getNdx()]);
+									fwCumulative.removeFromQualityMetric(nd, dps[nd.getNdx()]);
 								}
 						}
 				}
@@ -459,7 +451,7 @@ public class NetworkExplorer {
 		NodeQualityVector nQv = this.bestNodeQuality[nd.getNdx()];
 		NodeQualityVector pQv = this.bestNodeQuality[pd.getNdx()];
 		if (pQv == null) {
-			pQv = new NodeQualityVector(this.maxPairingLengthInDays, pd, this.numOfCoveringsInDuties[pd.getNdx()], this.blockTimeOfCoveringsInDuties[pd.getNdx()], dutyPriorities[pd.getNdx()], nQv);
+			pQv = new NodeQualityVector(this.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
 			this.bestNodeQuality[pd.getNdx()] = pQv;
 		} else {
 			res = pQv.checkAndMerge(this.heuristicNo, nQv);
@@ -505,7 +497,7 @@ public class NetworkExplorer {
 							&& pd.hasPairing(this.hbNdx)
 							&& (pd.isHbDep(this.hbNdx) || (dept > 1))
 							&& ((sourceNodeQmArray.length == 0)
-									|| (pd.getNumOfLegs() > numOfDistinctCoveringsInDuties[pd.getNdx()])
+									|| (pd.getNumOfLegs() > dps[pd.getNdx()].numOfDistinctCoverings)
 									|| (pd.getNumOfLegs() == 1))
 							&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 									|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
@@ -522,7 +514,7 @@ public class NetworkExplorer {
 									this.setNodeVisitedBw(pd, dept, maxMinDateDept);
 								} else {
 									bwCumulative.injectValues(this.bestNodeQuality[nd.getNdx()].getQuals()[maxPairingLengthInDays - dept - 1].getQual());
-									bwCumulative.addToQualityMetric(pd, numOfCoveringsInDuties[pd.getNdx()], blockTimeOfCoveringsInDuties[pd.getNdx()], dutyPriorities[pd.getNdx()]);
+									bwCumulative.addToQualityMetric(pd, dps[pd.getNdx()]);
 
 									if ((bestNodeQuality[pd.getNdx()] == null)
 											|| (bestNodeQuality[pd.getNdx()].getQuals()[maxPairingLengthInDays - dept] == null)

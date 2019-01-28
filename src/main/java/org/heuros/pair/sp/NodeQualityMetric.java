@@ -1,6 +1,7 @@
 package org.heuros.pair.sp;
 
 import org.heuros.data.model.Duty;
+import org.heuros.pair.heuro.DutyParam;
 
 public class NodeQualityMetric {
 
@@ -17,11 +18,9 @@ public class NodeQualityMetric {
 	}
 
 	public NodeQualityMetric(Duty nodeOwner,
-								int numOfCoveringsInDuty,
-								int blockTimeOfCoveringsInDuty,
-								int priority,
+								DutyParam dp,
 								NodeQualityMetric nextNodeMetric) {
-		this.qual = new QualityMetric(nodeOwner, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority);
+		this.qual = new QualityMetric(nodeOwner, dp);
 		this.nodeOwner = nodeOwner;
 		this.nextNodeMetric = nextNodeMetric;
 	}

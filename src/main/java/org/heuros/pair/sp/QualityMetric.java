@@ -1,6 +1,7 @@
 package org.heuros.pair.sp;
 
 import org.heuros.data.model.DutyView;
+import org.heuros.pair.heuro.DutyParam;
 
 public class QualityMetric {
 	/*
@@ -35,16 +36,14 @@ public class QualityMetric {
 	}
 
 	public QualityMetric(DutyView duty,
-							int numOfCoveringsInDuty,
-							int blockTimeOfCoveringsInDuty,
-							int priority) {
-		this.numOfDh = (duty.getNumOfLegsPassive() + numOfCoveringsInDuty);
-		this.dhDurationInMins = (duty.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuty);
-		this.activeBlocktimeInMins = (duty.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuty);
+							DutyParam dp) {
+		this.numOfDh = (duty.getNumOfLegsPassive() + dp.numOfCoverings);
+		this.dhDurationInMins = (duty.getBlockTimeInMinsPassive() + dp.blockTimeOfCoverings);
+		this.activeBlocktimeInMins = (duty.getBlockTimeInMinsActive() - dp.blockTimeOfCoverings);
 		this.numOfDuties = 1;
 		this.numOfIncludingDutiesOfTheSameLegs = duty.getTotalNumOfIncludingDutiesOfTheSameLegs();
 		this.numOfLegs = duty.getNumOfLegs();
-		this.priority = priority;
+		this.priority = dp.dutyPriority;
 	}
 
 	public void injectValues(QualityMetric qmToCopy) {
@@ -80,16 +79,14 @@ public class QualityMetric {
 	}
 
 	public void addToQualityMetric(DutyView d,
- 									int numOfCoveringsInDuty,
-									int blockTimeOfCoveringsInDuty,
-									int priority) {
-		this.numOfDh += (d.getNumOfLegsPassive() + numOfCoveringsInDuty);
-		this.dhDurationInMins += (d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuty);
-		this.activeBlocktimeInMins += (d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuty);
+									DutyParam dp) {
+		this.numOfDh += (d.getNumOfLegsPassive() + dp.numOfCoverings);
+		this.dhDurationInMins += (d.getBlockTimeInMinsPassive() + dp.blockTimeOfCoverings);
+		this.activeBlocktimeInMins += (d.getBlockTimeInMinsActive() - dp.blockTimeOfCoverings);
 		this.numOfDuties++;
 		this.numOfIncludingDutiesOfTheSameLegs += d.getTotalNumOfIncludingDutiesOfTheSameLegs();
 		this.numOfLegs += d.getNumOfLegs();
-		this.priority += priority;
+		this.priority += dp.dutyPriority;
 	}
 
 	public void addToQualityMetric(QualityMetric qmToAdd) {
@@ -103,16 +100,14 @@ public class QualityMetric {
 	}
 
 	public void removeFromQualityMetric(DutyView d,
-										int numOfCoveringsInDuty,
-										int blockTimeOfCoveringsInDuty,
-										int priority) {
-		this.numOfDh -= (d.getNumOfLegsPassive() + numOfCoveringsInDuty);
-		this.dhDurationInMins -= (d.getBlockTimeInMinsPassive() + blockTimeOfCoveringsInDuty);
-		this.activeBlocktimeInMins -= (d.getBlockTimeInMinsActive() - blockTimeOfCoveringsInDuty);
+										DutyParam dp) {
+		this.numOfDh -= (d.getNumOfLegsPassive() + dp.numOfCoverings);
+		this.dhDurationInMins -= (d.getBlockTimeInMinsPassive() + dp.blockTimeOfCoverings);
+		this.activeBlocktimeInMins -= (d.getBlockTimeInMinsActive() - dp.blockTimeOfCoverings);
 		this.numOfDuties--;
 		this.numOfIncludingDutiesOfTheSameLegs -= d.getTotalNumOfIncludingDutiesOfTheSameLegs();
 		this.numOfLegs -= d.getNumOfLegs();
-		this.priority -= priority;
+		this.priority -= dp.dutyPriority;
 	}
 
 	public void removeFromQualityMetric(QualityMetric qmToRemove) {

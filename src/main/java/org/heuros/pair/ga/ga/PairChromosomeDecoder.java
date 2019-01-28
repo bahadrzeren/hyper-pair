@@ -139,16 +139,16 @@ for (int i = 0; i < this.legs.size(); i++) {
 //heuristicNo = 2;
 
 			Pair p = null;
-			try {
-				p = this.pairingGenerator.generatePairing(legToCover, 
-															heuristicNo, 
-															numOfCoveringsInDuties,
-															numOfDistinctCoveringsInDuties,
-															blockTimeOfCoveringsInDuties,
-															dutyPriorityCumulative);
-			} catch (CloneNotSupportedException ex) {
-				PairChromosomeDecoder.logger.error(ex);
-			}
+//			try {
+//				p = this.pairingGenerator.generatePairing(legToCover, 
+//															heuristicNo, 
+//															numOfCoveringsInDuties,
+//															numOfDistinctCoveringsInDuties,
+//															blockTimeOfCoveringsInDuties,
+//															dutyPriorityCumulative);
+//			} catch (CloneNotSupportedException ex) {
+//				PairChromosomeDecoder.logger.error(ex);
+//			}
 
 //if (legToCover.getNdx() == 1768)
 //System.out.println(p);

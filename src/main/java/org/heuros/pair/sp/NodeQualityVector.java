@@ -1,6 +1,7 @@
 package org.heuros.pair.sp;
 
 import org.heuros.data.model.Duty;
+import org.heuros.pair.heuro.DutyParam;
 
 public class NodeQualityVector {
 
@@ -17,18 +18,18 @@ public class NodeQualityVector {
 		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, hbArrDutyQm, null);
 	}
 
-	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority) {
+	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, DutyParam dp) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
-		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority, null);
+		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, dp, null);
 	}
 
 	/*
 	 * Only for non HB arrival duty nodes!
 	 */
-	public NodeQualityVector(int maxPairingLengthInDays, Duty nonHbArrDuty, int numOfCoveringsInDuty, int blockTimeOfCoveringsInDuty, int priority, NodeQualityVector nextNodeQv) {
+	public NodeQualityVector(int maxPairingLengthInDays, Duty nonHbArrDuty, DutyParam dp, NodeQualityVector nextNodeQv) {
 		this.nodeOwner = nonHbArrDuty;
-		this.nodeOwnerQm = new QualityMetric(this.nodeOwner, numOfCoveringsInDuty, blockTimeOfCoveringsInDuty, priority);
+		this.nodeOwnerQm = new QualityMetric(this.nodeOwner, dp);
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if (nextNodeQv.nodeQuals[i - 1] != null) {

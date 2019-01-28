@@ -136,16 +136,16 @@ public class HyperChromoDecoder implements Decoder<Integer, Pair> {
 //heuristicNo = 2;
 
 			Pair p = null;
-			try {
-				p = this.pairingGenerator.generatePairing(legToCover, 
-															heuristicNo, 
-															numOfCoveringsInDuties,
-															numOfDistinctCoveringsInDuties,
-															blockTimeOfCoveringsInDuties,
-															dutyPriorityCumulative);
-			} catch (CloneNotSupportedException ex) {
-				HyperChromoDecoder.logger.error(ex);
-			}
+//			try {
+//				p = this.pairingGenerator.generatePairing(legToCover, 
+//															heuristicNo, 
+//															numOfCoveringsInDuties,
+//															numOfDistinctCoveringsInDuties,
+//															blockTimeOfCoveringsInDuties,
+//															dutyPriorityCumulative);
+//			} catch (CloneNotSupportedException ex) {
+//				HyperChromoDecoder.logger.error(ex);
+//			}
 
 //if (legToCover.getNdx() == 1768)
 //System.out.println(p);

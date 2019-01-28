@@ -9,6 +9,7 @@ import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
+import org.heuros.pair.heuro.DutyParam;
 import org.heuros.rule.PairRuleContext;
 
 public class PairingGenerator {
@@ -64,10 +65,7 @@ public class PairingGenerator {
 
 	public Pair generatePairing(Leg legToCover,
 								int heuristicNo,
-								int[] numOfCoveringsInDuties,
-								int[] numOfDistinctCoveringsInDuties,
-								int[] blockTimeOfCoveringsInDuties,
-								int[] dutyPriorities) throws CloneNotSupportedException {
+								DutyParam[] dutyParams) throws CloneNotSupportedException {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
@@ -90,10 +88,7 @@ public class PairingGenerator {
 													.build(legToCover, 
 															coveringDuties, 
 															heuristicNo, 
-															numOfCoveringsInDuties, 
-															numOfDistinctCoveringsInDuties, 
-															blockTimeOfCoveringsInDuties, 
-															dutyPriorities);
+															dutyParams);
 
 //			long subNetworkBuiltTime = System.nanoTime();
 
@@ -134,7 +129,7 @@ public class PairingGenerator {
 
 		    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
 
-		    			currentPair.pairQ.addToQualityMetric(d, numOfCoveringsInDuties[d.getNdx()], blockTimeOfCoveringsInDuties[d.getNdx()], dutyPriorities[d.getNdx()]);
+		    			currentPair.pairQ.addToQualityMetric(d, dutyParams[d.getNdx()]);
 		    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
 
 						if (d.isHbArr(this.hbNdx)) {
@@ -159,7 +154,7 @@ public class PairingGenerator {
 									Duty nd = nqm.getNodeOwner();
 
 									if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
-										currentPair.pairQ.addToQualityMetric(nd, numOfCoveringsInDuties[nd.getNdx()], blockTimeOfCoveringsInDuties[nd.getNdx()], dutyPriorities[nd.getNdx()]);
+										currentPair.pairQ.addToQualityMetric(nd, dutyParams[nd.getNdx()]);
 										pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, nd);
 										if (nd.isHbArr(this.hbNdx)) {
 											if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
