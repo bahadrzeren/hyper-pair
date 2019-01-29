@@ -20,7 +20,7 @@ public class QualityMetric {
 	private int numOfIncludingDutiesOfTheSameLegs = 0;
 	private int numOfLegs = 0;
 
-	private int priority = Integer.MAX_VALUE;
+	private int numOfAlternativeDutiesWoDh = 0;
 
 	public QualityMetric() {
 	}
@@ -32,7 +32,7 @@ public class QualityMetric {
 		this.numOfDuties = qmToCopy.numOfDuties;
 		this.numOfIncludingDutiesOfTheSameLegs = qmToCopy.numOfIncludingDutiesOfTheSameLegs;
 		this.numOfLegs = qmToCopy.numOfLegs;
-		this.priority = qmToCopy.priority;
+		this.numOfAlternativeDutiesWoDh = qmToCopy.numOfAlternativeDutiesWoDh;
 	}
 
 	public QualityMetric(DutyView duty,
@@ -43,7 +43,7 @@ public class QualityMetric {
 		this.numOfDuties = 1;
 		this.numOfIncludingDutiesOfTheSameLegs = duty.getTotalNumOfIncludingDutiesOfTheSameLegs();
 		this.numOfLegs = duty.getNumOfLegs();
-		this.priority = dp.dutyPriority;
+		this.numOfAlternativeDutiesWoDh = dp.numOfAlternativeDutiesWoDh;
 	}
 
 	public void injectValues(QualityMetric qmToCopy) {
@@ -53,7 +53,7 @@ public class QualityMetric {
 		this.numOfDuties = qmToCopy.numOfDuties;
 		this.numOfIncludingDutiesOfTheSameLegs = qmToCopy.numOfIncludingDutiesOfTheSameLegs;
 		this.numOfLegs = qmToCopy.numOfLegs;
-		this.priority = qmToCopy.priority;
+		this.numOfAlternativeDutiesWoDh = qmToCopy.numOfAlternativeDutiesWoDh;
 	}
 
 //	public void injectValues(DutyView nodeOwner,
@@ -75,7 +75,7 @@ public class QualityMetric {
 		this.numOfDuties = 0;
 		this.numOfIncludingDutiesOfTheSameLegs = 0;
 		this.numOfLegs = 0;
-		this.priority = Integer.MAX_VALUE;
+		this.numOfAlternativeDutiesWoDh = 0;
 	}
 
 	public void addToQualityMetric(DutyView d,
@@ -86,7 +86,7 @@ public class QualityMetric {
 		this.numOfDuties++;
 		this.numOfIncludingDutiesOfTheSameLegs += d.getTotalNumOfIncludingDutiesOfTheSameLegs();
 		this.numOfLegs += d.getNumOfLegs();
-		this.priority += dp.dutyPriority;
+		this.numOfAlternativeDutiesWoDh += dp.numOfAlternativeDutiesWoDh;
 	}
 
 	public void addToQualityMetric(QualityMetric qmToAdd) {
@@ -96,7 +96,7 @@ public class QualityMetric {
 		this.numOfDuties += qmToAdd.numOfDuties;
 		this.numOfIncludingDutiesOfTheSameLegs += qmToAdd.numOfIncludingDutiesOfTheSameLegs;
 		this.numOfLegs += qmToAdd.numOfLegs;
-		this.priority += qmToAdd.priority;
+		this.numOfAlternativeDutiesWoDh += qmToAdd.numOfAlternativeDutiesWoDh;
 	}
 
 	public void removeFromQualityMetric(DutyView d,
@@ -107,7 +107,7 @@ public class QualityMetric {
 		this.numOfDuties--;
 		this.numOfIncludingDutiesOfTheSameLegs -= d.getTotalNumOfIncludingDutiesOfTheSameLegs();
 		this.numOfLegs -= d.getNumOfLegs();
-		this.priority -= dp.dutyPriority;
+		this.numOfAlternativeDutiesWoDh -= dp.numOfAlternativeDutiesWoDh;
 	}
 
 	public void removeFromQualityMetric(QualityMetric qmToRemove) {
@@ -117,7 +117,7 @@ public class QualityMetric {
 		this.numOfDuties -= qmToRemove.numOfDuties;
 		this.numOfIncludingDutiesOfTheSameLegs -= qmToRemove.numOfIncludingDutiesOfTheSameLegs;
 		this.numOfLegs -= qmToRemove.numOfLegs;
-		this.priority -= qmToRemove.priority;
+		this.numOfAlternativeDutiesWoDh -= qmToRemove.numOfAlternativeDutiesWoDh;
 	}
 
 //	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
@@ -147,8 +147,9 @@ public class QualityMetric {
 					|| (this.numOfDh < qm.numOfDh)
 					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
 					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins) 
-							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
+//							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
 //							&& (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
+							&& (this.numOfAlternativeDutiesWoDh < qm.numOfAlternativeDutiesWoDh))) {
 				return true;
 			} else
 				return false;
@@ -156,8 +157,9 @@ public class QualityMetric {
 			if ((qm.numOfLegs == 0)
 					|| (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
 					|| ((((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) == ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
-							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
+//							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
 //							&& (this.numOfDh < qm.numOfDh))) {
+							&& (this.numOfAlternativeDutiesWoDh < qm.numOfAlternativeDutiesWoDh))) {
 				return true;
 			} else
 				return false;
@@ -197,7 +199,7 @@ public class QualityMetric {
 			|| (numOfDuties > 0)
 			|| (numOfIncludingDutiesOfTheSameLegs > 0)
 			|| (numOfLegs > 0)
-			|| (priority < Integer.MAX_VALUE));
+			|| (numOfAlternativeDutiesWoDh > 0));
 	}
 
 	public String toString() {

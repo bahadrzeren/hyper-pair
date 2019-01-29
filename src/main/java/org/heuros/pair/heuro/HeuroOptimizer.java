@@ -3,15 +3,12 @@ package org.heuros.pair.heuro;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
-import org.heuros.core.data.ndx.TwoDimIndexIntXInt;
 import org.heuros.data.model.AirportView;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
@@ -37,15 +34,10 @@ public class HeuroOptimizer {
 	 */
 	private int hbNdx = 0;
 
-//	private LegRepository legRepository = null;
-//	private DutyRepository dutyRepository = null;
-
-	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
-
-	private PairingGenerator pairingGenerator = null;
-
 	private List<Leg> legs = null;
 	private List<Duty> duties = null;
+	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+	private PairingGenerator pairingGenerator = null;
 
 	public HeuroOptimizer setLegRepository(LegRepository legRepository) {
 		this.legs = legRepository.getModels();
@@ -65,151 +57,6 @@ public class HeuroOptimizer {
 	public HeuroOptimizer setPairingGenerator(PairingGenerator pairingGenerator) {
 		this.pairingGenerator = pairingGenerator;
 		return this;
-	}
-
-//	private int getNextLegNdxToCover(int prevReOrderedLegNdx, List<Leg> reOrderedLegs, int[] numOfLegCoverings) {
-//		for (int i = prevReOrderedLegNdx + 1; i < reOrderedLegs.size(); i++) {
-//			if (reOrderedLegs.get(i).isCover()
-//					&& reOrderedLegs.get(i).hasPair(hbNdx)
-//					&& (numOfLegCoverings[reOrderedLegs.get(i).getNdx()] == 0))
-//				return i;
-//		}
-//		return Integer.MAX_VALUE;
-//	}
-	private int getNextLegNdxToCover(LegParam[] lps) {
-		int res = -1;
-		int minNumOfDutiesWoDh = Integer.MAX_VALUE;
-		for (int i = 0; i < this.legs.size(); i++) {
-			if (this.legs.get(i).isCover()
-					&& this.legs.get(i).hasPair(hbNdx)
-					&& (lps[i].numOfCoverings == 0)) {
-				if (minNumOfDutiesWoDh > lps[i].numOfDutiesWoDh) {
-					minNumOfDutiesWoDh = lps[i].numOfDutiesWoDh;
-					res = i;
-				}
-			}
-		}
-		return res;
-	}
-
-	private void udpateStateVectors(Pair p,
-									LegParam[] lps,
-									DutyParam[] dps) {
-		for (int i = 0; i < p.getNumOfDuties(); i++) {
-			Duty duty = p.getDuties().get(i);
-			for (int j = 0; j < duty.getNumOfLegs(); j++) {
-				Leg leg = duty.getLegs().get(j);
-				lps[leg.getNdx()].numOfCoverings++;
-				Duty[] dutiesOfLeg = this.dutyIndexByLegNdx.getArray(leg.getNdx());
-				for (int di = 0; di < dutiesOfLeg.length; di++) {
-					Duty dutyOfLeg = dutiesOfLeg[di];
-					dps[dutyOfLeg.getNdx()].numOfCoverings++;
-					if (lps[leg.getNdx()].numOfCoverings == 1)
-						dps[dutyOfLeg.getNdx()].numOfDistinctCoverings++;
-					dps[dutyOfLeg.getNdx()].blockTimeOfCoverings += leg.getBlockTimeInMins();
-
-for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
-lps[dutyOfLeg.getLegs().get(li).getNdx()].numOfDutiesWoDh--;
-}
-				}
-			}
-		}
-	}
-
-	private double generateSolution(List<Leg> reOrderedLegs,
-									List<Pair> solution,
-									LegParam[] legParams,
-									DutyParam[] dutyParams) {
-
-		logger.info("Solution generation process is started!");
-
-		int uncoveredLegs = 0;
-
-		int reOrderedLegNdx = -1;
-
-for (int i = 0; i < this.duties.size(); i++) {
-	Duty duty = this.duties.get(i);
-	if (duty.getNumOfLegsPassive() == 0) {
-		for (int j = 0; j < duty.getNumOfLegs(); j++) {
-			LegParam lp = legParams[duty.getLegs().get(j).getNdx()];
-			if (lp == null) {
-				legParams[j] = new LegParam();
-				lp = legParams[j];
-			}
-			lp.numOfDutiesWoDh++; 
-		}
-	}
-}
-
-		while (true) {
-//			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, reOrderedLegs, numOfLegCoverings);
-//			if (reOrderedLegNdx == Integer.MAX_VALUE)
-//				break;
-//			Leg legToCover = reOrderedLegs.get(reOrderedLegNdx);
-
-reOrderedLegNdx = this.getNextLegNdxToCover(legParams);
-if (reOrderedLegNdx < 0)
-	break;
-Leg legToCover = this.legs.get(reOrderedLegNdx);
-
-			int heuristicNo = 1;
-
-			Pair p = null;
-			try {
-				p = this.pairingGenerator.generatePairing(legToCover, 
-															heuristicNo,
-															dutyParams);
-			} catch (CloneNotSupportedException ex) {
-				HeuroOptimizer.logger.error(ex);
-			}
-
-			if (p != null) {
-				this.udpateStateVectors(p, legParams, dutyParams);
-				solution.add(p);
-			} else {
-				HeuroOptimizer.logger.error("Pairing could not be found for " + legToCover);
-				uncoveredLegs++;
-			}
-		}
-
-		double fitness = 0.0;
-		int numOfDuties = 0;
-		int numOfPairDays = 0;
-		int numOfPairs = 0;
-
-		for (int i = 0; i < solution.size(); i++) {
-			fitness += getPairCost(2, solution.get(i));
-			numOfDuties += solution.get(i).getNumOfDuties();
-			numOfPairDays += solution.get(i).getNumOfDaysTouched();
-			numOfPairs++;
-		}
-
-		int numOfDeadheads = 0;
-
-		for (int i = 0; i < this.legs.size(); i++) {
-			if (this.legs.get(i).isCover()) {
-				if (legParams[i].numOfCoverings > 1) {
-					fitness += (2.0 * (legParams[i].numOfCoverings - 1) * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
-//					fitness += (numOfLegCoverings[i] - 1) * 100;
-					numOfDeadheads += (legParams[i].numOfCoverings - 1);
-				}
-			} else {
-				if (legParams[i].numOfCoverings > 0) {
-					fitness += (2.0 * legParams[i].numOfCoverings * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
-//					fitness += numOfLegCoverings[i] * 100;
-					numOfDeadheads += legParams[i].numOfCoverings;
-				}
-			}
-		}
-
-		logger.info("numOfPairs: " + numOfPairs + 
-					", numOfDuties: " + numOfDuties +
-					", numOfPairDays:" + numOfPairDays +
-					", uncoveredLegs: " + uncoveredLegs + 
-					", numOfDeadheads: " + numOfDeadheads + 
-					", fitness: " + fitness);
-
-		return fitness;
 	}
 
 	private OneDimIndexInt<Pair> generateSolutionPairIndex(List<Pair> solution//	, int itrNr, TwoDimIndexIntXInt<Pair> pairIndexByItrNrLegNdx
@@ -365,21 +212,47 @@ Leg legToCover = this.legs.get(reOrderedLegNdx);
 
 			List<Pair> solution = new ArrayList<Pair>();
 			LegParam[] legParams = new LegParam[this.legs.size()];
-			for (int j = 0; j < legParams.length; j++)
+			for (int j = 0; j < legParams.length; j++) {
 				legParams[j] = new LegParam();
+				legParams[j].numOfDutiesWoDh = this.legs.get(j).getNumOfDutiesWoDh();
+			}
 			DutyParam[] dutyParams = new DutyParam[this.duties.size()];
-			for (int j = 0; j < dutyParams.length; j++)
+			for (int j = 0; j < dutyParams.length; j++) {
 				dutyParams[j] = new DutyParam();
+				dutyParams[j].numOfAlternativeDutiesWoDh = this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh();
+			}
 
-			double cost = this.generateSolution(reOrderedLegs,
-												solution,
-												legParams,
-												dutyParams);
+			SolutionGenerator solGen = new SolutionGenerator(this.legs,
+																this.dutyIndexByLegNdx,
+																this.pairingGenerator);
+			double cost = solGen.generateSolution(reOrderedLegs,
+													solution,
+													legParams,
+													dutyParams);
 
 //			for (int j = 0; j < numOfLegCoverings.length; j++) {
 //				numOfLegCoveringsCumulative[j] += numOfLegCoverings[j] * (i + 1);
 //				numOfLegCoveringsHistory[i][j] = numOfLegCoverings[j];
 //			}
+
+			/*
+			 * TOTALIZER CHECK!
+			 */
+			for (int j = 0; j < legParams.length; j++) {
+				if (((legParams[j].numOfCoverings == 0)
+						&& this.legs.get(j).isCover()
+						&& (this.legs.get(j).getNumOfDutiesWoDh() > 0)
+						&& (legParams[j].numOfDutiesWoDh < 1 || legParams[j].numOfDutiesWoDh > this.legs.get(j).getNumOfDutiesWoDh()))
+					|| ((legParams[j].numOfCoverings != 0) && (legParams[j].numOfDutiesWoDh != 0)))
+					logger.error("#Cvr: " + legParams[j].numOfCoverings + ", #DwoDh: " + legParams[j].numOfDutiesWoDh + "/" + this.legs.get(j).getNumOfDutiesWoDh() + " -> " + this.legs.get(j));
+			}
+			for (int j = 0; j < dutyParams.length; j++) {
+				if (dutyParams[j].numOfAlternativeDutiesWoDh != 0) {
+					logger.error("#Cvr: " + dutyParams[j].numOfCoverings + ", #DwoDh: " + dutyParams[j].numOfAlternativeDutiesWoDh + "/" + this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh());
+					logger.error(this.duties.get(j));
+				}
+			}
+
 
 			if (cost < bestCost) {
 				bestCost = cost;
@@ -456,139 +329,5 @@ Leg legToCover = this.legs.get(reOrderedLegNdx);
 //		}			
 
 		return bestSolution;
-	}
-
-	/*
-	 * COST calculations.
-	 */
-
-	private int hotelTransportTime = 30;
-
-	private int hotelCostDomPerCrewPerDay = 10000;	//	1000;
-	private int hotelCostIntPerCrewPerDay = 10000;	//	1000;
-
-	private int hotelTransferCost = 40;
-
-	private int getHotelCostPerCrew(AirportView ap, int gmtDiff, LocalDateTime debriefTime, LocalDateTime briefTime) {
-		if (briefTime == null)
-			return 0;
-
-		LocalDateTime hotelIn = debriefTime.plusMinutes(hotelTransportTime + gmtDiff);
-		LocalDateTime hotelOut = briefTime.plusMinutes(- hotelTransportTime + gmtDiff);
-
-		LocalDateTime hotelIn00 = hotelIn.truncatedTo(ChronoUnit.DAYS);
-		LocalDateTime hotelOut00 = hotelOut.minusSeconds(1).truncatedTo(ChronoUnit.DAYS);
-		int numOfLayNights = (int) ChronoUnit.DAYS.between(hotelIn00, hotelOut00);
-
-		if ((ChronoUnit.DAYS.between(hotelIn, hotelOut) < 1.0)
-				|| (numOfLayNights == 0)) {
-
-        	if (ap.isDomestic())
-        		return hotelCostDomPerCrewPerDay;
-        	else
-        		return hotelCostIntPerCrewPerDay;
-        }
-        else
-        	if (ap.isDomestic())
-        		return hotelCostDomPerCrewPerDay * numOfLayNights;
-        	else
-        		return hotelCostIntPerCrewPerDay * numOfLayNights;
-    }
-
-	private double dutyDayPenalty = 60000.0;	//	20000.0;
-	private double dutyHourPenalty = 1050.0;	//	0.0;
-	private double dhPenalty = 500000.0;	//	10000.0;
-	private double acChangePenalty = 250.0;	//	20.0;
-	private double squareRestPenalty = 2.0;
-	private int longRestLimit = 14 * 60;
-	private double longRestPenalty = 400;	//	700;
-	private double longConnPenalty = 100;	//	40;
-	private double augmentionHourPenalty = 100000.0;	//	2000;
-	private double specialDhPenalty = 10000.0;
-	private double augmentionDayPenalty = 0.0;	//	4000.0;
-
-	private double getDutyCost(int cc, DutyView d, boolean hbDep, LocalDateTime nt) {
-		LocalDateTime sh = d.getBriefTime(hbNdx);
-		LocalDateTime eh = d.getDebriefTime(hbNdx);
-
-		if (nt == null)
-			eh = d.getDebriefDayEnding(hbNdx);
-		else
-			eh = nt;
-		if (hbDep)
-			sh = d.getBriefDayBeginning(hbNdx);
-
-		double dutyDurationInMins = ChronoUnit.MINUTES.between(sh, eh);
-		double dCost = 0.0;
-
-		dCost += cc * dutyDurationInMins * dutyDayPenalty / (24.0 * 60.0);
-
-		if (hbDep)
-			dCost += cc * d.getDutyDurationInMins(hbNdx) * dutyHourPenalty / 60.0;
-		else
-			dCost += cc * d.getDutyDurationInMins(hbNdx) * dutyHourPenalty / 60.0;
-
-		dCost += acChangePenalty * d.getNumOfAcChanges();
-
-		if (nt != null) {
-			double idleTime = ChronoUnit.MINUTES.between(d.getDebriefTime(hbNdx), nt);
-
-			dCost += cc * getHotelCostPerCrew(d.getLastArrAirport(), d.getLastLeg().getArrOffset(), d.getDebriefTime(hbNdx), nt);
-
-			dCost += 2.0 * hotelTransferCost;
-
-			if (squareRestPenalty * idleTime * idleTime / 10000.0 > (squareRestPenalty * cc * dutyDayPenalty / 20.0))
-				dCost += squareRestPenalty * idleTime * idleTime / 10000.0;
-			else
-				dCost += (squareRestPenalty * cc * dutyDayPenalty) / 20.0;
-
-			if (idleTime > longRestLimit) {
-				dCost += (idleTime - longRestLimit) * longRestPenalty / 60.0;
-			}
-
-		} else
-			if (hbDep) {
-				dCost += cc * dutyDayPenalty / 20.0;
-			}
-
-		dCost += d.getLongConnDiff() * longConnPenalty / 60.0;
-
-		if (hbDep) {
-			if (d.getAugmented(hbNdx) > 0) {
-				dCost += d.getDutyDurationInMins(hbNdx) * augmentionHourPenalty / 60.0;
-				dCost += augmentionDayPenalty;
-			}
-		} else {
-			if (d.getAugmented(hbNdx) > 0) {
-				dCost += d.getDutyDurationInMins(hbNdx) * augmentionHourPenalty / 60.0;
-				dCost += augmentionDayPenalty;
-			}
-		}
-
-		dCost += d.getNumOfSpecialFlights() * specialDhPenalty;
-
-//		if (includeDh)
-//			dCost += cc * (d.getBlockTimeInMins() / 60.0) * dhPenalty;
-//		else
-//			dCost -= cc * (d.getBlockTimeInMins() / 60.0) * dhPenalty;
-
-		return dCost;
-	}
-
-	private double getPairCost(int cc, Pair p) {
-		DutyView pd = p.getFirstDuty();
-		if (p.getNumOfDuties() == 1)
-			return getDutyCost(cc, pd, true, null);
-		else {
-			DutyView nd = null;
-			double pCost = 0.0;
-			for (int i = 1; i < p.getNumOfDuties(); i++) {
-				nd = p.getDuties().get(i);
-				pCost += getDutyCost(cc, pd, i == 1, nd.getBriefTime(hbNdx));
-				pd = nd;
-			}
-			pCost += getDutyCost(cc, nd, false, null);
-			return pCost;
-		}
 	}
 }

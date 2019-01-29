@@ -31,7 +31,7 @@ public class PairingGenerator {
 	private List<Duty> duties = null;
 
 	public PairingGenerator(int maxPairingLengthInDays,
-			int maxDutyBlockTimeInMins) {
+							int maxDutyBlockTimeInMins) {
 		this.maxPairingLengthInDays = maxPairingLengthInDays;
 		this.maxDutyBlockTimeInMins = maxDutyBlockTimeInMins;
 	}

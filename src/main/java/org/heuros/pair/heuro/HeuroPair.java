@@ -261,9 +261,9 @@ public class HeuroPair {
 																			.setDutyRepository(pairOptimizationContext.getDutyRepository());
 
 			HeuroOptimizer pairOptimizer = new HeuroOptimizer().setLegRepository(pairOptimizationContext.getLegRepository())
-																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
-																						.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-																						.setPairingGenerator(pairingGenerator);
+																.setDutyRepository(pairOptimizationContext.getDutyRepository())
+																.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
+																.setPairingGenerator(pairingGenerator);
 
 //			List<Pair> solution = 
 					pairOptimizer.doMinimize();
