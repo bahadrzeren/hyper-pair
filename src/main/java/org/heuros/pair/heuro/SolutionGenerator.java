@@ -68,38 +68,39 @@ public class SolutionGenerator {
 				Leg leg = duty.getLegs().get(j);
 //if (leg.getNdx() == 288)
 //System.out.println();
-				lps[leg.getNdx()].numOfCoverings++;
-int legNumOfDutiesWoDh = lps[leg.getNdx()].numOfDutiesWoDh;
+//int legNumOfDutiesWoDh = lps[leg.getNdx()].numOfDutiesWoDh;
 				Duty[] dutiesOfLeg = this.dutyIndexByLegNdx.getArray(leg.getNdx());
 				for (int di = 0; di < dutiesOfLeg.length; di++) {
 					Duty dutyOfLeg = dutiesOfLeg[di];
-					dps[dutyOfLeg.getNdx()].numOfCoverings++;
-					if (lps[leg.getNdx()].numOfCoverings == 1)
+					if (lps[leg.getNdx()].numOfCoverings == 0)
 						dps[dutyOfLeg.getNdx()].numOfDistinctCoverings++;
 					dps[dutyOfLeg.getNdx()].blockTimeOfCoverings += leg.getBlockTimeInMins();
 if (leg.isCover()
-		&& (lps[leg.getNdx()].numOfCoverings == 1)) {
-	dps[dutyOfLeg.getNdx()].numOfAlternativeDutiesWoDh -= legNumOfDutiesWoDh;
+		&& (lps[leg.getNdx()].numOfCoverings == 0)) {
+//	dps[dutyOfLeg.getNdx()].numOfAlternativeDutiesWoDh -= legNumOfDutiesWoDh;
 	if ((dutyOfLeg.getNumOfLegsPassive() == 0)
-			&& (dps[dutyOfLeg.getNdx()].numOfCoverings == 1)) {
+			&& (dps[dutyOfLeg.getNdx()].numOfCoverings == 0)) {
 		for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
 			Leg indLeg = dutyOfLeg.getLegs().get(li);
 			if (indLeg.isCover()
-					&& ((indLeg.getNdx() == leg.getNdx())
-						|| (lps[indLeg.getNdx()].numOfCoverings == 0))) {
+					&& (lps[indLeg.getNdx()].numOfCoverings == 0)) {
 //if (indLeg.getNdx() == 288)
 //System.out.println();
-				lps[dutyOfLeg.getLegs().get(li).getNdx()].numOfDutiesWoDh--;
-				Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
-				for (int idi = 0; idi < dutiesOfIndLeg.length; idi++) {
-					if (dutyOfLeg.getNdx() != dutiesOfIndLeg[idi].getNdx())
-						dps[dutiesOfIndLeg[idi].getNdx()].numOfAlternativeDutiesWoDh--;
-				}
+				lps[indLeg.getNdx()].numOfDutiesWoDh--;
+//				if (indLeg.getNdx() != leg.getNdx()) {
+					Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
+					for (int idi = 0; idi < dutiesOfIndLeg.length; idi++) {
+//						if (dutyOfLeg.getNdx() != dutiesOfIndLeg[idi].getNdx())
+							dps[dutiesOfIndLeg[idi].getNdx()].numOfAlternativeDutiesWoDh--;
+					}
+//				}
 			}
 		}
 	}
 }
+					dps[dutyOfLeg.getNdx()].numOfCoverings++;
 				}
+				lps[leg.getNdx()].numOfCoverings++;
 			}
 		}
 	}

@@ -247,7 +247,9 @@ public class HeuroOptimizer {
 					logger.error("#Cvr: " + legParams[j].numOfCoverings + ", #DwoDh: " + legParams[j].numOfDutiesWoDh + "/" + this.legs.get(j).getNumOfDutiesWoDh() + " -> " + this.legs.get(j));
 			}
 			for (int j = 0; j < dutyParams.length; j++) {
-				if (dutyParams[j].numOfAlternativeDutiesWoDh != 0) {
+				if ((dutyParams[j].numOfAlternativeDutiesWoDh < 0)
+					|| ((dutyParams[j].numOfAlternativeDutiesWoDh != 0)
+						&& (dutyParams[j].numOfCoverings == this.duties.get(j).getNumOfLegs()))) {
 					logger.error("#Cvr: " + dutyParams[j].numOfCoverings + ", #DwoDh: " + dutyParams[j].numOfAlternativeDutiesWoDh + "/" + this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh());
 					logger.error(this.duties.get(j));
 				}
