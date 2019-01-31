@@ -205,6 +205,7 @@ public class QualityMetric {
 	public String toString() {
 		return "#DH:" + numOfDh + "/" + dhDurationInMins +
 				", ABT:" + activeBlocktimeInMins + "/" + numOfDuties + "=" + (Math.floor((100.0 * activeBlocktimeInMins) / numOfDuties) / 100.0) +
-				", #LD:" + numOfIncludingDutiesOfTheSameLegs + "/" + numOfLegs + "=" + (Math.floor((100.0 * numOfIncludingDutiesOfTheSameLegs) / numOfLegs) / 100.0);
+				", #LD:" + numOfIncludingDutiesOfTheSameLegs + "/" + numOfLegs + "=" + (Math.floor((100.0 * numOfIncludingDutiesOfTheSameLegs) / numOfLegs) / 100.0) +
+				", #AltDH:" + numOfAlternativeDutiesWoDh;
 	}
 }

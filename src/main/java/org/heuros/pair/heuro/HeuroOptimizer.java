@@ -236,7 +236,7 @@ public class HeuroOptimizer {
 //			}
 
 			/*
-			 * TOTALIZER CHECK!
+			 * NumOfDutiesWoDh TOTALIZERS CHECK!
 			 */
 			for (int j = 0; j < legParams.length; j++) {
 				if (((legParams[j].numOfCoverings == 0)
@@ -249,12 +249,22 @@ public class HeuroOptimizer {
 			for (int j = 0; j < dutyParams.length; j++) {
 				if ((dutyParams[j].numOfAlternativeDutiesWoDh < 0)
 					|| ((dutyParams[j].numOfAlternativeDutiesWoDh != 0)
-						&& (dutyParams[j].numOfCoverings == this.duties.get(j).getNumOfLegs()))) {
+						&& (dutyParams[j].numOfDistinctCoverings == this.duties.get(j).getNumOfLegs()))) {
 					logger.error("#Cvr: " + dutyParams[j].numOfCoverings + ", #DwoDh: " + dutyParams[j].numOfAlternativeDutiesWoDh + "/" + this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh());
 					logger.error(this.duties.get(j));
 				}
 			}
-
+			for (int j = 0; j < dutyParams.length; j++) {
+				Duty d = this.duties.get(j);
+				int totalNumOfDutiesWoDh = 0; 
+				for (int k = 0; k < d.getNumOfLegs(); k++) {
+					totalNumOfDutiesWoDh += legParams[d.getLegs().get(k).getNdx()].numOfDutiesWoDh;
+				}
+				if (dutyParams[j].numOfAlternativeDutiesWoDh != totalNumOfDutiesWoDh) {
+					logger.error("#Cvr: " + dutyParams[j].numOfCoverings + ", #DwoDh: " + dutyParams[j].numOfAlternativeDutiesWoDh + " != " + totalNumOfDutiesWoDh);
+					logger.error(this.duties.get(j));
+				}
+			}
 
 			if (cost < bestCost) {
 				bestCost = cost;

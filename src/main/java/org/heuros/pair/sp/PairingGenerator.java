@@ -117,7 +117,6 @@ public class PairingGenerator {
 //		bitC = bitC | (1 << i);
 //	}
 //}
-
 				NodeQualityMetric nqm = sourceDutyNodes[j];
 
 				if (nqm.getQual().isBetterThan(heuristicNo, bestPair.pairQ)) {

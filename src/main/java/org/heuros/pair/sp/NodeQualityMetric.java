@@ -46,4 +46,19 @@ public class NodeQualityMetric {
 	public QualityMetric getQual() {
 		return qual;
 	}
+
+	public String toString() {
+		NodeQualityMetric hNqm = this;
+		StringBuilder sb = new StringBuilder();
+		while (true) {
+			sb.append(hNqm.getQual())
+				.append("\n")
+				.append(hNqm.getNodeOwner())
+				.append("\n");
+			hNqm = hNqm.getNextNodeMetric();
+			if (hNqm == null)
+				break;
+		}
+		return sb.toString();
+	}
 }
