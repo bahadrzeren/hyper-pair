@@ -81,6 +81,9 @@ public class PairingGenerator {
 
 //			long startTime = System.nanoTime();
 
+if (legToCover.getNdx() == 1650)
+System.out.println();
+
 			NetworkExplorer networkExplorer = new NetworkExplorer(this.duties, 
 																		this.maxPairingLengthInDays, 
 																		this.maxDutyBlockTimeInMins,
@@ -97,26 +100,34 @@ public class PairingGenerator {
 
 			NodeQualityMetric[] sourceDutyNodes = networkExplorer.getSourceNodeQms();
 
-//int bitC = 0;
-//int maxLen = sourceDutyNodes.length;
-//if (maxLen > 3) maxLen = 3;
+			/**
+			 * TEST BLOCK BEGIN
+			 * 
+			 * Checks QualityMetric TOTALIZERS.
+			 * 
+			 */
+			for (int k = 0; k < sourceDutyNodes.length; k++) {
+				NodeQualityMetric nodeQualityMetric = sourceDutyNodes[k];
+				QualityMetric qualityMetric = new QualityMetric(nodeQualityMetric.getNodeOwner(), dutyParams[nodeQualityMetric.getNodeOwner().getNdx()]);
+				while (nodeQualityMetric.getNextNodeMetric() != null) {
+					nodeQualityMetric = nodeQualityMetric.getNextNodeMetric();
+					qualityMetric.addToQualityMetric(nodeQualityMetric.getNodeOwner(), dutyParams[nodeQualityMetric.getNodeOwner().getNdx()]);
+				}
+				nodeQualityMetric = sourceDutyNodes[k];
+				if (!nodeQualityMetric.getQual().isTheSame(qualityMetric)) {
+					logger.error("There is difference between shortest path quality found and post calculated quality!");
+					logger.error(legToCover);
+					logger.error(qualityMetric);
+					logger.error(nodeQualityMetric);
+				}
+			}
+			/**
+			 * TEST BLOCK END
+			 */
 
 			for (int i = 0; i < sourceDutyNodes.length; i++) {
 				int j = i;
 
-//if (randomize) {
-//	if (bestPair.pair != null)
-//		break;
-//	
-//	j = this.random.nextInt(maxLen);
-//	if (bitC == ((1 << maxLen) - 1)) {
-//		j = i;
-//	} else {
-//		while ((bitC & (1 << i)) > 0)
-//			i = this.random.nextInt(maxLen);
-//		bitC = bitC | (1 << i);
-//	}
-//}
 				NodeQualityMetric nqm = sourceDutyNodes[j];
 
 				if (nqm.getQual().isBetterThan(heuristicNo, bestPair.pairQ)) {

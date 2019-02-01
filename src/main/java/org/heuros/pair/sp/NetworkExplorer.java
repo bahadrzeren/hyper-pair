@@ -335,6 +335,14 @@ public class NetworkExplorer {
 	}
 
 	private void fwRegister(Duty pd, Duty nd) {
+
+if ((pd.getNdx() == 8350)
+&& (nd.getNdx() == 24369))
+System.out.println();
+if ((pd.getNdx() == 24369)
+&& (nd.getNdx() == 33569))
+System.out.println();
+
 		/*
 		 * Calculate quality metric.
 		 */
@@ -373,11 +381,11 @@ public class NetworkExplorer {
 		for (Leg leg : nextLegs) {
 			Duty[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
 			for (Duty nd: nextDuties) {
-//if ((pd.getNdx() == 36121)
-//&& (nd.getNdx() == 43778))
+//if ((pd.getNdx() == 8350)
+//&& (nd.getNdx() == 24369))
 //System.out.println();
-//if ((pd.getNdx() == 43778)
-//&& (nd.getNdx() == 57972))
+//if ((pd.getNdx() == 24369)
+//&& (nd.getNdx() == 33569))
 //System.out.println();
 //if ((pd.getNdx() == 31625)
 //&& (nd.getNdx() == 37544))

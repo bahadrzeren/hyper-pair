@@ -235,8 +235,11 @@ public class HeuroOptimizer {
 //				numOfLegCoveringsHistory[i][j] = numOfLegCoverings[j];
 //			}
 
-			/*
-			 * NumOfDutiesWoDh TOTALIZERS CHECK!
+			/**
+			 * TEST BLOCK BEGIN
+			 * 
+			 * Checks DEADHEAD TOTALIZERS!
+			 * 
 			 */
 			for (int j = 0; j < legParams.length; j++) {
 				if (((legParams[j].numOfCoverings == 0)
@@ -265,7 +268,13 @@ public class HeuroOptimizer {
 					logger.error(this.duties.get(j));
 				}
 			}
+			/**
+			 * TEST BLOCK END
+			 */
 
+			/*
+			 * Improvement test.
+			 */
 			if (cost < bestCost) {
 				bestCost = cost;
 				bestSolution = solution;

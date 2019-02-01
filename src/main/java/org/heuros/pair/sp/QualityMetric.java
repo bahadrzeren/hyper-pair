@@ -202,6 +202,16 @@ public class QualityMetric {
 			|| (numOfAlternativeDutiesWoDh > 0));
 	}
 
+	public boolean isTheSame(QualityMetric qmToCompare) {
+		return (this.numOfDh == qmToCompare.numOfDh)
+				&& (this.dhDurationInMins == qmToCompare.dhDurationInMins)
+				&& (this.activeBlocktimeInMins == qmToCompare.activeBlocktimeInMins)
+				&& (this.numOfDuties == qmToCompare.numOfDuties)
+				&& (this.numOfIncludingDutiesOfTheSameLegs == qmToCompare.numOfIncludingDutiesOfTheSameLegs)
+				&& (this.numOfLegs == qmToCompare.numOfLegs)
+				&& (this.numOfAlternativeDutiesWoDh == qmToCompare.numOfAlternativeDutiesWoDh);
+	}
+
 	public String toString() {
 		return "#DH:" + numOfDh + "/" + dhDurationInMins +
 				", ABT:" + activeBlocktimeInMins + "/" + numOfDuties + "=" + (Math.floor((100.0 * activeBlocktimeInMins) / numOfDuties) / 100.0) +

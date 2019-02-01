@@ -137,9 +137,6 @@ public class SolutionGenerator {
 
 			int heuristicNo = 1;
 
-if (solution.size() > 1000)
-System.out.println();
-
 			Pair p = null;
 			try {
 				p = this.pairingGenerator.generatePairing(legToCover, 
