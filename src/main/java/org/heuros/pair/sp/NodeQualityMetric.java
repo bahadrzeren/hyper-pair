@@ -6,32 +6,38 @@ public class NodeQualityMetric {
 
 	private NodeQualityVector parent = null;
 	private QualityMetric qual = null;
+	private NodeQualityMetric prevNodeMetric = null;
 	private NodeQualityMetric nextNodeMetric = null;
 
 	public NodeQualityMetric(NodeQualityVector parent,
-								QualityMetric nodeQm,
-								NodeQualityMetric nextNodeMetric) {
+								QualityMetric nodeQm) {
 		this.parent = parent;
 		this.qual = new QualityMetric(nodeQm);
-		this.nextNodeMetric = nextNodeMetric;
 	}
 
 	public NodeQualityMetric(NodeQualityVector parent,
-								DutyParam dp,
-								NodeQualityMetric nextNodeMetric) {
+								DutyParam dp) {
 		this.parent = parent;
 		this.qual = new QualityMetric(parent.getNodeOwner(), dp);
-		this.nextNodeMetric = nextNodeMetric;
 	}
 
 	public void reset() {
 		this.qual.reset();
 		this.parent = null;
 		this.nextNodeMetric = null;
+		this.prevNodeMetric = null;
 	}
 
 	public NodeQualityVector getParent() {
 		return parent;
+	}
+
+	public NodeQualityMetric getPrevNodeMetric() {
+		return prevNodeMetric;
+	}
+
+	public void setPrevNodeMetric(NodeQualityMetric prevNodeMetric) {
+		this.prevNodeMetric = prevNodeMetric;
 	}
 
 	public NodeQualityMetric getNextNodeMetric() {

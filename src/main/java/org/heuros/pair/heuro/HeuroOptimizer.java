@@ -241,33 +241,33 @@ public class HeuroOptimizer {
 			 * Checks DEADHEAD TOTALIZERS!
 			 * 
 			 */
-			for (int j = 0; j < legParams.length; j++) {
-				if (((legParams[j].numOfCoverings == 0)
-						&& this.legs.get(j).isCover()
-						&& (this.legs.get(j).getNumOfDutiesWoDh() > 0)
-						&& (legParams[j].numOfDutiesWoDh < 1 || legParams[j].numOfDutiesWoDh > this.legs.get(j).getNumOfDutiesWoDh()))
-					|| ((legParams[j].numOfCoverings != 0) && (legParams[j].numOfDutiesWoDh != 0)))
-					logger.error("#Cvr: " + legParams[j].numOfCoverings + ", #DwoDh: " + legParams[j].numOfDutiesWoDh + "/" + this.legs.get(j).getNumOfDutiesWoDh() + " -> " + this.legs.get(j));
-			}
-			for (int j = 0; j < dutyParams.length; j++) {
-				if ((dutyParams[j].numOfAlternativeDutiesWoDh < 0)
-					|| ((dutyParams[j].numOfAlternativeDutiesWoDh != 0)
-						&& (dutyParams[j].numOfDistinctCoverings == this.duties.get(j).getNumOfLegs()))) {
-					logger.error("#Cvr: " + dutyParams[j].numOfCoverings + ", #DwoDh: " + dutyParams[j].numOfAlternativeDutiesWoDh + "/" + this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh());
-					logger.error(this.duties.get(j));
-				}
-			}
-			for (int j = 0; j < dutyParams.length; j++) {
-				Duty d = this.duties.get(j);
-				int totalNumOfDutiesWoDh = 0; 
-				for (int k = 0; k < d.getNumOfLegs(); k++) {
-					totalNumOfDutiesWoDh += legParams[d.getLegs().get(k).getNdx()].numOfDutiesWoDh;
-				}
-				if (dutyParams[j].numOfAlternativeDutiesWoDh != totalNumOfDutiesWoDh) {
-					logger.error("#Cvr: " + dutyParams[j].numOfCoverings + ", #DwoDh: " + dutyParams[j].numOfAlternativeDutiesWoDh + " != " + totalNumOfDutiesWoDh);
-					logger.error(this.duties.get(j));
-				}
-			}
+//			for (int j = 0; j < legParams.length; j++) {
+//				if (((legParams[j].numOfCoverings == 0)
+//						&& this.legs.get(j).isCover()
+//						&& (this.legs.get(j).getNumOfDutiesWoDh() > 0)
+//						&& (legParams[j].numOfDutiesWoDh < 1 || legParams[j].numOfDutiesWoDh > this.legs.get(j).getNumOfDutiesWoDh()))
+//					|| ((legParams[j].numOfCoverings != 0) && (legParams[j].numOfDutiesWoDh != 0)))
+//					logger.error("#Cvr: " + legParams[j].numOfCoverings + ", #DwoDh: " + legParams[j].numOfDutiesWoDh + "/" + this.legs.get(j).getNumOfDutiesWoDh() + " -> " + this.legs.get(j));
+//			}
+//			for (int j = 0; j < dutyParams.length; j++) {
+//				if ((dutyParams[j].numOfAlternativeDutiesWoDh < 0)
+//					|| ((dutyParams[j].numOfAlternativeDutiesWoDh != 0)
+//						&& (dutyParams[j].numOfDistinctCoverings == this.duties.get(j).getNumOfLegs()))) {
+//					logger.error("#Cvr: " + dutyParams[j].numOfCoverings + ", #DwoDh: " + dutyParams[j].numOfAlternativeDutiesWoDh + "/" + this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh());
+//					logger.error(this.duties.get(j));
+//				}
+//			}
+//			for (int j = 0; j < dutyParams.length; j++) {
+//				Duty d = this.duties.get(j);
+//				int totalNumOfDutiesWoDh = 0; 
+//				for (int k = 0; k < d.getNumOfLegs(); k++) {
+//					totalNumOfDutiesWoDh += legParams[d.getLegs().get(k).getNdx()].numOfDutiesWoDh;
+//				}
+//				if (dutyParams[j].numOfAlternativeDutiesWoDh != totalNumOfDutiesWoDh) {
+//					logger.error("#Cvr: " + dutyParams[j].numOfCoverings + ", #DwoDh: " + dutyParams[j].numOfAlternativeDutiesWoDh + " != " + totalNumOfDutiesWoDh);
+//					logger.error(this.duties.get(j));
+//				}
+//			}
 			/**
 			 * TEST BLOCK END
 			 */

@@ -15,26 +15,37 @@ public class NodeQualityVector {
 	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, QualityMetric hbArrDutyQm) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
-		this.nodeQuals[0] = new NodeQualityMetric(this, hbArrDutyQm, null);
+		this.nodeQuals[0] = new NodeQualityMetric(this, hbArrDutyQm);
 	}
 
 	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, DutyParam dp) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
-		this.nodeQuals[0] = new NodeQualityMetric(this, dp, null);
+		this.nodeQuals[0] = new NodeQualityMetric(this, dp);
 	}
 
 	/*
 	 * Only for non HB arrival duty nodes!
 	 */
-	public NodeQualityVector(int maxPairingLengthInDays, Duty nonHbArrDuty, DutyParam dp, NodeQualityVector nextNodeQv) {
+	public NodeQualityVector(int heuristicNo, int maxPairingLengthInDays, Duty nonHbArrDuty, DutyParam dp, NodeQualityVector nextNodeQv) {
 		this.nodeOwner = nonHbArrDuty;
 		this.nodeOwnerQm = new QualityMetric(this.nodeOwner, dp);
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if (nextNodeQv.nodeQuals[i - 1] != null) {
-				this.nodeQuals[i] = new NodeQualityMetric(this, this.nodeOwnerQm, nextNodeQv.nodeQuals[i - 1]);
+				this.nodeQuals[i] = new NodeQualityMetric(this, this.nodeOwnerQm);
 				this.nodeQuals[i].getQual().addToQualityMetric(nextNodeQv.nodeQuals[i - 1].getQual());
+				this.nodeQuals[i].setNextNodeMetric(nextNodeQv.nodeQuals[i - 1]);
+				/*
+				 * Sets previous path.
+				 * Checks if it is the best.
+				 */
+				if (nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric() == null)
+					nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
+				else
+					if (this.nodeQuals[i].getQual().isBetterThan(heuristicNo, nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric().getQual())) {
+						nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
+					}
 			}
 		}
 	}
@@ -59,14 +70,39 @@ public class NodeQualityVector {
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if ((this.nodeQuals[i] != null) || (nextNodeQv.nodeQuals[i - 1] != null)) {
 				if (this.nodeQuals[i] == null) {
-					this.nodeQuals[i] = new NodeQualityMetric(this, this.nodeOwnerQm, nextNodeQv.nodeQuals[i - 1]);
+					this.nodeQuals[i] = new NodeQualityMetric(this, this.nodeOwnerQm);
 					this.nodeQuals[i].getQual().addToQualityMetric(nextNodeQv.nodeQuals[i - 1].getQual());
+					this.nodeQuals[i].setNextNodeMetric(nextNodeQv.nodeQuals[i - 1]);
+
+					if (nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric() == null)
+						nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
+					else
+						if (this.nodeQuals[i].getQual().isBetterThan(heuristicNo, nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric().getQual())) {
+							nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
+						}
 				} else
 					if (nextNodeQv.nodeQuals[i - 1] != null) {
 						nextNodeQv.nodeQuals[i - 1].getQual().addToQualityMetric(this.nodeOwnerQm);
 						if (nextNodeQv.nodeQuals[i - 1].getQual().isBetterThan(heuristicNo, this.nodeQuals[i].getQual())) {
-							this.nodeQuals[i].setNextNodeMetric(nextNodeQv.nodeQuals[i - 1]);
 							this.nodeQuals[i].getQual().injectValues(nextNodeQv.nodeQuals[i - 1].getQual());
+							this.nodeQuals[i].setNextNodeMetric(nextNodeQv.nodeQuals[i - 1]);
+
+							/*
+							 * Sets previous path.
+							 * Checks if it is the best.
+							 * And updates all nodes till the hbDep node.
+							 */
+							nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
+							if (this.nodeQuals[i].getPrevNodeMetric() != null) {
+								NodeQualityMetric prevNqm = this.nodeQuals[i].getPrevNodeMetric();
+								while (prevNqm != null) {
+									prevNqm.getQual().reset();
+									prevNqm.getQual().injectValues(prevNqm.getNextNodeMetric().getQual());
+									prevNqm.getQual().addToQualityMetric(prevNqm.getParent().getNodeOwnerQm());
+									prevNqm = prevNqm.getPrevNodeMetric();
+								}
+							}
+
 							res = true;
 						}
 						nextNodeQv.nodeQuals[i - 1].getQual().removeFromQualityMetric(this.nodeOwnerQm);

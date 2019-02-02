@@ -364,7 +364,7 @@ public class NetworkExplorer {
 		 * Non HB arr duty
 		 */
 		if (pQv == null) {
-			pQv = new NodeQualityVector(maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
+			pQv = new NodeQualityVector(this.heuristicNo, maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
 			this.bestNodeQuality[pd.getNdx()] = pQv;
 		} else {
 			pQv.checkAndMerge(this.heuristicNo, nQv);
@@ -471,7 +471,7 @@ public class NetworkExplorer {
 		NodeQualityVector nQv = this.bestNodeQuality[nd.getNdx()];
 		NodeQualityVector pQv = this.bestNodeQuality[pd.getNdx()];
 		if (pQv == null) {
-			pQv = new NodeQualityVector(this.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
+			pQv = new NodeQualityVector(this.heuristicNo, this.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
 			this.bestNodeQuality[pd.getNdx()] = pQv;
 		} else {
 			res = pQv.checkAndMerge(this.heuristicNo, nQv);
