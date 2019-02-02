@@ -15,13 +15,13 @@ public class NodeQualityVector {
 	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, QualityMetric hbArrDutyQm) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
-		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, hbArrDutyQm, null);
+		this.nodeQuals[0] = new NodeQualityMetric(this, hbArrDutyQm, null);
 	}
 
 	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, DutyParam dp) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
-		this.nodeQuals[0] = new NodeQualityMetric(this.nodeOwner, dp, null);
+		this.nodeQuals[0] = new NodeQualityMetric(this, dp, null);
 	}
 
 	/*
@@ -33,7 +33,7 @@ public class NodeQualityVector {
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if (nextNodeQv.nodeQuals[i - 1] != null) {
-				this.nodeQuals[i] = new NodeQualityMetric(this.nodeOwner, this.nodeOwnerQm, nextNodeQv.nodeQuals[i - 1]);
+				this.nodeQuals[i] = new NodeQualityMetric(this, this.nodeOwnerQm, nextNodeQv.nodeQuals[i - 1]);
 				this.nodeQuals[i].getQual().addToQualityMetric(nextNodeQv.nodeQuals[i - 1].getQual());
 			}
 		}
@@ -41,6 +41,10 @@ public class NodeQualityVector {
 
 	public Duty getNodeOwner() {
 		return nodeOwner;
+	}
+
+	public QualityMetric getNodeOwnerQm() {
+		return nodeOwnerQm;
 	}
 
 	public NodeQualityMetric[] getQuals() {
@@ -55,7 +59,7 @@ public class NodeQualityVector {
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if ((this.nodeQuals[i] != null) || (nextNodeQv.nodeQuals[i - 1] != null)) {
 				if (this.nodeQuals[i] == null) {
-					this.nodeQuals[i] = new NodeQualityMetric(this.nodeOwner, this.nodeOwnerQm, nextNodeQv.nodeQuals[i - 1]);
+					this.nodeQuals[i] = new NodeQualityMetric(this, this.nodeOwnerQm, nextNodeQv.nodeQuals[i - 1]);
 					this.nodeQuals[i].getQual().addToQualityMetric(nextNodeQv.nodeQuals[i - 1].getQual());
 				} else
 					if (nextNodeQv.nodeQuals[i - 1] != null) {

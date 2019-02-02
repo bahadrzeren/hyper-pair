@@ -195,6 +195,11 @@ public class NetworkExplorer {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param rootDuties must be ordered according to (hbDep, hbArr, briefTime).
+	 * 
+	 */
 	public NetworkExplorer build(Leg legToCover,
 									Duty[] rootDuties,
 									int heuristicNo,
@@ -250,15 +255,15 @@ public class NetworkExplorer {
 		this.maxSearchDayDept = new LocalDate[this.duties.size()];
 		this.hbArrFound = new boolean[this.duties.size()];
 
-//if (legToCover.getNdx() == 4284)
+//if (legToCover.getNdx() == 10038)
 //System.out.println();
 
 		QualityMetric cumulativeQual = new QualityMetric();
 
 		for (Duty duty: rootDuties) {
 
-//if ((legToCover.getNdx() == 4284)
-//		&& (duty.getNdx() == 36121))
+//if ((legToCover.getNdx() == 10038)
+//		&& (duty.getNdx() == 90163))
 //System.out.println();
 
 			LocalDate maxMinDateDept = null;
@@ -336,12 +341,12 @@ public class NetworkExplorer {
 
 	private void fwRegister(Duty pd, Duty nd) {
 
-if ((pd.getNdx() == 8350)
-&& (nd.getNdx() == 24369))
-System.out.println();
-if ((pd.getNdx() == 24369)
-&& (nd.getNdx() == 33569))
-System.out.println();
+//if ((pd.getNdx() == 60341)
+//&& (nd.getNdx() == 71683))
+//System.out.println();
+//if ((pd.getNdx() == 71683)
+//&& (nd.getNdx() == 90163))
+//System.out.println();
 
 		/*
 		 * Calculate quality metric.
@@ -381,15 +386,14 @@ System.out.println();
 		for (Leg leg : nextLegs) {
 			Duty[] nextDuties = this.dutyIndexByDepLegNdx.getArray(leg.getNdx());
 			for (Duty nd: nextDuties) {
-//if ((pd.getNdx() == 8350)
-//&& (nd.getNdx() == 24369))
+
+//if ((pd.getNdx() == 60341)
+//&& (nd.getNdx() == 71683))
 //System.out.println();
-//if ((pd.getNdx() == 24369)
-//&& (nd.getNdx() == 33569))
+//if ((pd.getNdx() == 71683)
+//&& (nd.getNdx() == 90163))
 //System.out.println();
-//if ((pd.getNdx() == 31625)
-//&& (nd.getNdx() == 37544))
-//System.out.println();
+
 				numOfNodes++;
 				numOfFwNodes++;
 				if (nd.isValid(this.hbNdx)
@@ -453,6 +457,14 @@ System.out.println();
 
 	private boolean bwRegister(Duty pd, Duty nd) {
 		boolean res = false;
+
+//if ((pd.getNdx() == 60341)
+//&& (nd.getNdx() == 71683))
+//System.out.println();
+//if ((pd.getNdx() == 71683)
+//&& (nd.getNdx() == 90163))
+//System.out.println();
+
 		/*
 		 * Calculate quality metric.
 		 */
@@ -501,6 +513,14 @@ System.out.println();
 			for (Leg leg : prevLegs) {
 				Duty[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
 				for (Duty pd: prevDuties) {
+
+//if ((pd.getNdx() == 60341)
+//&& (nd.getNdx() == 71683))
+//System.out.println();
+//if ((pd.getNdx() == 71683)
+//&& (nd.getNdx() == 90163))
+//System.out.println();
+
 					if (pd.isValid(this.hbNdx)
 							&& pd.hasPairing(this.hbNdx)
 							&& (pd.isHbDep(this.hbNdx) || (dept > 1))

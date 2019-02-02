@@ -44,31 +44,31 @@ public class SolutionGenerator {
 //		return Integer.MAX_VALUE;
 //	}
 
-//	private int getNextLegNdxToCover(LegParam[] lps) {
-//		int res = -1;
-//		int minNumOfDutiesWoDh = Integer.MAX_VALUE;
-//		for (int i = 0; i < this.legs.size(); i++) {
-//			if (this.legs.get(i).isCover()
-//					&& this.legs.get(i).hasPair(hbNdx)
-//					&& (lps[i].numOfCoverings == 0)) {
-//				if (minNumOfDutiesWoDh > lps[i].numOfDutiesWoDh) {
-//					minNumOfDutiesWoDh = lps[i].numOfDutiesWoDh;
-//					res = i;
-//				}
-//			}
-//		}
-//		return res;
-//	}
-
-	private int getNextLegNdxToCover(int prevReOrderedLegNdx, List<Leg> reOrderedLegs, LegParam[] lps) {
-	for (int i = prevReOrderedLegNdx + 1; i < reOrderedLegs.size(); i++) {
-		if (reOrderedLegs.get(i).isCover()
-				&& reOrderedLegs.get(i).hasPair(hbNdx)
-				&& (lps[reOrderedLegs.get(i).getNdx()].numOfCoverings == 0))
-			return i;
+	private int getNextLegNdxToCover(LegParam[] lps) {
+		int res = -1;
+		int minNumOfDutiesWoDh = Integer.MAX_VALUE;
+		for (int i = 0; i < this.legs.size(); i++) {
+			if (this.legs.get(i).isCover()
+					&& this.legs.get(i).hasPair(hbNdx)
+					&& (lps[i].numOfCoverings == 0)) {
+				if (minNumOfDutiesWoDh > lps[i].numOfDutiesWoDh) {
+					minNumOfDutiesWoDh = lps[i].numOfDutiesWoDh;
+					res = i;
+				}
+			}
+		}
+		return res;
 	}
-	return Integer.MAX_VALUE;
-}
+
+//	private int getNextLegNdxToCover(int prevReOrderedLegNdx, List<Leg> reOrderedLegs, LegParam[] lps) {
+//		for (int i = prevReOrderedLegNdx + 1; i < reOrderedLegs.size(); i++) {
+//			if (reOrderedLegs.get(i).isCover()
+//					&& reOrderedLegs.get(i).hasPair(hbNdx)
+//					&& (lps[reOrderedLegs.get(i).getNdx()].numOfCoverings == 0))
+//				return i;
+//		}
+//		return Integer.MAX_VALUE;
+//	}
 
 	private void udpateStateVectors(Pair p,
 									LegParam[] lps,
@@ -125,15 +125,15 @@ public class SolutionGenerator {
 		int reOrderedLegNdx = -1;
 
 		while (true) {
-			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, reOrderedLegs, legParams);
-			if (reOrderedLegNdx == Integer.MAX_VALUE)
-				break;
-			Leg legToCover = reOrderedLegs.get(reOrderedLegNdx);
-
-//			reOrderedLegNdx = this.getNextLegNdxToCover(legParams);
-//			if (reOrderedLegNdx < 0)
+//			reOrderedLegNdx = this.getNextLegNdxToCover(reOrderedLegNdx, reOrderedLegs, legParams);
+//			if (reOrderedLegNdx == Integer.MAX_VALUE)
 //				break;
-//			Leg legToCover = this.legs.get(reOrderedLegNdx);
+//			Leg legToCover = reOrderedLegs.get(reOrderedLegNdx);
+
+			reOrderedLegNdx = this.getNextLegNdxToCover(legParams);
+			if (reOrderedLegNdx < 0)
+				break;
+			Leg legToCover = this.legs.get(reOrderedLegNdx);
 
 			int heuristicNo = 1;
 

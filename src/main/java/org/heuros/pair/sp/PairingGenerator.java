@@ -81,8 +81,8 @@ public class PairingGenerator {
 
 //			long startTime = System.nanoTime();
 
-if (legToCover.getNdx() == 1650)
-System.out.println();
+//if (legToCover.getNdx() == 1650)
+//System.out.println();
 
 			NetworkExplorer networkExplorer = new NetworkExplorer(this.duties, 
 																		this.maxPairingLengthInDays, 
@@ -108,10 +108,10 @@ System.out.println();
 			 */
 			for (int k = 0; k < sourceDutyNodes.length; k++) {
 				NodeQualityMetric nodeQualityMetric = sourceDutyNodes[k];
-				QualityMetric qualityMetric = new QualityMetric(nodeQualityMetric.getNodeOwner(), dutyParams[nodeQualityMetric.getNodeOwner().getNdx()]);
+				QualityMetric qualityMetric = new QualityMetric(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
 				while (nodeQualityMetric.getNextNodeMetric() != null) {
 					nodeQualityMetric = nodeQualityMetric.getNextNodeMetric();
-					qualityMetric.addToQualityMetric(nodeQualityMetric.getNodeOwner(), dutyParams[nodeQualityMetric.getNodeOwner().getNdx()]);
+					qualityMetric.addToQualityMetric(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
 				}
 				nodeQualityMetric = sourceDutyNodes[k];
 				if (!nodeQualityMetric.getQual().isTheSame(qualityMetric)) {
@@ -132,7 +132,7 @@ System.out.println();
 
 				if (nqm.getQual().isBetterThan(heuristicNo, bestPair.pairQ)) {
 
-					Duty d = nqm.getNodeOwner();
+					Duty d = nqm.getParent().getNodeOwner();
 
 					if (d.isNonHbDep(this.hbNdx))
 						logger.error("Must be HB departed duty!");
@@ -161,7 +161,7 @@ System.out.println();
 								int dept = this.maxPairingLengthInDays - 1;
 								while (nqm.getNextNodeMetric() != null) {
 									nqm = nqm.getNextNodeMetric();
-									Duty nd = nqm.getNodeOwner();
+									Duty nd = nqm.getParent().getNodeOwner();
 
 									if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
 										currentPair.pairQ.addToQualityMetric(nd, dutyParams[nd.getNdx()]);

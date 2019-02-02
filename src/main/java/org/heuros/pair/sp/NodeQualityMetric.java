@@ -1,38 +1,37 @@
 package org.heuros.pair.sp;
 
-import org.heuros.data.model.Duty;
 import org.heuros.pair.heuro.DutyParam;
 
 public class NodeQualityMetric {
 
-	private Duty nodeOwner = null;
-	private NodeQualityMetric nextNodeMetric = null;
+	private NodeQualityVector parent = null;
 	private QualityMetric qual = null;
+	private NodeQualityMetric nextNodeMetric = null;
 
-	public NodeQualityMetric(Duty nodeOwner,
+	public NodeQualityMetric(NodeQualityVector parent,
 								QualityMetric nodeQm,
 								NodeQualityMetric nextNodeMetric) {
+		this.parent = parent;
 		this.qual = new QualityMetric(nodeQm);
-		this.nodeOwner = nodeOwner;
 		this.nextNodeMetric = nextNodeMetric;
 	}
 
-	public NodeQualityMetric(Duty nodeOwner,
+	public NodeQualityMetric(NodeQualityVector parent,
 								DutyParam dp,
 								NodeQualityMetric nextNodeMetric) {
-		this.qual = new QualityMetric(nodeOwner, dp);
-		this.nodeOwner = nodeOwner;
+		this.parent = parent;
+		this.qual = new QualityMetric(parent.getNodeOwner(), dp);
 		this.nextNodeMetric = nextNodeMetric;
 	}
 
 	public void reset() {
 		this.qual.reset();
-		this.nodeOwner = null;
+		this.parent = null;
 		this.nextNodeMetric = null;
 	}
 
-	public Duty getNodeOwner() {
-		return nodeOwner;
+	public NodeQualityVector getParent() {
+		return parent;
 	}
 
 	public NodeQualityMetric getNextNodeMetric() {
@@ -53,7 +52,9 @@ public class NodeQualityMetric {
 		while (true) {
 			sb.append(hNqm.getQual())
 				.append("\n")
-				.append(hNqm.getNodeOwner())
+				.append(hNqm.parent.getNodeOwnerQm())
+				.append("\n")
+				.append(hNqm.parent.getNodeOwner())
 				.append("\n");
 			hNqm = hNqm.getNextNodeMetric();
 			if (hNqm == null)
