@@ -214,15 +214,20 @@ public class HeuroOptimizer {
 			LegParam[] legParams = new LegParam[this.legs.size()];
 			for (int j = 0; j < legParams.length; j++) {
 				legParams[j] = new LegParam();
-				legParams[j].numOfDutiesWoDh = this.legs.get(j).getNumOfDutiesWoDh();
+				legParams[j].numOfIncludingDuties = this.legs.get(j).getNumOfIncludingDuties();
+				legParams[j].numOfIncludingDutiesWoDh = this.legs.get(j).getNumOfIncludingDutiesWoDh();
 			}
 			DutyParam[] dutyParams = new DutyParam[this.duties.size()];
 			for (int j = 0; j < dutyParams.length; j++) {
 				dutyParams[j] = new DutyParam();
-				dutyParams[j].numOfAlternativeDutiesWoDh = this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh();
+				dutyParams[j].minNumOfAlternativeDuties = this.duties.get(j).getMinNumOfAlternativeDuties();
+				dutyParams[j].minNumOfAlternativeDutiesWoDh = this.duties.get(j).getMinNumOfAlternativeDutiesWoDh();
+				dutyParams[j].totalNumOfAlternativeDuties = this.duties.get(j).getTotalNumOfAlternativeDuties();
+				dutyParams[j].totalNumOfAlternativeDutiesWoDh = this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh();
 			}
 
 			SolutionGenerator solGen = new SolutionGenerator(this.legs,
+																this.duties,
 																this.dutyIndexByLegNdx,
 																this.pairingGenerator);
 			double cost = solGen.generateSolution(reOrderedLegs,

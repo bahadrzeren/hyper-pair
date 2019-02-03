@@ -23,13 +23,16 @@ public class SolutionGenerator {
 	private int hbNdx = 0;
 
 	private List<Leg> legs = null;
+	private List<Duty> duties = null;
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 	private PairingGenerator pairingGenerator = null;
 
 	public SolutionGenerator(List<Leg> legs,
+								List<Duty> duties,
 								OneDimIndexInt<Duty> dutyIndexByLegNdx,
 								PairingGenerator pairingGenerator) {
 		this.legs = legs;
+		this.duties = duties;
 		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
 		this.pairingGenerator = pairingGenerator;
 	}
@@ -51,8 +54,8 @@ public class SolutionGenerator {
 			if (this.legs.get(i).isCover()
 					&& this.legs.get(i).hasPair(hbNdx)
 					&& (lps[i].numOfCoverings == 0)) {
-				if (minNumOfDutiesWoDh > lps[i].numOfDutiesWoDh) {
-					minNumOfDutiesWoDh = lps[i].numOfDutiesWoDh;
+				if (minNumOfDutiesWoDh > lps[i].numOfIncludingDutiesWoDh) {
+					minNumOfDutiesWoDh = lps[i].numOfIncludingDutiesWoDh;
 					res = i;
 				}
 			}
@@ -93,10 +96,12 @@ public class SolutionGenerator {
 										&& (lps[indLeg.getNdx()].numOfCoverings == 0)) {
 //if (indLeg.getNdx() == 326)
 //System.out.println();
-									lps[indLeg.getNdx()].numOfDutiesWoDh--;
+									lps[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
 									Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
 									for (int idi = 0; idi < dutiesOfIndLeg.length; idi++) {
-											dps[dutiesOfIndLeg[idi].getNdx()].numOfAlternativeDutiesWoDh--;
+										dps[dutiesOfIndLeg[idi].getNdx()].totalNumOfAlternativeDutiesWoDh--;
+										if (dps[dutiesOfIndLeg[idi].getNdx()].minNumOfAlternativeDutiesWoDh > lps[indLeg.getNdx()].numOfIncludingDutiesWoDh)
+											dps[dutiesOfIndLeg[idi].getNdx()].minNumOfAlternativeDutiesWoDh = lps[indLeg.getNdx()].numOfIncludingDutiesWoDh;
 									}
 								}
 							}
@@ -149,6 +154,42 @@ public class SolutionGenerator {
 			if (p != null) {
 				this.udpateStateVectors(p, legParams, dutyParams);
 				solution.add(p);
+
+				/**
+				 * TEST BLOCK BEGIN
+				 * 
+				 * Checks QualityMetric TOTALIZERS.
+				 * 
+				 */
+//				this.duties.forEach((d) -> {
+//					DutyParam dp = dutyParams[d.getNdx()];
+//					int minNumOfAlternativeDuties = Integer.MAX_VALUE;
+//					int minNumOfAlternativeDutiesWoDh = Integer.MAX_VALUE;
+//					int totalNumOfAlternativeDuties = 0;
+//					int totalNumOfAlternativeDutiesWoDh = 0;
+//					for (int i = 0; i < d.getNumOfLegs(); i++) {
+//						Leg l = d.getLegs().get(i);
+//						if (minNumOfAlternativeDuties > legParams[l.getNdx()].numOfIncludingDuties)
+//							minNumOfAlternativeDuties = legParams[l.getNdx()].numOfIncludingDuties;
+//						if (minNumOfAlternativeDutiesWoDh > legParams[l.getNdx()].numOfIncludingDutiesWoDh)
+//							minNumOfAlternativeDutiesWoDh = legParams[l.getNdx()].numOfIncludingDutiesWoDh;
+//						totalNumOfAlternativeDuties += legParams[l.getNdx()].numOfIncludingDuties;
+//						totalNumOfAlternativeDutiesWoDh += legParams[l.getNdx()].numOfIncludingDutiesWoDh;
+//					}
+//					if (dp.minNumOfAlternativeDuties != minNumOfAlternativeDuties)
+//						System.out.println();
+//					if (dp.minNumOfAlternativeDutiesWoDh != minNumOfAlternativeDutiesWoDh)
+//						System.out.println();
+//					if (dp.totalNumOfAlternativeDuties != totalNumOfAlternativeDuties)
+//						System.out.println();
+//					if (dp.totalNumOfAlternativeDutiesWoDh != totalNumOfAlternativeDutiesWoDh)
+//						System.out.println();
+//
+//				});
+				/**
+				 * TEST BLOCK END
+				 * 
+				 */
 			} else {
 				logger.error("Pairing could not be found for " + legToCover);
 				uncoveredLegs++;

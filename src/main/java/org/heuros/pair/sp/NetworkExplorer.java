@@ -275,7 +275,7 @@ public class NetworkExplorer {
 							|| (duty.getNumOfLegs() == 1))
 					) {
 
-				cumulativeQual.addToQualityMetric(duty, dps[duty.getNdx()]);
+				cumulativeQual.addToQualityMetricFw(duty, dps[duty.getNdx()]);
 				if (duty.isHbDep(this.hbNdx)) {
 					if (duty.isHbArr(this.hbNdx)) {
 						/*
@@ -312,7 +312,7 @@ public class NetworkExplorer {
 							}
 						}
 					}
-				cumulativeQual.removeFromQualityMetric(duty, dps[duty.getNdx()]);
+				cumulativeQual.removeLastDutyQualityMetric(duty, dps[duty.getNdx()]);
 
 //if (cumulativeQual.isNotEmpty())
 //	logger.error("CumulativeQual is not empty!");
@@ -419,7 +419,7 @@ public class NetworkExplorer {
 								res = true;
 							} else
 								if (!this.isNodeVisitedFw(nd, dept, maxMinDateDept)) {
-									fwCumulative.addToQualityMetric(nd, dps[nd.getNdx()]);
+									fwCumulative.addToQualityMetricFw(nd, dps[nd.getNdx()]);
 									if ((sourceNodeQmArray.length == 0)
 													|| fwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, sourceNodeQmArray[0].getQual())) {
 										if (this.fwNetworkSearch(nd, fwCumulative, hbDep, maxMinDateDept, dept - 1)) {
@@ -428,7 +428,7 @@ public class NetworkExplorer {
 										}
 										this.setNodeVisitedFw(nd, dept, maxMinDateDept);
 									}
-									fwCumulative.removeFromQualityMetric(nd, dps[nd.getNdx()]);
+									fwCumulative.removeLastDutyQualityMetric(nd, dps[nd.getNdx()]);
 								}
 						}
 				}
@@ -542,7 +542,7 @@ public class NetworkExplorer {
 									this.setNodeVisitedBw(pd, dept, maxMinDateDept);
 								} else {
 									bwCumulative.injectValues(this.bestNodeQuality[nd.getNdx()].getQuals()[maxPairingLengthInDays - dept - 1].getQual());
-									bwCumulative.addToQualityMetric(pd, dps[pd.getNdx()]);
+									bwCumulative.addToQualityMetricBw(pd, dps[pd.getNdx()]);
 
 									if ((bestNodeQuality[pd.getNdx()] == null)
 											|| (bestNodeQuality[pd.getNdx()].getQuals()[maxPairingLengthInDays - dept] == null)

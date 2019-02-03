@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -113,7 +114,7 @@ public class HeuroPair {
 
 	private static Logger logger = Logger.getLogger(HeuroPair.class);
 
-	public static void main(String[] args) throws IOException, RuleAnnotationIsMissing, RuleRegistrationMatchingException {
+	public static void main(String[] args) throws IOException, RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException {
     	/*
     	 * Load configuration file.
     	 */
@@ -196,8 +197,7 @@ public class HeuroPair {
 			pairOptimizationContext.registerDuties(duties, HeurosSystemParam.homebases.length);
 
 			ExecutorService executorService = Executors.newFixedThreadPool(HeurosSystemParam.homebases.length * 2);
-
-			List<Future<Boolean>> pairInitCalls = new ArrayList<Future<Boolean>>(HeurosSystemParam.homebases.length);
+//			List<Future<Boolean>> pairInitCalls = new ArrayList<Future<Boolean>>(HeurosSystemParam.homebases.length);
 
 			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
 
@@ -216,7 +216,10 @@ public class HeuroPair {
 																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
 																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
-				pairInitCalls.add(executorService.submit(dutyPairChecker));
+//				pairInitCalls.add(executorService.submit(dutyPairChecker));
+				Future<Boolean> dutyPairCheckCall = executorService.submit(dutyPairChecker);
+				if (dutyPairCheckCall.get())
+					logger.info("dutyPairCheck job is completed!");
 
 				BiDirLegPairingChecker legPairChecker = new BiDirLegPairingChecker(hbNdx, HeurosDatasetParam.legCoverPeriodEndExc)
 																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
@@ -228,18 +231,21 @@ public class HeuroPair {
 																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
 																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime())
 																	.setDutyIndexByArrAirportNdxNextBrieftime(pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
-				pairInitCalls.add(executorService.submit(legPairChecker));
+//				pairInitCalls.add(executorService.submit(legPairChecker));
+				Future<Boolean> legPairCheckCall = executorService.submit(legPairChecker);
+				if (legPairCheckCall.get())
+					logger.info("legPairCheck job is completed!");
 			}
 
-			for (int i = 0; i < pairInitCalls.size(); i++) {
-				try {
-					if (pairInitCalls.get(i).get())
-						logger.info(i + "th pairGen is completed its task!");
-				} catch(Exception ex) {
-					ex.printStackTrace();
-					logger.error(ex);
-				}
-			}
+//			for (int i = 0; i < pairInitCalls.size(); i++) {
+//				try {
+//					if (pairInitCalls.get(i).get())
+//						logger.info(i + "th pairGen is completed its task!");
+//				} catch(Exception ex) {
+//					ex.printStackTrace();
+//					logger.error(ex);
+//				}
+//			}
 
 			executorService.shutdown();
 

@@ -106,25 +106,73 @@ public class PairingGenerator {
 			 * Checks QualityMetric TOTALIZERS.
 			 * 
 			 */
-			for (int k = 0; k < sourceDutyNodes.length; k++) {
-				NodeQualityMetric nodeQualityMetric = sourceDutyNodes[k];
-				QualityMetric qualityMetric = new QualityMetric(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
-				while (nodeQualityMetric.getNextNodeMetric() != null) {
-					nodeQualityMetric = nodeQualityMetric.getNextNodeMetric();
-					qualityMetric.addToQualityMetric(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
-				}
-				nodeQualityMetric = sourceDutyNodes[k];
-				if (!nodeQualityMetric.getQual().isTheSame(qualityMetric)) {
-					logger.error("There is difference between shortest path quality found and post calculated quality!");
-					logger.error(legToCover);
-					logger.error(qualityMetric);
-					logger.error(nodeQualityMetric);
-				}
-			}
+			int failedNodeNdxTot = Integer.MAX_VALUE;
+//			for (int k = 0; k < sourceDutyNodes.length; k++) {
+//				NodeQualityMetric nodeQualityMetric = sourceDutyNodes[k];
+//				QualityMetric qualityMetric = new QualityMetric(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
+//				while (nodeQualityMetric.getNextNodeMetric() != null) {
+//					nodeQualityMetric = nodeQualityMetric.getNextNodeMetric();
+//					qualityMetric.addToQualityMetricFw(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
+//				}
+//				nodeQualityMetric = sourceDutyNodes[k];
+//				if (!nodeQualityMetric.getQual().isTheSame(qualityMetric)) {
+////					logger.error("There is difference between shortest path quality found and post calculated quality!");
+////					logger.error(legToCover);
+////					logger.error(qualityMetric);
+////					logger.error(nodeQualityMetric);
+//					failedNodeNdxTot = k;
+//					break;
+//				}
+//			}
 			/**
 			 * TEST BLOCK END
 			 */
 
+			/**
+			 * TEST BLOCK BEGIN
+			 * 
+			 * Checks QualityMetric Alternative Duty w/wo DH TOTALIZERS.
+			 * 
+			 */
+			int failedNodeNdxAltD = Integer.MAX_VALUE;
+//			for (int k = 0; k < sourceDutyNodes.length; k++) {
+//				int minNumOfAlternativeDuties = Integer.MAX_VALUE;
+//				int minNumOfAlternativeDutiesWoDh = Integer.MAX_VALUE;
+//				int totalNumOfAlternativeDuties = 0;
+//				int totalNumOfAlternativeDutiesWoDh = 0;
+//
+//				NodeQualityMetric nodeQualityMetric = sourceDutyNodes[k];
+//				QualityMetric qualityMetric = new QualityMetric(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
+//
+//				if (minNumOfAlternativeDuties > dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDuties)
+//					minNumOfAlternativeDuties = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDuties;
+//				if (minNumOfAlternativeDutiesWoDh > dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDutiesWoDh)
+//					minNumOfAlternativeDutiesWoDh = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDutiesWoDh;
+//				totalNumOfAlternativeDuties += dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].totalNumOfAlternativeDuties;
+//				totalNumOfAlternativeDutiesWoDh += dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].totalNumOfAlternativeDutiesWoDh;
+//
+//				while (nodeQualityMetric.getNextNodeMetric() != null) {
+//					nodeQualityMetric = nodeQualityMetric.getNextNodeMetric();
+//					qualityMetric.addToQualityMetricFw(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
+//
+//					if (minNumOfAlternativeDuties > dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDuties)
+//						minNumOfAlternativeDuties = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDuties;
+//					if (minNumOfAlternativeDutiesWoDh > dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDutiesWoDh)
+//						minNumOfAlternativeDutiesWoDh = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDutiesWoDh;
+//					totalNumOfAlternativeDuties += dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].totalNumOfAlternativeDuties;
+//					totalNumOfAlternativeDutiesWoDh += dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].totalNumOfAlternativeDutiesWoDh;
+//				}
+//				nodeQualityMetric = sourceDutyNodes[k];
+//				if (!nodeQualityMetric.getQual().hasTheSameValues(minNumOfAlternativeDuties, minNumOfAlternativeDutiesWoDh, totalNumOfAlternativeDuties, totalNumOfAlternativeDutiesWoDh)) {
+//					failedNodeNdxAltD = k;
+//					break;
+//				}
+//			}
+
+			/**
+			 * TEST BLOCK END
+			 */
+			int pairingGenerationNodeNdx = 0;
 			for (int i = 0; i < sourceDutyNodes.length; i++) {
 				int j = i;
 
@@ -139,7 +187,7 @@ public class PairingGenerator {
 
 		    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
 
-		    			currentPair.pairQ.addToQualityMetric(d, dutyParams[d.getNdx()]);
+		    			currentPair.pairQ.addToQualityMetricFw(d, dutyParams[d.getNdx()]);
 		    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
 
 						if (d.isHbArr(this.hbNdx)) {
@@ -148,6 +196,7 @@ public class PairingGenerator {
 			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
 			    						bestPair.pair = (Pair) currentPair.pair.clone();
 			    						bestPair.pairQ.injectValues(currentPair.pairQ);
+			    						pairingGenerationNodeNdx = i;
 			    					}
 			    				} else
 			    					logger.error("Pairing " + d + " must be complete!");
@@ -164,7 +213,7 @@ public class PairingGenerator {
 									Duty nd = nqm.getParent().getNodeOwner();
 
 									if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
-										currentPair.pairQ.addToQualityMetric(nd, dutyParams[nd.getNdx()]);
+										currentPair.pairQ.addToQualityMetricFw(nd, dutyParams[nd.getNdx()]);
 										pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, nd);
 										if (nd.isHbArr(this.hbNdx)) {
 											if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
@@ -172,6 +221,7 @@ public class PairingGenerator {
 							    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
 							    						bestPair.pair = (Pair) currentPair.pair.clone();
 							    						bestPair.pairQ.injectValues(currentPair.pairQ);
+							    						pairingGenerationNodeNdx = i;
 							    						break;
 							    					}
 							    				} else
@@ -195,6 +245,17 @@ public class PairingGenerator {
 						this.pairRuleContext.getAggregatorProxy().removeAll(currentPair.pair);
 		    		}
 				}
+			}
+
+			/*
+			 * TODO
+			 * 
+			 * In some of iterations pairingGenerationNodeNdx is quite large. Why ?
+			 * 
+			 */
+			if ((failedNodeNdxTot < pairingGenerationNodeNdx)
+					|| (failedNodeNdxAltD < pairingGenerationNodeNdx)) {
+				System.out.println("!");
 			}
 
 //			long searchCompletionTime = System.nanoTime();

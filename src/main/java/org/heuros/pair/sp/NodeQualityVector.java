@@ -33,12 +33,12 @@ public class NodeQualityVector {
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if (nextNodeQv.nodeQuals[i - 1] != null) {
-				this.nodeQuals[i] = new NodeQualityMetric(this, this.nodeOwnerQm);
-				this.nodeQuals[i].getQual().addToQualityMetric(nextNodeQv.nodeQuals[i - 1].getQual());
+				this.nodeQuals[i] = new NodeQualityMetric(this, nextNodeQv.nodeQuals[i - 1].getQual());
+				this.nodeQuals[i].getQual().addLeadingDutyQualityMetric(this.nodeOwnerQm);
 				this.nodeQuals[i].setNextNodeMetric(nextNodeQv.nodeQuals[i - 1]);
 				/*
 				 * Sets previous path.
-				 * Checks if it is the best.
+				 * Checks if new connection is better.
 				 */
 				if (nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric() == null)
 					nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
@@ -70,8 +70,8 @@ public class NodeQualityVector {
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if ((this.nodeQuals[i] != null) || (nextNodeQv.nodeQuals[i - 1] != null)) {
 				if (this.nodeQuals[i] == null) {
-					this.nodeQuals[i] = new NodeQualityMetric(this, this.nodeOwnerQm);
-					this.nodeQuals[i].getQual().addToQualityMetric(nextNodeQv.nodeQuals[i - 1].getQual());
+					this.nodeQuals[i] = new NodeQualityMetric(this, nextNodeQv.nodeQuals[i - 1].getQual());
+					this.nodeQuals[i].getQual().addLeadingDutyQualityMetric(this.nodeOwnerQm);
 					this.nodeQuals[i].setNextNodeMetric(nextNodeQv.nodeQuals[i - 1]);
 
 					if (nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric() == null)
@@ -82,15 +82,15 @@ public class NodeQualityVector {
 						}
 				} else
 					if (nextNodeQv.nodeQuals[i - 1] != null) {
-						nextNodeQv.nodeQuals[i - 1].getQual().addToQualityMetric(this.nodeOwnerQm);
+						nextNodeQv.nodeQuals[i - 1].getQual().addLeadingDutyQualityMetric(this.nodeOwnerQm);
 						if (nextNodeQv.nodeQuals[i - 1].getQual().isBetterThan(heuristicNo, this.nodeQuals[i].getQual())) {
 							this.nodeQuals[i].getQual().injectValues(nextNodeQv.nodeQuals[i - 1].getQual());
 							this.nodeQuals[i].setNextNodeMetric(nextNodeQv.nodeQuals[i - 1]);
 
 							/*
 							 * Sets previous path.
-							 * Checks if it is the best.
-							 * And updates all nodes till the hbDep node.
+							 * Checks if new connection is better.
+							 * And updates all nodes till the leading hbDep node.
 							 */
 							nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
 							if (this.nodeQuals[i].getPrevNodeMetric() != null) {
@@ -98,14 +98,14 @@ public class NodeQualityVector {
 								while (prevNqm != null) {
 									prevNqm.getQual().reset();
 									prevNqm.getQual().injectValues(prevNqm.getNextNodeMetric().getQual());
-									prevNqm.getQual().addToQualityMetric(prevNqm.getParent().getNodeOwnerQm());
+									prevNqm.getQual().addLeadingDutyQualityMetric(prevNqm.getParent().getNodeOwnerQm());
 									prevNqm = prevNqm.getPrevNodeMetric();
 								}
 							}
 
 							res = true;
 						}
-						nextNodeQv.nodeQuals[i - 1].getQual().removeFromQualityMetric(this.nodeOwnerQm);
+						nextNodeQv.nodeQuals[i - 1].getQual().removeLeadingDutyQualityMetric(this.nodeOwnerQm);
 					}
 			}
 		}
