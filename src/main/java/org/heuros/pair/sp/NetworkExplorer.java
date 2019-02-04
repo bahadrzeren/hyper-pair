@@ -10,7 +10,7 @@ import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
-import org.heuros.pair.heuro.DutyParam;
+import org.heuros.pair.heuro.DutyState;
 
 public class NetworkExplorer {
 
@@ -143,7 +143,7 @@ public class NetworkExplorer {
 	}
 
 	private int heuristicNo = 0;
-	private DutyParam[] dps = null;
+	private DutyState[] dps = null;
 
 	private int[] maxSearchNumDept = null;
 	private LocalDate[] maxSearchDayDept = null;
@@ -203,7 +203,7 @@ public class NetworkExplorer {
 	public NetworkExplorer build(Leg legToCover,
 									Duty[] rootDuties,
 									int heuristicNo,
-									DutyParam[] dps) throws CloneNotSupportedException {
+									DutyState[] dps) throws CloneNotSupportedException {
 		this.heuristicNo = heuristicNo;
 		this.dps = dps;
 

@@ -191,8 +191,8 @@ public class HeuroOptimizer {
 
 		double bestCost = Double.MAX_VALUE;
 		List<Pair> bestSolution = null;
-		LegParam[] bestLegParams = null;
-		DutyParam[] bestDutyParams = null;
+		LegState[] bestLegParams = null;
+		DutyState[] bestDutyParams = null;
 
 		List<Leg> reOrderedLegs = new ArrayList<Leg>();
 		for (int i = 0; i < this.legs.size(); i++)
@@ -211,17 +211,19 @@ public class HeuroOptimizer {
 		for (int i = 0; i < HeurosGaParameters.maxNumOfIterations; i++) {
 
 			List<Pair> solution = new ArrayList<Pair>();
-			LegParam[] legParams = new LegParam[this.legs.size()];
+			LegState[] legParams = new LegState[this.legs.size()];
 			for (int j = 0; j < legParams.length; j++) {
-				legParams[j] = new LegParam();
+				legParams[j] = new LegState();
 				legParams[j].numOfIncludingDuties = this.legs.get(j).getNumOfIncludingDuties();
 				legParams[j].numOfIncludingDutiesWoDh = this.legs.get(j).getNumOfIncludingDutiesWoDh();
 			}
-			DutyParam[] dutyParams = new DutyParam[this.duties.size()];
+			DutyState[] dutyParams = new DutyState[this.duties.size()];
 			for (int j = 0; j < dutyParams.length; j++) {
-				dutyParams[j] = new DutyParam();
+				dutyParams[j] = new DutyState();
 				dutyParams[j].minNumOfAlternativeDuties = this.duties.get(j).getMinNumOfAlternativeDuties();
 				dutyParams[j].minNumOfAlternativeDutiesWoDh = this.duties.get(j).getMinNumOfAlternativeDutiesWoDh();
+				dutyParams[j].maxNumOfAlternativeDuties = this.duties.get(j).getMaxNumOfAlternativeDuties();
+				dutyParams[j].maxNumOfAlternativeDutiesWoDh = this.duties.get(j).getMaxNumOfAlternativeDutiesWoDh();
 				dutyParams[j].totalNumOfAlternativeDuties = this.duties.get(j).getTotalNumOfAlternativeDuties();
 				dutyParams[j].totalNumOfAlternativeDutiesWoDh = this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh();
 			}

@@ -47,7 +47,7 @@ public class SolutionGenerator {
 //		return Integer.MAX_VALUE;
 //	}
 
-	private int getNextLegNdxToCover(LegParam[] lps) {
+	private int getNextLegNdxToCover(LegState[] lps) {
 		int res = -1;
 		int minNumOfDutiesWoDh = Integer.MAX_VALUE;
 		for (int i = 0; i < this.legs.size(); i++) {
@@ -74,8 +74,8 @@ public class SolutionGenerator {
 //	}
 
 	private void udpateStateVectors(Pair p,
-									LegParam[] lps,
-									DutyParam[] dps) {
+									LegState[] lps,
+									DutyState[] dps) {
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
 			Duty duty = p.getDuties().get(i);
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
@@ -102,6 +102,16 @@ public class SolutionGenerator {
 										dps[dutiesOfIndLeg[idi].getNdx()].totalNumOfAlternativeDutiesWoDh--;
 										if (dps[dutiesOfIndLeg[idi].getNdx()].minNumOfAlternativeDutiesWoDh > lps[indLeg.getNdx()].numOfIncludingDutiesWoDh)
 											dps[dutiesOfIndLeg[idi].getNdx()].minNumOfAlternativeDutiesWoDh = lps[indLeg.getNdx()].numOfIncludingDutiesWoDh;
+										/*
+										 * TODO
+										 * 
+										 * This implementation does not guarantee to set exact maxNumOfAlternativeDutiesWoDh.
+										 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
+										 * Therefore the number of legs that has the same maxNumOfAlternativeDutiesWoDh might cause small disruptions.
+										 *  
+										 */
+										if (dps[dutiesOfIndLeg[idi].getNdx()].maxNumOfAlternativeDutiesWoDh <= lps[indLeg.getNdx()].numOfIncludingDutiesWoDh)
+											dps[dutiesOfIndLeg[idi].getNdx()].maxNumOfAlternativeDutiesWoDh = lps[indLeg.getNdx()].numOfIncludingDutiesWoDh;
 									}
 								}
 							}
@@ -120,8 +130,8 @@ public class SolutionGenerator {
 
 	public double generateSolution(List<Leg> reOrderedLegs,
 									List<Pair> solution,
-									LegParam[] legParams,
-									DutyParam[] dutyParams) {
+									LegState[] legParams,
+									DutyState[] dutyParams) {
 
 		logger.info("Solution generation process is started!");
 

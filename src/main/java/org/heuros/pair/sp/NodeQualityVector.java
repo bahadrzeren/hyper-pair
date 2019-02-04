@@ -1,7 +1,7 @@
 package org.heuros.pair.sp;
 
 import org.heuros.data.model.Duty;
-import org.heuros.pair.heuro.DutyParam;
+import org.heuros.pair.heuro.DutyState;
 
 public class NodeQualityVector {
 
@@ -18,7 +18,7 @@ public class NodeQualityVector {
 		this.nodeQuals[0] = new NodeQualityMetric(this, hbArrDutyQm);
 	}
 
-	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, DutyParam dp) {
+	public NodeQualityVector(int maxPairingLengthInDays, Duty hbArrDuty, DutyState dp) {
 		this.nodeOwner = hbArrDuty;
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
 		this.nodeQuals[0] = new NodeQualityMetric(this, dp);
@@ -27,7 +27,7 @@ public class NodeQualityVector {
 	/*
 	 * Only for non HB arrival duty nodes!
 	 */
-	public NodeQualityVector(int heuristicNo, int maxPairingLengthInDays, Duty nonHbArrDuty, DutyParam dp, NodeQualityVector nextNodeQv) {
+	public NodeQualityVector(int heuristicNo, int maxPairingLengthInDays, Duty nonHbArrDuty, DutyState dp, NodeQualityVector nextNodeQv) {
 		this.nodeOwner = nonHbArrDuty;
 		this.nodeOwnerQm = new QualityMetric(this.nodeOwner, dp);
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];

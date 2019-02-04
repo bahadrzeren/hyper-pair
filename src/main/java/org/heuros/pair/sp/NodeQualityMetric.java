@@ -1,6 +1,6 @@
 package org.heuros.pair.sp;
 
-import org.heuros.pair.heuro.DutyParam;
+import org.heuros.pair.heuro.DutyState;
 
 public class NodeQualityMetric {
 
@@ -16,7 +16,7 @@ public class NodeQualityMetric {
 	}
 
 	public NodeQualityMetric(NodeQualityVector parent,
-								DutyParam dp) {
+								DutyState dp) {
 		this.parent = parent;
 		this.qual = new QualityMetric(parent.getNodeOwner(), dp);
 	}
