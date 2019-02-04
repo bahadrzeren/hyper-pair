@@ -260,6 +260,8 @@ public class NetworkExplorer {
 
 		QualityMetric cumulativeQual = new QualityMetric();
 
+		LinkedList<BwRootNodeInfo> treeOfBwDuties = new LinkedList<BwRootNodeInfo>();
+
 		for (Duty duty: rootDuties) {
 
 //if ((legToCover.getNdx() == 10038)
@@ -272,8 +274,7 @@ public class NetworkExplorer {
 					&& duty.hasPairing(this.hbNdx)
 					&& ((sourceNodeQmArray.length == 0)
 							|| (duty.getNumOfLegs() > dps[duty.getNdx()].numOfDistinctCoverings)
-							|| (duty.getNumOfLegs() == 1))
-					) {
+							|| (duty.getNumOfLegs() == 1))) {
 
 				cumulativeQual.addToQualityMetricFw(duty, dps[duty.getNdx()]);
 				if (duty.isHbDep(this.hbNdx)) {
@@ -297,18 +298,20 @@ public class NetworkExplorer {
 						if (duty.isHbArr(this.hbNdx)) {
 							maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(this.maxPairingLengthInDays - 1);
 							this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(maxPairingLengthInDays, duty, cumulativeQual);
-							if (this.bwNetworkSearch(duty, true, maxMinDateDept, this.maxPairingLengthInDays)) {
-								hbArrFound[duty.getNdx()] = true;
-							}
+//							if (this.bwNetworkSearch(duty, true, maxMinDateDept, this.maxPairingLengthInDays)) {
+//								hbArrFound[duty.getNdx()] = true;
+//							}
+							treeOfBwDuties.add(new BwRootNodeInfo(duty, maxMinDateDept, this.maxPairingLengthInDays).initRootNode());
 						} else {
 							maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(this.maxPairingLengthInDays - 1);
 							if (this.fwNetworkSearch(duty, cumulativeQual, false, maxMinDateDept, this.maxPairingLengthInDays - 2)) {
 								hbArrFound[duty.getNdx()] = true;
 								maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(this.maxPairingLengthInDays - 2);
-								/*
-								 * We need to use the best quality metric that is found for the root duty so far.
-								 */
-								this.bwNetworkSearch(duty, false, maxMinDateDept, this.maxPairingLengthInDays - 1);
+//								/*
+//								 * We need to use the best quality metric that is found for the root duty so far.
+//								 */
+//								this.bwNetworkSearch(duty, false, maxMinDateDept, this.maxPairingLengthInDays - 1);
+								treeOfBwDuties.add(new BwRootNodeInfo(duty, maxMinDateDept, this.maxPairingLengthInDays - 1).initRootNode());
 							}
 						}
 					}
@@ -318,6 +321,9 @@ public class NetworkExplorer {
 //	logger.error("CumulativeQual is not empty!");
 			}
 		}
+
+		this.bwNetworkSearch(treeOfBwDuties);
+
 		return this;
 	}
 
@@ -483,33 +489,43 @@ public class NetworkExplorer {
 		return res;
 	}
 
-	private boolean bwNetworkSearch(Duty rootDuty, boolean hbArr, LocalDate maxMinDateDept, int maxDept) throws CloneNotSupportedException {
+	private class BwRootNodeInfo {
+		public Duty duty;
+		public LocalDate maxMinDateDept;
+		public int maxDept;
+		public BwRootNodeInfo(Duty rootDuty, LocalDate maxMinDateDept, int maxDept) {
+			this.duty = rootDuty;
+			this.maxMinDateDept = maxMinDateDept;
+			this.maxDept = maxDept;
+		}
+		public BwRootNodeInfo initRootNode() {
+			/*
+			 * This reduce is needed because in some cases the root duty might not have a hbArr connection with desired dept.
+			 * 
+			 * RootDuty.QualVector[X, X, Q, X]
+			 * 
+			 */
+			while (bestNodeQuality[duty.getNdx()].getQuals()[maxPairingLengthInDays - this.maxDept] == null) {
+				this.maxDept--;
+			}
+			setNodeVisitedBw(this.duty, this.maxDept, this.maxMinDateDept);
+			return this;
+		}
+	}
+
+	private boolean bwNetworkSearch(LinkedList<BwRootNodeInfo> treeOfDuties) throws CloneNotSupportedException {
 		boolean res = false;
 
-		LinkedList<Duty> treeOfDuties = new LinkedList<Duty>();
-		treeOfDuties.add(rootDuty);
-
-		/*
-		 * This reduce is needed because in some cases the root duty might not have a hbArr connection with desired dept.
-		 * 
-		 * RootDuty.QualVector[X, X, Q, X]
-		 * 
-		 */
-		while (this.bestNodeQuality[rootDuty.getNdx()].getQuals()[maxPairingLengthInDays - maxDept] == null) {
-			maxDept--;
-		}
-
-		this.setNodeVisitedBw(rootDuty, maxDept, maxMinDateDept);
 
 		QualityMetric bwCumulative = new QualityMetric();
 
 		while (treeOfDuties.size() > 0) {
 
-			Duty nd = treeOfDuties.removeFirst();
+			BwRootNodeInfo ndInfo = treeOfDuties.removeFirst();
 
-			int dept = this.maxSearchNumDept[nd.getNdx()] - 1;
+			int dept = ndInfo.maxDept - 1;	//	this.maxSearchNumDept[ndInfo.duty.getNdx()] - 1;
 
-			Leg[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(nd.getNdx());
+			Leg[] prevLegs = this.prevDebriefLegIndexByDutyNdx.getArray(ndInfo.duty.getNdx());
 			for (Leg leg : prevLegs) {
 				Duty[] prevDuties = this.dutyIndexByArrLegNdx.getArray(leg.getNdx());
 				for (Duty pd: prevDuties) {
@@ -527,21 +543,21 @@ public class NetworkExplorer {
 							&& ((sourceNodeQmArray.length == 0)
 									|| (pd.getNumOfLegs() > dps[pd.getNdx()].numOfDistinctCoverings)
 									|| (pd.getNumOfLegs() == 1))
-							&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
-									|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
+							&& (ndInfo.maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
+									|| ndInfo.maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
 							) {
 
 						if (pd.isHbDep(this.hbNdx)) {
-							this.addSourceDuty(heuristicNo, pd, this.bwRegister(pd, nd));
-							this.setNodeVisitedBw(pd, dept, maxMinDateDept);
+							this.addSourceDuty(heuristicNo, pd, this.bwRegister(pd, ndInfo.duty));
+							this.setNodeVisitedBw(pd, dept, ndInfo.maxMinDateDept);
 							res = true;
 						} else
 							if (dept > 1) {
-								if (this.isNodeVisitedBw(pd, dept, maxMinDateDept)) {
-									this.bwRegister(pd, nd);
-									this.setNodeVisitedBw(pd, dept, maxMinDateDept);
+								if (this.isNodeVisitedBw(pd, dept, ndInfo.maxMinDateDept)) {
+									this.bwRegister(pd, ndInfo.duty);
+									this.setNodeVisitedBw(pd, dept, ndInfo.maxMinDateDept);
 								} else {
-									bwCumulative.injectValues(this.bestNodeQuality[nd.getNdx()].getQuals()[maxPairingLengthInDays - dept - 1].getQual());
+									bwCumulative.injectValues(this.bestNodeQuality[ndInfo.duty.getNdx()].getQuals()[maxPairingLengthInDays - dept - 1].getQual());
 									bwCumulative.addToQualityMetricBw(pd, dps[pd.getNdx()]);
 
 									if ((bestNodeQuality[pd.getNdx()] == null)
@@ -554,9 +570,9 @@ public class NetworkExplorer {
 																						heuristicNo, 
 																						dept, 
 																						sourceNodeQmArray[0].getQual())) {
-											this.bwRegister(pd, nd);
-											this.setNodeVisitedBw(pd, dept, maxMinDateDept);
-											treeOfDuties.add(pd);
+											this.bwRegister(pd, ndInfo.duty);
+											this.setNodeVisitedBw(pd, dept, ndInfo.maxMinDateDept);
+											treeOfDuties.add(new BwRootNodeInfo(pd, ndInfo.maxMinDateDept, dept));
 										}
 									}
 								}

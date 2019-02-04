@@ -273,7 +273,7 @@ public class QualityMetric {
 //							&& (this.numOfIncludingDutiesOfTheSameLegs < qm.numOfIncludingDutiesOfTheSameLegs))) {
 							&& (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))) {
 //							&& ((1.0 * this.numOfAlternativeDutiesWoDh) / this.numOfLegs < (1.0 * qm.numOfAlternativeDutiesWoDh) / qm.numOfLegs))) {
-//							&& (this.minNumOfAlternativeDutiesWoDh < qm.minNumOfAlternativeDutiesWoDh))) {
+//							&& (this.maxNumOfAlternativeDutiesWoDh < qm.maxNumOfAlternativeDutiesWoDh))) {
 //							&& (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
 				return true;
 			} else
@@ -286,7 +286,7 @@ public class QualityMetric {
 //							&& (this.numOfIncludingDutiesOfTheSameLegs < qm.numOfIncludingDutiesOfTheSameLegs))) {
 							&& (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))) {
 //							&& ((1.0 * this.numOfAlternativeDutiesWoDh) / this.numOfLegs < (1.0 * qm.numOfAlternativeDutiesWoDh) / qm.numOfLegs))) {
-//							&& (this.minNumOfAlternativeDutiesWoDh < qm.minNumOfAlternativeDutiesWoDh))) {
+//							&& (this.maxNumOfAlternativeDutiesWoDh < qm.maxNumOfAlternativeDutiesWoDh))) {
 //							&& (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
 				return true;
 			} else

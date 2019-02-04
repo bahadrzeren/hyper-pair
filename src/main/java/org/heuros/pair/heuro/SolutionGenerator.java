@@ -11,6 +11,7 @@ import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
+import org.heuros.pair.conf.HeurosDatasetParam;
 import org.heuros.pair.sp.PairingGenerator;
 
 public class SolutionGenerator {
@@ -53,6 +54,7 @@ public class SolutionGenerator {
 		for (int i = 0; i < this.legs.size(); i++) {
 			if (this.legs.get(i).isCover()
 					&& this.legs.get(i).hasPair(hbNdx)
+					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
 					&& (lps[i].numOfCoverings == 0)) {
 				if (minNumOfDutiesWoDh > lps[i].numOfIncludingDutiesWoDh) {
 					minNumOfDutiesWoDh = lps[i].numOfIncludingDutiesWoDh;
@@ -162,8 +164,10 @@ public class SolutionGenerator {
 			}
 
 			if (p != null) {
-				this.udpateStateVectors(p, legParams, dutyParams);
-				solution.add(p);
+				if (p.getFirstDuty().getBriefTime(hbNdx).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
+					this.udpateStateVectors(p, legParams, dutyParams);
+					solution.add(p);
+				}
 
 				/**
 				 * TEST BLOCK BEGIN

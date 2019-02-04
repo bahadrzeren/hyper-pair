@@ -40,12 +40,12 @@ public class NodeQualityVector {
 				 * Sets previous path.
 				 * Checks if new connection is better.
 				 */
-				if (nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric() == null)
-					nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
-				else
-					if (this.nodeQuals[i].getQual().isBetterThan(heuristicNo, nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric().getQual())) {
-						nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
-					}
+//				if (nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric() == null)
+//					nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
+//				else
+//					if (this.nodeQuals[i].getQual().isBetterThan(heuristicNo, nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric().getQual())) {
+//						nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
+//					}
 			}
 		}
 	}
@@ -92,16 +92,16 @@ public class NodeQualityVector {
 							 * Checks if new connection is better.
 							 * And updates all nodes till the leading hbDep node.
 							 */
-							nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
-							if (this.nodeQuals[i].getPrevNodeMetric() != null) {
-								NodeQualityMetric prevNqm = this.nodeQuals[i].getPrevNodeMetric();
-								while (prevNqm != null) {
-									prevNqm.getQual().reset();
-									prevNqm.getQual().injectValues(prevNqm.getNextNodeMetric().getQual());
-									prevNqm.getQual().addLeadingDutyQualityMetric(prevNqm.getParent().getNodeOwnerQm());
-									prevNqm = prevNqm.getPrevNodeMetric();
-								}
-							}
+//							nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
+//							if (this.nodeQuals[i].getPrevNodeMetric() != null) {
+//								NodeQualityMetric prevNqm = this.nodeQuals[i].getPrevNodeMetric();
+//								while (prevNqm != null) {
+//									prevNqm.getQual().reset();
+//									prevNqm.getQual().injectValues(prevNqm.getNextNodeMetric().getQual());
+//									prevNqm.getQual().addLeadingDutyQualityMetric(prevNqm.getParent().getNodeOwnerQm());
+//									prevNqm = prevNqm.getPrevNodeMetric();
+//								}
+//							}
 
 							res = true;
 						}
