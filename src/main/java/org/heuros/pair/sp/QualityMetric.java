@@ -28,6 +28,7 @@ public class QualityMetric {
 	private int totalNumOfAlternativeDuties = 0;
 	private int totalNumOfAlternativeDutiesWoDh = 0;
 	private int numOfLegs = 0;
+	private int numOfCriticalDuties = 0;
 
 	public QualityMetric() {
 	}
@@ -50,6 +51,7 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties = qmToCopy.totalNumOfAlternativeDuties;
 		this.totalNumOfAlternativeDutiesWoDh = qmToCopy.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs = qmToCopy.numOfLegs;
+		this.numOfCriticalDuties = qmToCopy.numOfCriticalDuties;
 	}
 
 	public QualityMetric(DutyView duty,
@@ -69,6 +71,8 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties = duty.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh = dp.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs = duty.getNumOfLegs();
+		if (dp.isCritical)
+			this.numOfCriticalDuties++;
 	}
 
 	public void injectValues(QualityMetric qmToCopy) {
@@ -89,6 +93,7 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties = qmToCopy.totalNumOfAlternativeDuties;
 		this.totalNumOfAlternativeDutiesWoDh = qmToCopy.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs = qmToCopy.numOfLegs;
+		this.numOfCriticalDuties = qmToCopy.numOfCriticalDuties;
 	}
 
 //	public void injectValues(DutyView nodeOwner,
@@ -117,6 +122,7 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties = 0;
 		this.totalNumOfAlternativeDutiesWoDh = 0;
 		this.numOfLegs = 0;
+		this.numOfCriticalDuties = 0;
 	}
 
 	/**
@@ -157,11 +163,13 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties += d.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh += dp.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs += d.getNumOfLegs();
+		if (dp.isCritical)
+			this.numOfCriticalDuties++;
 	}
 
 
 	public void addToQualityMetricBw(DutyView d,
-									DutyState dp) {
+										DutyState dp) {
 		this.numOfDh += (d.getNumOfLegsPassive() + dp.numOfCoverings);
 		this.dhDurationInMins += (d.getBlockTimeInMinsPassive() + dp.blockTimeOfCoverings);
 		this.activeBlocktimeInMins += (d.getBlockTimeInMinsActive() - dp.blockTimeOfCoverings);
@@ -182,6 +190,8 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties += d.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh += dp.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs += d.getNumOfLegs();
+		if (dp.isCritical)
+			this.numOfCriticalDuties++;
 	}
 
 	public void addLeadingDutyQualityMetric(QualityMetric leadingDutyQm) {
@@ -208,6 +218,7 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties += leadingDutyQm.totalNumOfAlternativeDuties;
 		this.totalNumOfAlternativeDutiesWoDh += leadingDutyQm.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs += leadingDutyQm.numOfLegs;
+		this.numOfCriticalDuties += leadingDutyQm.numOfCriticalDuties;
 	}
 
 	public void removeLastDutyQualityMetric(DutyView d,
@@ -223,6 +234,8 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties -= d.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh -= dp.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs -= d.getNumOfLegs();
+		if (dp.isCritical)
+			this.numOfCriticalDuties--;
 	}
 
 	public void removeLeadingDutyQualityMetric(QualityMetric leadingDutyQm) {
@@ -240,6 +253,7 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties -= leadingDutyQm.totalNumOfAlternativeDuties;
 		this.totalNumOfAlternativeDutiesWoDh -= leadingDutyQm.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs -= leadingDutyQm.numOfLegs;
+		this.numOfCriticalDuties -= leadingDutyQm.numOfCriticalDuties;
 	}
 
 //	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
@@ -267,14 +281,13 @@ public class QualityMetric {
 		if (heuristicNo < 2) {	//	If layover or dh effective. 
 			if ((qm.numOfLegs == 0)
 					|| (this.numOfDh < qm.numOfDh)
-					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
-					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins)
-//							&& (((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs) < ((1.0 * qm.numOfIncludingDutiesOfTheSameLegs) / qm.numOfLegs)))) {
-//							&& (this.numOfIncludingDutiesOfTheSameLegs < qm.numOfIncludingDutiesOfTheSameLegs))) {
-							&& (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))) {
-//							&& ((1.0 * this.numOfAlternativeDutiesWoDh) / this.numOfLegs < (1.0 * qm.numOfAlternativeDutiesWoDh) / qm.numOfLegs))) {
-//							&& (this.maxNumOfAlternativeDutiesWoDh < qm.maxNumOfAlternativeDutiesWoDh))) {
-//							&& (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties)))) {
+//					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
+//					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins)
+//					|| ((this.numOfDh == qm.numOfDh) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
+					|| ((this.numOfDh == qm.numOfDh) && (this.numOfCriticalDuties < qm.numOfCriticalDuties))
+					|| ((this.numOfDh == qm.numOfDh) && (this.numOfCriticalDuties == qm.numOfCriticalDuties) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
+					) {
+
 				return true;
 			} else
 				return false;
@@ -283,7 +296,6 @@ public class QualityMetric {
 					|| (((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) > ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
 					|| ((((1.0 * this.activeBlocktimeInMins) / this.numOfDuties) == ((1.0 * qm.activeBlocktimeInMins) / qm.numOfDuties))
 //							&& (this.numOfDh < qm.numOfDh))) {
-//							&& (this.numOfIncludingDutiesOfTheSameLegs < qm.numOfIncludingDutiesOfTheSameLegs))) {
 							&& (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))) {
 //							&& ((1.0 * this.numOfAlternativeDutiesWoDh) / this.numOfLegs < (1.0 * qm.numOfAlternativeDutiesWoDh) / qm.numOfLegs))) {
 //							&& (this.maxNumOfAlternativeDutiesWoDh < qm.maxNumOfAlternativeDutiesWoDh))) {
@@ -301,7 +313,11 @@ public class QualityMetric {
 		if (heuristicNo < 2) {	//	If layover or dh effective.
 			if ((bestQualSoFar == null)
 					|| (bestQualSoFar.numOfDh > this.numOfDh)
-					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins >= this.dhDurationInMins))
+//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins >= this.dhDurationInMins))
+//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
+					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfCriticalDuties > this.numOfCriticalDuties))
+					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfCriticalDuties == this.numOfCriticalDuties) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
+
 //					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins == this.dhDurationInMins) 
 //							&& (((1.0 * bestQualSoFar.numOfIncludingDutiesOfTheSameLegs) / bestQualSoFar.numOfLegs) >= ((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs)))
 					) {
@@ -331,7 +347,8 @@ public class QualityMetric {
 			|| (maxNumOfAlternativeDutiesWoDh > 0)
 			|| (totalNumOfAlternativeDuties < 0)
 			|| (totalNumOfAlternativeDutiesWoDh > 0)
-			|| (numOfLegs > 0));
+			|| (numOfLegs > 0)
+			|| (numOfCriticalDuties > 0));
 	}
 
 	public boolean isTheSame(QualityMetric qmToCompare) {
@@ -345,7 +362,8 @@ public class QualityMetric {
 				&& (this.maxNumOfAlternativeDutiesWoDh == qmToCompare.maxNumOfAlternativeDutiesWoDh)
 				&& (this.totalNumOfAlternativeDuties == qmToCompare.totalNumOfAlternativeDuties)
 				&& (this.totalNumOfAlternativeDutiesWoDh == qmToCompare.totalNumOfAlternativeDutiesWoDh)
-				&& (this.numOfLegs == qmToCompare.numOfLegs);
+				&& (this.numOfLegs == qmToCompare.numOfLegs)
+				&& (this.numOfCriticalDuties == qmToCompare.numOfCriticalDuties);
 	}
 
 	public boolean hasTheSameValues(int minNumOfAlternativeDuties,

@@ -271,7 +271,7 @@ public class PairingGenerator {
 			 */
 			if ((failedNodeNdxTot < pairingGenerationNodeNdx)
 					|| (failedNodeNdxAltD < pairingGenerationNodeNdx)) {
-				System.out.println("!");
+				System.out.println("!!!");
 			}
 
 //			long searchCompletionTime = System.nanoTime();

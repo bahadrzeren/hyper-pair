@@ -51,15 +51,22 @@ public class SolutionGenerator {
 	private int getNextLegNdxToCover(LegState[] lps) {
 		int res = -1;
 		int minNumOfDutiesWoDh = Integer.MAX_VALUE;
+		boolean isCritical = false;
 		for (int i = 0; i < this.legs.size(); i++) {
 			if (this.legs.get(i).isCover()
 					&& this.legs.get(i).hasPair(hbNdx)
 					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
 					&& (lps[i].numOfCoverings == 0)) {
-				if (minNumOfDutiesWoDh > lps[i].numOfIncludingDutiesWoDh) {
+				if (this.legs.get(i).isCritical()
+						&& (!isCritical)) {
+					isCritical = true;
 					minNumOfDutiesWoDh = lps[i].numOfIncludingDutiesWoDh;
 					res = i;
-				}
+				} else
+					if (minNumOfDutiesWoDh > lps[i].numOfIncludingDutiesWoDh) {
+						minNumOfDutiesWoDh = lps[i].numOfIncludingDutiesWoDh;
+						res = i;
+					}
 			}
 		}
 		return res;
@@ -88,32 +95,39 @@ public class SolutionGenerator {
 				for (int di = 0; di < dutiesOfLeg.length; di++) {
 					Duty dutyOfLeg = dutiesOfLeg[di];
 
-					if (leg.isCover()
-							&& (lps[leg.getNdx()].numOfCoverings == 0)) {
-						if ((dutyOfLeg.getNumOfLegsPassive() == 0)
-								&& (dps[dutyOfLeg.getNdx()].numOfCoverings == 0)) {
-							for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
-								Leg indLeg = dutyOfLeg.getLegs().get(li);
-								if (indLeg.isCover()
-										&& (lps[indLeg.getNdx()].numOfCoverings == 0)) {
+					if (dutyOfLeg.hasPairing(hbNdx)
+							&& dutyOfLeg.isValid(hbNdx)) {
+						if (leg.isCover()
+								&& (lps[leg.getNdx()].numOfCoverings == 0)) {
+							if ((dutyOfLeg.getNumOfLegsPassive() == 0)
+									&& (dps[dutyOfLeg.getNdx()].numOfCoverings == 0)) {
+								for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
+									Leg indLeg = dutyOfLeg.getLegs().get(li);
+									if (indLeg.isCover()
+											&& (lps[indLeg.getNdx()].numOfCoverings == 0)) {
 //if (indLeg.getNdx() == 326)
 //System.out.println();
-									lps[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
-									Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
-									for (int idi = 0; idi < dutiesOfIndLeg.length; idi++) {
-										dps[dutiesOfIndLeg[idi].getNdx()].totalNumOfAlternativeDutiesWoDh--;
-										if (dps[dutiesOfIndLeg[idi].getNdx()].minNumOfAlternativeDutiesWoDh > lps[indLeg.getNdx()].numOfIncludingDutiesWoDh)
-											dps[dutiesOfIndLeg[idi].getNdx()].minNumOfAlternativeDutiesWoDh = lps[indLeg.getNdx()].numOfIncludingDutiesWoDh;
-										/*
-										 * TODO
-										 * 
-										 * This implementation does not guarantee to set exact maxNumOfAlternativeDutiesWoDh.
-										 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
-										 * Therefore the number of legs that has the same maxNumOfAlternativeDutiesWoDh might cause small disruptions.
-										 *  
-										 */
-										if (dps[dutiesOfIndLeg[idi].getNdx()].maxNumOfAlternativeDutiesWoDh <= lps[indLeg.getNdx()].numOfIncludingDutiesWoDh)
-											dps[dutiesOfIndLeg[idi].getNdx()].maxNumOfAlternativeDutiesWoDh = lps[indLeg.getNdx()].numOfIncludingDutiesWoDh;
+										lps[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
+										Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
+										for (int idi = 0; idi < dutiesOfIndLeg.length; idi++) {
+											Duty dutieOfIndLeg = dutiesOfIndLeg[idi];
+											if (dutieOfIndLeg.hasPairing(hbNdx)
+													&& dutieOfIndLeg.isValid(hbNdx)) {
+												dps[dutieOfIndLeg.getNdx()].totalNumOfAlternativeDutiesWoDh--;
+												if (dps[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh > lps[indLeg.getNdx()].numOfIncludingDutiesWoDh)
+													dps[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh = lps[indLeg.getNdx()].numOfIncludingDutiesWoDh;
+												/*
+												 * TODO
+												 * 
+												 * This implementation does not guarantee to set exact maxNumOfAlternativeDutiesWoDh.
+												 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
+												 * Therefore the number of legs that has the same maxNumOfAlternativeDutiesWoDh might cause small disruptions.
+												 *  
+												 */
+												if (dps[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh <= lps[indLeg.getNdx()].numOfIncludingDutiesWoDh)
+													dps[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh = lps[indLeg.getNdx()].numOfIncludingDutiesWoDh;
+											}
+										}
 									}
 								}
 							}
@@ -222,20 +236,27 @@ public class SolutionGenerator {
 			numOfPairs++;
 		}
 
+		int numOfLegsFromTheFleet = 0;
+		int numOfDeadheadLegsFromTheFleet = 0;
+		int numOfLegsOutsideOfTheFleet = 0;
 		int numOfDeadheads = 0;
 
 		for (int i = 0; i < this.legs.size(); i++) {
 			if (this.legs.get(i).isCover()) {
+				if (legParams[i].numOfCoverings > 0) 
+					numOfLegsFromTheFleet++;
 				if (legParams[i].numOfCoverings > 1) {
 					fitness += (2.0 * (legParams[i].numOfCoverings - 1) * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
 //					fitness += (numOfLegCoverings[i] - 1) * 100;
 					numOfDeadheads += (legParams[i].numOfCoverings - 1);
+					numOfDeadheadLegsFromTheFleet++;
 				}
 			} else {
 				if (legParams[i].numOfCoverings > 0) {
 					fitness += (2.0 * legParams[i].numOfCoverings * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
 //					fitness += numOfLegCoverings[i] * 100;
 					numOfDeadheads += legParams[i].numOfCoverings;
+					numOfLegsOutsideOfTheFleet++;
 				}
 			}
 		}
@@ -245,6 +266,9 @@ public class SolutionGenerator {
 					", numOfPairDays:" + numOfPairDays +
 					", uncoveredLegs: " + uncoveredLegs + 
 					", numOfDeadheads: " + numOfDeadheads + 
+					", numOfLegsFromTheFleet: " + numOfLegsFromTheFleet +
+					", numOfDeadheadLegsFromTheFleet: " + numOfDeadheadLegsFromTheFleet +
+					", numOfLegsOutsideOfTheFleet: " + numOfLegsOutsideOfTheFleet +
 					", fitness: " + fitness);
 
 		return fitness;

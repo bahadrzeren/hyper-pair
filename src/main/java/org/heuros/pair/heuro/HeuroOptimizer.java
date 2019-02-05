@@ -226,6 +226,7 @@ public class HeuroOptimizer {
 				dutyParams[j].maxNumOfAlternativeDutiesWoDh = this.duties.get(j).getMaxNumOfAlternativeDutiesWoDh();
 				dutyParams[j].totalNumOfAlternativeDuties = this.duties.get(j).getTotalNumOfAlternativeDuties();
 				dutyParams[j].totalNumOfAlternativeDutiesWoDh = this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh();
+				dutyParams[j].isCritical = this.duties.get(j).getCriticalLeg() != null;
 			}
 
 			SolutionGenerator solGen = new SolutionGenerator(this.legs,
