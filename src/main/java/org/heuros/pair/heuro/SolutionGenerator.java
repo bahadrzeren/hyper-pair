@@ -57,15 +57,21 @@ public class SolutionGenerator {
 					&& this.legs.get(i).hasPair(hbNdx)
 					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
 					&& (lps[i].numOfCoverings == 0)) {
-				if (this.legs.get(i).isCritical()
-						&& (!isCritical)) {
-					isCritical = true;
-					minNumOfDutiesWoDh = lps[i].numOfIncludingDutiesWoDh;
-					res = i;
-				} else
-					if (minNumOfDutiesWoDh > lps[i].numOfIncludingDutiesWoDh) {
-						minNumOfDutiesWoDh = lps[i].numOfIncludingDutiesWoDh;
+				if (this.legs.get(i).isCriticalWoDh()) {
+					if (!isCritical) {
+						isCritical = true;
 						res = i;
+					} else
+						if (minNumOfDutiesWoDh > lps[i].numOfIncludingDutiesWoDh) {
+							minNumOfDutiesWoDh = lps[i].numOfIncludingDutiesWoDh;
+							res = i;
+						}
+				} else
+					if (!isCritical) {
+						if (minNumOfDutiesWoDh > lps[i].numOfIncludingDutiesWoDh) {
+							minNumOfDutiesWoDh = lps[i].numOfIncludingDutiesWoDh;
+							res = i;
+						}
 					}
 			}
 		}
@@ -181,43 +187,45 @@ public class SolutionGenerator {
 				if (p.getFirstDuty().getBriefTime(hbNdx).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
 					this.udpateStateVectors(p, legParams, dutyParams);
 					solution.add(p);
-				}
 
-				/**
-				 * TEST BLOCK BEGIN
-				 * 
-				 * Checks QualityMetric TOTALIZERS.
-				 * 
-				 */
-//				this.duties.forEach((d) -> {
-//					DutyParam dp = dutyParams[d.getNdx()];
-//					int minNumOfAlternativeDuties = Integer.MAX_VALUE;
-//					int minNumOfAlternativeDutiesWoDh = Integer.MAX_VALUE;
-//					int totalNumOfAlternativeDuties = 0;
-//					int totalNumOfAlternativeDutiesWoDh = 0;
-//					for (int i = 0; i < d.getNumOfLegs(); i++) {
-//						Leg l = d.getLegs().get(i);
-//						if (minNumOfAlternativeDuties > legParams[l.getNdx()].numOfIncludingDuties)
-//							minNumOfAlternativeDuties = legParams[l.getNdx()].numOfIncludingDuties;
-//						if (minNumOfAlternativeDutiesWoDh > legParams[l.getNdx()].numOfIncludingDutiesWoDh)
-//							minNumOfAlternativeDutiesWoDh = legParams[l.getNdx()].numOfIncludingDutiesWoDh;
-//						totalNumOfAlternativeDuties += legParams[l.getNdx()].numOfIncludingDuties;
-//						totalNumOfAlternativeDutiesWoDh += legParams[l.getNdx()].numOfIncludingDutiesWoDh;
-//					}
-//					if (dp.minNumOfAlternativeDuties != minNumOfAlternativeDuties)
-//						System.out.println();
-//					if (dp.minNumOfAlternativeDutiesWoDh != minNumOfAlternativeDutiesWoDh)
-//						System.out.println();
-//					if (dp.totalNumOfAlternativeDuties != totalNumOfAlternativeDuties)
-//						System.out.println();
-//					if (dp.totalNumOfAlternativeDutiesWoDh != totalNumOfAlternativeDutiesWoDh)
-//						System.out.println();
-//
-//				});
-				/**
-				 * TEST BLOCK END
-				 * 
-				 */
+					/**
+					 * TEST BLOCK BEGIN
+					 * 
+					 * Checks QualityMetric TOTALIZERS.
+					 * 
+					 */
+//					this.duties.forEach((d) -> {
+//						if (d.isValid(this.hbNdx)
+//								&& d.hasPairing(this.hbNdx)) {
+//							DutyState ds = dutyParams[d.getNdx()];
+//							int minNumOfAlternativeDuties = Integer.MAX_VALUE;
+//							int minNumOfAlternativeDutiesWoDh = Integer.MAX_VALUE;
+//							int totalNumOfAlternativeDuties = 0;
+//							int totalNumOfAlternativeDutiesWoDh = 0;
+//							for (int i = 0; i < d.getNumOfLegs(); i++) {
+//								Leg l = d.getLegs().get(i);
+//								if (minNumOfAlternativeDuties > legParams[l.getNdx()].numOfIncludingDuties)
+//									minNumOfAlternativeDuties = legParams[l.getNdx()].numOfIncludingDuties;
+//								if (minNumOfAlternativeDutiesWoDh > legParams[l.getNdx()].numOfIncludingDutiesWoDh)
+//									minNumOfAlternativeDutiesWoDh = legParams[l.getNdx()].numOfIncludingDutiesWoDh;
+//								totalNumOfAlternativeDuties += legParams[l.getNdx()].numOfIncludingDuties;
+//								totalNumOfAlternativeDutiesWoDh += legParams[l.getNdx()].numOfIncludingDutiesWoDh;
+//							}
+//							if (ds.minNumOfAlternativeDuties != minNumOfAlternativeDuties)
+//								System.out.println("!" + legToCover);
+//							if (ds.minNumOfAlternativeDutiesWoDh != minNumOfAlternativeDutiesWoDh)
+//								System.out.println("!" + legToCover);
+//							if (ds.totalNumOfAlternativeDuties != totalNumOfAlternativeDuties)
+//								System.out.println("!" + legToCover);
+//							if (ds.totalNumOfAlternativeDutiesWoDh != totalNumOfAlternativeDutiesWoDh)
+//								System.out.println("!" + legToCover);
+//						}
+//					});
+					/**
+					 * TEST BLOCK END
+					 * 
+					 */
+				}
 			} else {
 				logger.error("Pairing could not be found for " + legToCover);
 				uncoveredLegs++;
