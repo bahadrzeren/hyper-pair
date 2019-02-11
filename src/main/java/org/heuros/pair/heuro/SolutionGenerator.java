@@ -114,6 +114,13 @@ public class SolutionGenerator {
 //if (indLeg.getNdx() == 326)
 //System.out.println();
 										lps[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
+//boolean becameCritical = false;
+//if (indLeg.getNdx() != leg.getNdx()) {
+//leg.getCouplingDutiesInDutiesWoDh()[indLeg.getNdx()]--;
+//indLeg.getCouplingDutiesInDutiesWoDh()[leg.getNdx()]--;
+//if (indLeg.getCouplingDutiesInDutiesWoDh()[indLeg.getNdx()] == lps[indLeg.getNdx()].numOfIncludingDutiesWoDh)
+//	
+//}
 										Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
 										for (int idi = 0; idi < dutiesOfIndLeg.length; idi++) {
 											Duty dutieOfIndLeg = dutiesOfIndLeg[idi];
