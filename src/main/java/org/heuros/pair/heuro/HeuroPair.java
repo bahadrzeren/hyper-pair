@@ -235,6 +235,15 @@ public class HeuroPair {
 				Future<Boolean> legPairCheckCall = executorService.submit(legPairChecker);
 				if (legPairCheckCall.get())
 					logger.info("legPairCheck job is completed!");
+
+				PotentialDhChecker potentialDhChecker = new PotentialDhChecker(hbNdx, HeurosDatasetParam.legCoverPeriodEndExc)
+																	.setLegRepository(pairOptimizationContext.getLegRepository())
+																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
+																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx());
+//				pairInitCalls.add(executorService.submit(legPairChecker));
+				Future<Boolean> potentialDhCheckCall = executorService.submit(potentialDhChecker);
+				if (potentialDhCheckCall.get())
+					logger.info("potentialDhCheck job is completed!");
 			}
 
 //			for (int i = 0; i < pairInitCalls.size(); i++) {
