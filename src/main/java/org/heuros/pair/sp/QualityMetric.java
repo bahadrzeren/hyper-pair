@@ -28,8 +28,9 @@ public class QualityMetric {
 	private int totalNumOfAlternativeDuties = 0;
 	private int totalNumOfAlternativeDutiesWoDh = 0;
 	private int numOfLegs = 0;
-	private int numOfCriticalDuties = 0;
-	private int numOfCriticalDutiesWoDh = 0;
+//	private int numOfCriticalDuties = 0;
+//	private int numOfCriticalDutiesWoDh = 0;
+	private int numOfPotentialIndirectDhLegs = 0;
 
 	public QualityMetric() {
 	}
@@ -52,8 +53,9 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties = qmToCopy.totalNumOfAlternativeDuties;
 		this.totalNumOfAlternativeDutiesWoDh = qmToCopy.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs = qmToCopy.numOfLegs;
-		this.numOfCriticalDuties = qmToCopy.numOfCriticalDuties;
-		this.numOfCriticalDutiesWoDh = qmToCopy.numOfCriticalDutiesWoDh;
+//		this.numOfCriticalDuties = qmToCopy.numOfCriticalDuties;
+//		this.numOfCriticalDutiesWoDh = qmToCopy.numOfCriticalDutiesWoDh;
+		this.numOfPotentialIndirectDhLegs = qmToCopy.numOfPotentialIndirectDhLegs;
 	}
 
 	public QualityMetric(DutyView d,
@@ -73,10 +75,11 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties = d.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh = dp.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs = d.getNumOfLegs();
-		if (d.getCriticalLeg() != null)
-			this.numOfCriticalDuties++;
-		if (dp.isCriticalWoDh)
-			this.numOfCriticalDutiesWoDh++;
+//		if (d.getCriticalLeg() != null)
+//			this.numOfCriticalDuties++;
+//		if (dp.isCriticalWoDh)
+//			this.numOfCriticalDutiesWoDh++;
+		this.numOfPotentialIndirectDhLegs = dp.totalNumOfPotentialIndirectDhLegs;
 	}
 
 	public void injectValues(QualityMetric qmToCopy) {
@@ -97,8 +100,9 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties = qmToCopy.totalNumOfAlternativeDuties;
 		this.totalNumOfAlternativeDutiesWoDh = qmToCopy.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs = qmToCopy.numOfLegs;
-		this.numOfCriticalDuties = qmToCopy.numOfCriticalDuties;
-		this.numOfCriticalDutiesWoDh = qmToCopy.numOfCriticalDutiesWoDh;
+//		this.numOfCriticalDuties = qmToCopy.numOfCriticalDuties;
+//		this.numOfCriticalDutiesWoDh = qmToCopy.numOfCriticalDutiesWoDh;
+		this.numOfPotentialIndirectDhLegs = qmToCopy.numOfPotentialIndirectDhLegs;
 	}
 
 //	public void injectValues(DutyView nodeOwner,
@@ -127,8 +131,9 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties = 0;
 		this.totalNumOfAlternativeDutiesWoDh = 0;
 		this.numOfLegs = 0;
-		this.numOfCriticalDuties = 0;
-		this.numOfCriticalDutiesWoDh = 0;
+//		this.numOfCriticalDuties = 0;
+//		this.numOfCriticalDutiesWoDh = 0;
+		this.numOfPotentialIndirectDhLegs = 0;
 	}
 
 	/**
@@ -169,10 +174,11 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties += d.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh += dp.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs += d.getNumOfLegs();
-		if (d.getCriticalLeg() != null)
-			this.numOfCriticalDuties++;
-		if (dp.isCriticalWoDh)
-			this.numOfCriticalDutiesWoDh++;
+//		if (d.getCriticalLeg() != null)
+//			this.numOfCriticalDuties++;
+//		if (dp.isCriticalWoDh)
+//			this.numOfCriticalDutiesWoDh++;
+		this.numOfPotentialIndirectDhLegs += dp.totalNumOfPotentialIndirectDhLegs;
 	}
 
 
@@ -198,10 +204,11 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties += d.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh += dp.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs += d.getNumOfLegs();
-		if (d.getCriticalLeg() != null)
-			this.numOfCriticalDuties++;
-		if (dp.isCriticalWoDh)
-			this.numOfCriticalDutiesWoDh++;
+//		if (d.getCriticalLeg() != null)
+//			this.numOfCriticalDuties++;
+//		if (dp.isCriticalWoDh)
+//			this.numOfCriticalDutiesWoDh++;
+		this.numOfPotentialIndirectDhLegs += dp.totalNumOfPotentialIndirectDhLegs;
 	}
 
 	public void addLeadingDutyQualityMetric(QualityMetric leadingDutyQm) {
@@ -228,8 +235,9 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties += leadingDutyQm.totalNumOfAlternativeDuties;
 		this.totalNumOfAlternativeDutiesWoDh += leadingDutyQm.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs += leadingDutyQm.numOfLegs;
-		this.numOfCriticalDuties += leadingDutyQm.numOfCriticalDuties;
-		this.numOfCriticalDutiesWoDh += leadingDutyQm.numOfCriticalDutiesWoDh;
+//		this.numOfCriticalDuties += leadingDutyQm.numOfCriticalDuties;
+//		this.numOfCriticalDutiesWoDh += leadingDutyQm.numOfCriticalDutiesWoDh;
+		this.numOfPotentialIndirectDhLegs += leadingDutyQm.numOfPotentialIndirectDhLegs;
 	}
 
 	public void removeLastDutyQualityMetric(DutyView d,
@@ -245,10 +253,11 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties -= d.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh -= dp.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs -= d.getNumOfLegs();
-		if (d.getCriticalLeg() != null)
-			this.numOfCriticalDuties--;
-		if (dp.isCriticalWoDh)
-			this.numOfCriticalDutiesWoDh--;
+//		if (d.getCriticalLeg() != null)
+//			this.numOfCriticalDuties--;
+//		if (dp.isCriticalWoDh)
+//			this.numOfCriticalDutiesWoDh--;
+		this.numOfPotentialIndirectDhLegs -= dp.totalNumOfPotentialIndirectDhLegs;
 	}
 
 	public void removeLeadingDutyQualityMetric(QualityMetric leadingDutyQm) {
@@ -266,8 +275,9 @@ public class QualityMetric {
 		this.totalNumOfAlternativeDuties -= leadingDutyQm.totalNumOfAlternativeDuties;
 		this.totalNumOfAlternativeDutiesWoDh -= leadingDutyQm.totalNumOfAlternativeDutiesWoDh;
 		this.numOfLegs -= leadingDutyQm.numOfLegs;
-		this.numOfCriticalDuties -= leadingDutyQm.numOfCriticalDuties;
-		this.numOfCriticalDutiesWoDh -= leadingDutyQm.numOfCriticalDutiesWoDh;
+//		this.numOfCriticalDuties -= leadingDutyQm.numOfCriticalDuties;
+//		this.numOfCriticalDutiesWoDh -= leadingDutyQm.numOfCriticalDutiesWoDh;
+		this.numOfPotentialIndirectDhLegs -= leadingDutyQm.numOfPotentialIndirectDhLegs;
 	}
 
 //	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
@@ -298,8 +308,8 @@ public class QualityMetric {
 //					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
 //					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins)
 //					|| ((this.numOfDh == qm.numOfDh) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
-					|| ((this.numOfDh == qm.numOfDh) && (this.numOfCriticalDutiesWoDh < qm.numOfCriticalDutiesWoDh))
-					|| ((this.numOfDh == qm.numOfDh) && (this.numOfCriticalDutiesWoDh == qm.numOfCriticalDutiesWoDh) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
+					|| ((this.numOfDh == qm.numOfDh) && (this.numOfPotentialIndirectDhLegs < qm.numOfPotentialIndirectDhLegs))
+					|| ((this.numOfDh == qm.numOfDh) && (this.numOfPotentialIndirectDhLegs == qm.numOfPotentialIndirectDhLegs) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
 					) {
 
 				return true;
@@ -329,8 +339,8 @@ public class QualityMetric {
 					|| (bestQualSoFar.numOfDh > this.numOfDh)
 //					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins >= this.dhDurationInMins))
 //					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
-					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfCriticalDutiesWoDh > this.numOfCriticalDutiesWoDh))
-					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfCriticalDutiesWoDh == this.numOfCriticalDutiesWoDh) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
+					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfPotentialIndirectDhLegs > this.numOfPotentialIndirectDhLegs))
+					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfPotentialIndirectDhLegs == this.numOfPotentialIndirectDhLegs) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
 
 //					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins == this.dhDurationInMins) 
 //							&& (((1.0 * bestQualSoFar.numOfIncludingDutiesOfTheSameLegs) / bestQualSoFar.numOfLegs) >= ((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs)))
@@ -362,8 +372,9 @@ public class QualityMetric {
 			|| (totalNumOfAlternativeDuties < 0)
 			|| (totalNumOfAlternativeDutiesWoDh > 0)
 			|| (numOfLegs > 0)
-			|| (numOfCriticalDuties > 0)
-			|| (numOfCriticalDutiesWoDh > 0));
+//			|| (numOfCriticalDuties > 0)
+//			|| (numOfCriticalDutiesWoDh > 0)
+			|| (numOfPotentialIndirectDhLegs > 0));
 	}
 
 	public boolean isTheSame(QualityMetric qmToCompare) {
@@ -378,8 +389,10 @@ public class QualityMetric {
 				&& (this.totalNumOfAlternativeDuties == qmToCompare.totalNumOfAlternativeDuties)
 				&& (this.totalNumOfAlternativeDutiesWoDh == qmToCompare.totalNumOfAlternativeDutiesWoDh)
 				&& (this.numOfLegs == qmToCompare.numOfLegs)
-				&& (this.numOfCriticalDuties == qmToCompare.numOfCriticalDuties)
-				&& (this.numOfCriticalDutiesWoDh == qmToCompare.numOfCriticalDutiesWoDh);
+//				&& (this.numOfCriticalDuties == qmToCompare.numOfCriticalDuties)
+//				&& (this.numOfCriticalDutiesWoDh == qmToCompare.numOfCriticalDutiesWoDh)
+				&& (this.numOfPotentialIndirectDhLegs == qmToCompare.numOfPotentialIndirectDhLegs)
+				;
 	}
 
 	public boolean hasTheSameValues(int minNumOfAlternativeDuties,
@@ -405,7 +418,9 @@ public class QualityMetric {
 				", #AltMaxDwoDH:" + maxNumOfAlternativeDutiesWoDh +
 				", #AltD:" + totalNumOfAlternativeDuties +
 				", #AltDwoDH:" + totalNumOfAlternativeDutiesWoDh +
-				", #CritD:" + numOfCriticalDuties +
-				", #CritDwoDH:" + numOfCriticalDutiesWoDh;
+//				", #CritD:" + numOfCriticalDuties +
+//				", #CritDwoDH:" + numOfCriticalDutiesWoDh
+				", #PotIndDhDs:" + numOfPotentialIndirectDhLegs
+				;
 	}
 }

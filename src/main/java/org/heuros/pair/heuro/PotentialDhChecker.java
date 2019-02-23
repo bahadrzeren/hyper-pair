@@ -96,29 +96,31 @@ public class PotentialDhChecker implements Callable<Boolean> {
             		/*
             		 * Critical legs & duties identification.
             		 */
-            		if (numOfDuties == maxNumOfAssociations) {
-			    		for (int ali = 0; ali < legAssociationVector.length; ali++) {
-			    			if (legAssociationVector[ali] == maxNumOfAssociations) {
-			    				Duty[] aDuties = dutyIndexByLegNdx.getArray(ali);
-			    				for (Duty aDuty : aDuties) {
-			    					if (aDuty.isValid(hbNdx)
-			    							&& aDuty.hasPairing(hbNdx)) {
-										boolean hasCriticalLeg = false;
-										for (int aldi = 0; aldi < aDuty.getLegs().size(); aldi++) {
-											if (aDuty.getLegs().get(aldi).getNdx() == l.getNdx()) {
-												hasCriticalLeg = true;
-												break;
-											}
-										}
-										if (!hasCriticalLeg) {
-											aDuty.setCriticalLeg(l);
-											l.setCritical(true);
-										}
-			    					}
-								}
-			    			}
-			    		}
-		    		}
+//            		if (numOfDuties == maxNumOfAssociations) {
+//			    		for (int ali = 0; ali < legAssociationVector.length; ali++) {
+//			    			if (legAssociationVector[ali] == maxNumOfAssociations) {
+//			    				Duty[] aDuties = dutyIndexByLegNdx.getArray(ali);
+//			    				for (Duty aDuty : aDuties) {
+//			    					if (aDuty.isValid(hbNdx)
+//			    							&& aDuty.hasPairing(hbNdx)) {
+//										boolean hasCriticalLeg = false;
+//										for (int aldi = 0; aldi < aDuty.getLegs().size(); aldi++) {
+//											if (aDuty.getLegs().get(aldi).getNdx() == l.getNdx()) {
+//												hasCriticalLeg = true;
+//												break;
+//											}
+//										}
+//										if (!hasCriticalLeg) {
+////											aDuty.setCriticalLeg(l);
+////											l.setCritical(true);
+//											aDuty.setTotalNumOfPotentialIndirectDhLegs(1);
+//											l.setPotentialDhLevel(1);
+//										}
+//			    					}
+//								}
+//			    			}
+//			    		}
+//		    		}
             		if (numOfDutiesWoDh == maxNumOfAssociationsWoDh) {
 			    		for (int ali = 0; ali < legAssociationVectorWoDh.length; ali++) {
 			    			if (legAssociationVectorWoDh[ali] == maxNumOfAssociationsWoDh) {
@@ -139,8 +141,10 @@ public class PotentialDhChecker implements Callable<Boolean> {
 											}
 										}
 										if (!hasCriticalLeg) {
-											aDuty.setCriticalLegWoDh(l);
-											l.setCriticalWoDh(true);
+//											aDuty.setCriticalLegWoDh(l);
+//											l.setCriticalWoDh(true);
+											aDuty.setTotalNumOfPotentialIndirectDhLegs(1);
+											l.setPotentialDhLevel(1);
 										}
 			    					}
 								}

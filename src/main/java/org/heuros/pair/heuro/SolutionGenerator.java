@@ -57,7 +57,8 @@ public class SolutionGenerator {
 					&& this.legs.get(i).hasPair(hbNdx)
 					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
 					&& (lps[i].numOfCoverings == 0)) {
-				if (this.legs.get(i).isCriticalWoDh()) {
+//				if (this.legs.get(i).isCriticalWoDh()) {
+				if (this.legs.get(i).getPotentialDhLevel() == 1) {
 					if (!isCritical) {
 						isCritical = true;
 						res = i;
