@@ -2,6 +2,8 @@ package org.heuros.pair.heuro;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -57,7 +59,6 @@ public class SolutionGenerator {
 					&& this.legs.get(i).hasPair(hbNdx)
 					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
 					&& (lps[i].numOfCoverings == 0)) {
-//				if (this.legs.get(i).isCriticalWoDh()) {
 				if (this.legs.get(i).getPotentialDhLevel() == 1) {
 					if (!isCritical) {
 						isCritical = true;
@@ -92,6 +93,8 @@ public class SolutionGenerator {
 	private void udpateStateVectors(Pair p,
 									LegState[] lps,
 									DutyState[] dps) {
+		HashSet<Integer> indLegNdxs = new HashSet<Integer>();
+
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
 			Duty duty = p.getDuties().get(i);
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
@@ -112,6 +115,7 @@ public class SolutionGenerator {
 									Leg indLeg = dutyOfLeg.getLegs().get(li);
 									if (indLeg.isCover()
 											&& (lps[indLeg.getNdx()].numOfCoverings == 0)) {
+										indLegNdxs.add(indLeg.getNdx());
 //if (indLeg.getNdx() == 326)
 //System.out.println();
 										lps[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
@@ -156,6 +160,61 @@ public class SolutionGenerator {
 				lps[leg.getNdx()].numOfCoverings++;
 			}
 		}
+
+		indLegNdxs.forEach((indLegNdx) -> {
+			Leg indLeg = this.legs.get(indLegNdx);
+			if (lps[indLeg.getNdx()].numOfCoverings == 0) {
+				int numOfNewCritDuties = 0;
+				Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
+				int[] numOfLegAssc = new int[this.legs.size()];
+				int maxLegAssc = 0;
+				Leg legWithMaxAssc = null;
+				int numOfDhFreeDuties = 0;
+				for (Duty dutyOfIndLeg : dutiesOfIndLeg) {
+					if (dutyOfIndLeg.hasPairing(hbNdx)
+							&& dutyOfIndLeg.isValid(hbNdx)
+							&& (dps[dutyOfIndLeg.getNdx()].numOfCoverings == 0)) {
+						numOfDhFreeDuties++;
+						for (int ili = 0; ili < dutyOfIndLeg.getLegs().size(); ili++) {
+							Leg ascLeg = dutyOfIndLeg.getLegs().get(ili);
+							numOfLegAssc[ascLeg.getNdx()]++;
+							if (maxLegAssc < numOfLegAssc[ascLeg.getNdx()]) {
+								maxLegAssc = numOfLegAssc[ascLeg.getNdx()];
+								legWithMaxAssc = ascLeg;
+							}
+						}
+					}
+				}
+				if ((maxLegAssc > 0)
+						&& (maxLegAssc == numOfDhFreeDuties)) {
+					indLeg.setPotentialDhLevel(1);
+					Duty[] critDutyCands = this.dutyIndexByLegNdx.getArray(legWithMaxAssc.getNdx());
+					for (Duty critDutyCand : critDutyCands) {
+						if (critDutyCand.hasPairing(hbNdx)
+								&& critDutyCand.isValid(hbNdx)
+//								&& (dps[critDutyCand.getNdx()].numOfCoverings == 0)
+								) {
+
+							boolean hasIndLeg = false;
+							for (int cli = 0; cli < critDutyCand.getLegs().size(); cli++) {
+								if (critDutyCand.getLegs().get(cli).getNdx() == indLegNdx) {
+									hasIndLeg = true;
+									break;
+								}
+							}
+							if (!hasIndLeg) {
+								if (critDutyCand.getTotalNumOfPotentialIndirectDhLegs() == 0)
+									numOfNewCritDuties++;
+								critDutyCand.setTotalNumOfPotentialIndirectDhLegs(1);
+								dps[critDutyCand.getNdx()].totalNumOfPotentialIndirectDhLegs = 1;
+							}
+						}
+					}
+				}
+				if (numOfNewCritDuties > 0)
+					logger.info(indLeg + " -> newCritDuties: " + numOfNewCritDuties);
+			}
+		});
 	}
 
 	public double generateSolution(List<Leg> reOrderedLegs,
@@ -195,7 +254,6 @@ public class SolutionGenerator {
 				if (p.getFirstDuty().getBriefTime(hbNdx).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
 					this.udpateStateVectors(p, legParams, dutyParams);
 					solution.add(p);
-
 					/**
 					 * TEST BLOCK BEGIN
 					 * 

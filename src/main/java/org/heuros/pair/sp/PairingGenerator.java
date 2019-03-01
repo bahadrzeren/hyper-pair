@@ -59,6 +59,7 @@ public class PairingGenerator {
 	private class PairWithQuality {
 		public Pair pair = null;
 		public QualityMetric pairQ = null;
+		public NodeQualityMetric pairNq = null;
 	}
 
 //	private Random random = new Random();
@@ -95,7 +96,7 @@ public class PairingGenerator {
 
 //			long subNetworkBuiltTime = System.nanoTime();
 
-//if (legToCover.getNdx() == 4284)
+//if (legToCover.getNdx() == 6147)
 //System.out.println();
 
 			NodeQualityMetric[] sourceDutyNodes = networkExplorer.getSourceNodeQms();
@@ -212,6 +213,7 @@ public class PairingGenerator {
 			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
 			    						bestPair.pair = (Pair) currentPair.pair.clone();
 			    						bestPair.pairQ.injectValues(currentPair.pairQ);
+			    						bestPair.pairNq = sourceDutyNodes[j];
 			    						pairingGenerationNodeNdx = i;
 			    					}
 			    				} else
@@ -237,6 +239,7 @@ public class PairingGenerator {
 							    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
 							    						bestPair.pair = (Pair) currentPair.pair.clone();
 							    						bestPair.pairQ.injectValues(currentPair.pairQ);
+							    						bestPair.pairNq = sourceDutyNodes[j];
 							    						pairingGenerationNodeNdx = i;
 							    						break;
 							    					}
@@ -262,6 +265,10 @@ public class PairingGenerator {
 		    		}
 				}
 			}
+
+//logger.info(legToCover);
+//logger.info(bestPair.pairNq);
+//logger.info("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
 			/*
 			 * TODO

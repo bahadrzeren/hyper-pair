@@ -32,6 +32,14 @@ public class QualityMetric {
 //	private int numOfCriticalDutiesWoDh = 0;
 	private int numOfPotentialIndirectDhLegs = 0;
 
+	private double getNumOfActiveLegs() {
+		return this.numOfLegs - this.numOfDh;
+	}
+
+	private double getAvgActiveBlockTimePerDuty() {
+		return (1.0 * this.activeBlocktimeInMins) / this.numOfDuties;
+	}
+
 	public QualityMetric() {
 	}
 
@@ -305,13 +313,16 @@ public class QualityMetric {
 		if (heuristicNo < 2) {	//	If layover or dh effective. 
 			if ((qm.numOfLegs == 0)
 					|| (this.numOfDh < qm.numOfDh)
-//					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins < qm.dhDurationInMins))
-//					|| ((this.numOfDh == qm.numOfDh) && (this.dhDurationInMins == qm.dhDurationInMins)
-//					|| ((this.numOfDh == qm.numOfDh) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
-					|| ((this.numOfDh == qm.numOfDh) && (this.numOfPotentialIndirectDhLegs < qm.numOfPotentialIndirectDhLegs))
-					|| ((this.numOfDh == qm.numOfDh) && (this.numOfPotentialIndirectDhLegs == qm.numOfPotentialIndirectDhLegs) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
-					) {
 
+//					|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
+//					|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
+
+					|| ((this.numOfDh == qm.numOfDh) && (this.numOfPotentialIndirectDhLegs < qm.numOfPotentialIndirectDhLegs))
+					|| ((this.numOfDh == qm.numOfDh) && (this.numOfPotentialIndirectDhLegs == qm.numOfPotentialIndirectDhLegs) && (this.numOfDuties < qm.numOfDuties))
+					|| ((this.numOfDh == qm.numOfDh) && (this.numOfPotentialIndirectDhLegs == qm.numOfPotentialIndirectDhLegs) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
+
+//					&& (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh)
+					) {
 				return true;
 			} else
 				return false;
@@ -337,13 +348,15 @@ public class QualityMetric {
 		if (heuristicNo < 2) {	//	If layover or dh effective.
 			if ((bestQualSoFar == null)
 					|| (bestQualSoFar.numOfDh > this.numOfDh)
-//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins >= this.dhDurationInMins))
-//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
-					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfPotentialIndirectDhLegs > this.numOfPotentialIndirectDhLegs))
-					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfPotentialIndirectDhLegs == this.numOfPotentialIndirectDhLegs) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
 
-//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.dhDurationInMins == this.dhDurationInMins) 
-//							&& (((1.0 * bestQualSoFar.numOfIncludingDutiesOfTheSameLegs) / bestQualSoFar.numOfLegs) >= ((1.0 * this.numOfIncludingDutiesOfTheSameLegs) / this.numOfLegs)))
+//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfDuties > this.numOfDuties))
+//					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfDuties == this.numOfDuties) && (bestQualSoFar.getAvgActiveBlockTimePerDuty() < this.getAvgActiveBlockTimePerDuty()))
+
+					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfPotentialIndirectDhLegs > this.numOfPotentialIndirectDhLegs))
+					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfPotentialIndirectDhLegs == this.numOfPotentialIndirectDhLegs) && (bestQualSoFar.numOfDuties > this.numOfDuties))
+					|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfPotentialIndirectDhLegs == this.numOfPotentialIndirectDhLegs) && (bestQualSoFar.numOfDuties == this.numOfDuties) && (bestQualSoFar.getAvgActiveBlockTimePerDuty() < this.getAvgActiveBlockTimePerDuty()))
+
+//					&& (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh)
 					) {
 				return true;
 			} else
