@@ -59,7 +59,7 @@ public class SolutionGenerator {
 					&& this.legs.get(i).hasPair(hbNdx)
 					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
 					&& (lps[i].numOfCoverings == 0)) {
-				if (this.legs.get(i).getPotentialDhLevel() == 1) {
+				if (lps[this.legs.get(i).getNdx()].potentialDh) {
 					if (!isCritical) {
 						isCritical = true;
 						res = i;
@@ -164,7 +164,7 @@ public class SolutionGenerator {
 		indLegNdxs.forEach((indLegNdx) -> {
 			Leg indLeg = this.legs.get(indLegNdx);
 			if (lps[indLeg.getNdx()].numOfCoverings == 0) {
-				int numOfNewCritDuties = 0;
+				int numOfNewDhCritDuties = 0;
 				Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
 				int[] numOfLegAssc = new int[this.legs.size()];
 				int maxLegAssc = 0;
@@ -187,7 +187,7 @@ public class SolutionGenerator {
 				}
 				if ((maxLegAssc > 0)
 						&& (maxLegAssc == numOfDhFreeDuties)) {
-					indLeg.setPotentialDhLevel(1);
+					lps[indLeg.getNdx()].potentialDh = true;
 					Duty[] critDutyCands = this.dutyIndexByLegNdx.getArray(legWithMaxAssc.getNdx());
 					for (Duty critDutyCand : critDutyCands) {
 						if (critDutyCand.hasPairing(hbNdx)
@@ -203,16 +203,15 @@ public class SolutionGenerator {
 								}
 							}
 							if (!hasIndLeg) {
-								if (critDutyCand.getTotalNumOfPotentialIndirectDhLegs() == 0)
-									numOfNewCritDuties++;
-								critDutyCand.setTotalNumOfPotentialIndirectDhLegs(1);
-								dps[critDutyCand.getNdx()].totalNumOfPotentialIndirectDhLegs = 1;
+								if (!dps[critDutyCand.getNdx()].dhCritical)
+									numOfNewDhCritDuties++;
+								dps[critDutyCand.getNdx()].dhCritical = true;
 							}
 						}
 					}
 				}
-				if (numOfNewCritDuties > 0)
-					logger.info(indLeg + " -> newCritDuties: " + numOfNewCritDuties);
+				if (numOfNewDhCritDuties > 0)
+					logger.info(indLeg + " -> newCritDuties: " + numOfNewDhCritDuties);
 			}
 		});
 	}

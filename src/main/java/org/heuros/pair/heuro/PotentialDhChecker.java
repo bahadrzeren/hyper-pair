@@ -23,7 +23,7 @@ public class PotentialDhChecker implements Callable<Boolean> {
 	}
 
 	private List<Leg> legs = null;
-	private List<Duty> duties = null;
+//	private List<Duty> duties = null;
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 
 	public PotentialDhChecker setLegRepository(DataRepository<Leg> legRepository) {
@@ -31,10 +31,10 @@ public class PotentialDhChecker implements Callable<Boolean> {
 		return this;
 	}
 
-	public PotentialDhChecker setDutyRepository(DataRepository<Duty> dutyRepository) {
-		this.duties = dutyRepository.getModels();
-		return this;
-	}
+//	public PotentialDhChecker setDutyRepository(DataRepository<Duty> dutyRepository) {
+//		this.duties = dutyRepository.getModels();
+//		return this;
+//	}
 
 	public PotentialDhChecker setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
 		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
@@ -112,8 +112,8 @@ public class PotentialDhChecker implements Callable<Boolean> {
 											}
 										}
 										if (!hasCriticalLeg) {
-											aDuty.setTotalNumOfPotentialIndirectDhLegs(1);
-											l.setPotentialDhLevel(1);
+											aDuty.setDhCritical(true);
+											l.setPotentialDh(true);
 										}
 			    					}
 								}
@@ -172,59 +172,4 @@ public class PotentialDhChecker implements Callable<Boolean> {
 
 		return true;
 	}
-
-//	private boolean enumerateCriticalLegs(Leg l, Duty[] ds, int[] legAsscVector, boolean[] dsFlagVector, int numOfRestOfTheDuties) {
-//
-//		boolean res = false;
-//
-//		while (true) {
-//			int maxNumOfExistence = 0;
-//			int legNdx = -1;
-//    		for (int ali = 0; ali < legAsscVector.length; ali++) {
-//    			if (legAsscVector[ali] > maxNumOfExistence) {
-//    				maxNumOfExistence = legAsscVector[ali];
-//    				legNdx = ali;
-//    			}
-//			}
-//    		legAsscVector[legNdx] = 0;
-//
-//    		if (legNdx >= 0) {
-//
-//        		int[] legAsscs = new int[legAsscVector.length];
-//        		boolean[] dsFlags = dsFlagVector.clone();
-//
-//        		int numOfRestOfTheDuties = 0;
-//        		for (int di = 0; di < ds.length; di++) {
-//					Duty d = ds[di];
-//					if (d.isValid(hbNdx)
-//							&& d.hasPairing(hbNdx)
-//							&& (!dsFlags[di])) {
-//						boolean hasLeg = false;
-//						for (int aldi = 0; aldi < d.getLegs().size(); aldi++) {
-//			    			Leg cl = d.getLegs().get(aldi);
-//			    			if (cl.getNdx() == legNdx) {
-//								hasLeg = true;
-//								break;
-//							}
-//						}
-//						if (hasLeg) {
-//							dsFlags[di] = true;
-//						} else {
-//							numOfRestOfTheDuties++;
-//							for (int aldi = 0; aldi < d.getLegs().size(); aldi++) {
-//				    			Leg cl = d.getLegs().get(aldi);
-//				    			if (cl.isCover()
-//				    					&& (cl.getNdx() != l.getNdx()))
-//				    				legAsscs[cl.getNdx()]++;
-//							}
-//						}
-//					}
-//				}
-//
-//        		
-//    		} else
-//    			break;
-//		}
-//		return res;
-//	}
 }

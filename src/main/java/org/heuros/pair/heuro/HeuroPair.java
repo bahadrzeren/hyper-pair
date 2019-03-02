@@ -238,7 +238,7 @@ public class HeuroPair {
 
 				PotentialDhChecker potentialDhChecker = new PotentialDhChecker(hbNdx, HeurosDatasetParam.legCoverPeriodEndExc)
 																	.setLegRepository(pairOptimizationContext.getLegRepository())
-																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
+//																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
 																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx());
 //				pairInitCalls.add(executorService.submit(legPairChecker));
 				Future<Boolean> potentialDhCheckCall = executorService.submit(potentialDhChecker);

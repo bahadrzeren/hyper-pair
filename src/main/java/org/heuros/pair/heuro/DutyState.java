@@ -10,7 +10,5 @@ public class DutyState {
 	public int maxNumOfAlternativeDutiesWoDh = 0;
 	public int totalNumOfAlternativeDuties = 0;
 	public int totalNumOfAlternativeDutiesWoDh = 0;
-//	public boolean isCritical = false;
-//	public boolean isCriticalWoDh = false;
-	public int totalNumOfPotentialIndirectDhLegs = 0;
+	public boolean dhCritical = false;
 }
