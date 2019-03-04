@@ -10,7 +10,7 @@ import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
-import org.heuros.pair.heuro.DutyState;
+import org.heuros.pair.heuro.state.DutyState;
 
 public class NetworkExplorer {
 

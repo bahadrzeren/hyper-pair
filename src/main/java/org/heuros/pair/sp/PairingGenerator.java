@@ -9,7 +9,7 @@ import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
-import org.heuros.pair.heuro.DutyState;
+import org.heuros.pair.heuro.state.DutyState;
 import org.heuros.rule.PairRuleContext;
 
 public class PairingGenerator {
@@ -59,7 +59,7 @@ public class PairingGenerator {
 	private class PairWithQuality {
 		public Pair pair = null;
 		public QualityMetric pairQ = null;
-		public NodeQualityMetric pairNq = null;
+//		public NodeQualityMetric pairNq = null;
 	}
 
 //	private Random random = new Random();
@@ -213,7 +213,7 @@ public class PairingGenerator {
 			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
 			    						bestPair.pair = (Pair) currentPair.pair.clone();
 			    						bestPair.pairQ.injectValues(currentPair.pairQ);
-			    						bestPair.pairNq = sourceDutyNodes[j];
+//			    						bestPair.pairNq = sourceDutyNodes[j];
 			    						pairingGenerationNodeNdx = i;
 			    					}
 			    				} else
@@ -239,7 +239,7 @@ public class PairingGenerator {
 							    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
 							    						bestPair.pair = (Pair) currentPair.pair.clone();
 							    						bestPair.pairQ.injectValues(currentPair.pairQ);
-							    						bestPair.pairNq = sourceDutyNodes[j];
+//							    						bestPair.pairNq = sourceDutyNodes[j];
 							    						pairingGenerationNodeNdx = i;
 							    						break;
 							    					}

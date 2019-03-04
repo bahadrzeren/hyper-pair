@@ -1,7 +1,7 @@
 package org.heuros.pair.sp;
 
 import org.heuros.data.model.Duty;
-import org.heuros.pair.heuro.DutyState;
+import org.heuros.pair.heuro.state.DutyState;
 
 public class NodeQualityVector {
 
