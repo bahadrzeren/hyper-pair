@@ -13,6 +13,7 @@ import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.conf.HeurosDatasetParam;
+import org.heuros.pair.conf.HeurosSystemParam;
 
 public class SolutionState {
 
@@ -52,11 +53,12 @@ public class SolutionState {
 	}
 
 	public void initializeIteration() {
-		this.legMaxState.numOfIncludingDuties = this.legs.get(0).getNumOfIncludingDuties();
-		this.legMaxState.numOfIncludingDutiesWoDh = this.legs.get(0).getNumOfIncludingDutiesWoDh();
-		this.legMaxState.numOfIncludingEffectiveDuties = this.legs.get(0).getNumOfIncludingEffectiveDuties();
-		this.legMaxState.numOfIncludingEffectiveDutiesWoDh = this.legs.get(0).getNumOfIncludingEffectiveDutiesWoDh();
+		this.legMaxState.numOfIncludingDuties = 0;
+		this.legMaxState.numOfIncludingDutiesWoDh = 0;
+		this.legMaxState.numOfIncludingEffectiveDuties = 0;
+		this.legMaxState.numOfIncludingEffectiveDutiesWoDh = 0;
 		for (int j = 0; j < legStates.length; j++) {
+			this.legStates[j].reset();
 			this.legStates[j].numOfIncludingDuties = this.legs.get(j).getNumOfIncludingDuties();
 			this.legStates[j].numOfIncludingDutiesWoDh = this.legs.get(j).getNumOfIncludingDutiesWoDh();
 			this.legStates[j].numOfIncludingEffectiveDuties = this.legs.get(j).getNumOfIncludingEffectiveDuties();
@@ -73,6 +75,7 @@ public class SolutionState {
 				this.legMaxState.numOfIncludingEffectiveDutiesWoDh = this.legStates[j].numOfIncludingEffectiveDutiesWoDh;
 		}
 		for (int j = 0; j < dutyStates.length; j++) {
+			this.dutyStates[j].reset();
 //			this.dutyParams[j].minNumOfAlternativeDuties = this.duties.get(j).getMinNumOfAlternativeDuties();
 //			this.dutyParams[j].minNumOfAlternativeDutiesWoDh = this.duties.get(j).getMinNumOfAlternativeDutiesWoDh();
 //			this.dutyParams[j].maxNumOfAlternativeDuties = this.duties.get(j).getMaxNumOfAlternativeDuties();
@@ -133,6 +136,7 @@ public class SolutionState {
 
 	public void udpateStateVectors(Pair p) {
 
+
 		HashSet<Integer> indLegNdxs = new HashSet<Integer>();
 
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
@@ -148,22 +152,30 @@ public class SolutionState {
 						if (leg.isCover()
 								&& (legStates[leg.getNdx()].numOfCoverings == 0)) {
 
-//							boolean effectivenessLost = (dutyOfLeg.getBlockTimeInMinsActive() - dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoverings >= 240)
-//														&& (dutyOfLeg.getBlockTimeInMinsActive() - dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoverings - leg.getBlockTimeInMins() < 240);
+							boolean dutyOfLegEffectivenessAffected = (dutyOfLeg.getBlockTimeInMinsActive() - dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive >= HeurosSystemParam.effectiveDutyBlockHourLimit)
+																&& (dutyOfLeg.getBlockTimeInMinsActive() - dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive - leg.getBlockTimeInMins() < HeurosSystemParam.effectiveDutyBlockHourLimit);
 
-							boolean calculateForWoDh = (dutyOfLeg.getNumOfLegsPassive() == 0) && (dutyStates[dutyOfLeg.getNdx()].numOfCoverings == 0);
+							boolean dutyOfLegWoDhAffected = (dutyOfLeg.getNumOfLegsPassive() == 0) && (dutyStates[dutyOfLeg.getNdx()].numOfCoverings == 0);
 
-							if (calculateForWoDh) {
+							if (dutyOfLegWoDhAffected
+									|| dutyOfLegEffectivenessAffected) {
 
 								for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
 									Leg indLeg = dutyOfLeg.getLegs().get(li);
-									if (indLeg.isCover()
-											&& (legStates[indLeg.getNdx()].numOfCoverings == 0)) {
 
-										indLegNdxs.add(indLeg.getNdx());
+									if (dutyOfLegEffectivenessAffected) {
+										legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties--;
+									}
+
+									if (indLeg.isCover()
+											&& (legStates[indLeg.getNdx()].numOfCoverings == 0)
+											&& dutyOfLegWoDhAffected) {
+
+										if (indLeg.getNdx() != leg.getNdx())
+											indLegNdxs.add(indLeg.getNdx());
 
 										legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
-										if (dutyOfLeg.getBlockTimeInMinsActive() >= 240) {
+										if (dutyOfLeg.getBlockTimeInMinsActive() >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
 											legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh--;
 										}
 
@@ -192,10 +204,34 @@ public class SolutionState {
 							}
 						}
 
+//						dutyStates[dutyOfLeg.getNdx()].numOfCoverings++;
+//						if (legStates[leg.getNdx()].numOfCoverings == 0) {
+//							dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoverings++;
+//							dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoverings += leg.getBlockTimeInMins();
+//						}
+//						dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoverings += leg.getBlockTimeInMins();
+
 						dutyStates[dutyOfLeg.getNdx()].numOfCoverings++;
-						if (legStates[leg.getNdx()].numOfCoverings == 0)
-							dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoverings++;
 						dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoverings += leg.getBlockTimeInMins();
+						if (leg.isCover()) {
+							dutyStates[dutyOfLeg.getNdx()].numOfCoveringsActive++;
+							dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoveringsActive += leg.getBlockTimeInMins();
+						} else {
+							dutyStates[dutyOfLeg.getNdx()].numOfCoveringsPassive++;
+							dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoveringsPassive += leg.getBlockTimeInMins();
+						}
+						if (legStates[leg.getNdx()].numOfCoverings == 0) {
+							dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoverings++;
+							dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoverings += leg.getBlockTimeInMins();
+							if (leg.isCover()) {
+								dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoveringsActive++;
+								dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive += leg.getBlockTimeInMins();
+							} else {
+								dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoveringsPassive++;
+								dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsPassive += leg.getBlockTimeInMins();
+							}
+						}
+
 					}
 				}
 				legStates[leg.getNdx()].numOfCoverings++;

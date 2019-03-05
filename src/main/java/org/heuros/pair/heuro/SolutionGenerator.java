@@ -3,9 +3,12 @@ package org.heuros.pair.heuro;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.heuros.core.data.ndx.OneDimIndexInt;
+import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.conf.HeurosDatasetParam;
+import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairingGenerator;
 
@@ -19,17 +22,17 @@ public class SolutionGenerator {
 	private int hbNdx = 0;
 
 	private List<Leg> legs = null;
-//	private List<Duty> duties = null;
-//	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+	private List<Duty> duties = null;
+	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 	private PairingGenerator pairingGenerator = null;
 
 	public SolutionGenerator(List<Leg> legs,
-//								List<Duty> duties,
-//								OneDimIndexInt<Duty> dutyIndexByLegNdx,
+								List<Duty> duties,
+								OneDimIndexInt<Duty> dutyIndexByLegNdx,
 								PairingGenerator pairingGenerator) {
 		this.legs = legs;
-//		this.duties = duties;
-//		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
+		this.duties = duties;
+		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
 		this.pairingGenerator = pairingGenerator;
 	}
 
@@ -72,19 +75,19 @@ public class SolutionGenerator {
 //					this.duties.forEach((d) -> {
 //						if (d.isValid(this.hbNdx)
 //								&& d.hasPairing(this.hbNdx)) {
-//							DutyState ds = dutyParams[d.getNdx()];
+//							DutyState ds = solutionState.getDutyStates()[d.getNdx()];
 //							int minNumOfAlternativeDuties = Integer.MAX_VALUE;
 //							int minNumOfAlternativeDutiesWoDh = Integer.MAX_VALUE;
 //							int totalNumOfAlternativeDuties = 0;
 //							int totalNumOfAlternativeDutiesWoDh = 0;
 //							for (int i = 0; i < d.getNumOfLegs(); i++) {
 //								Leg l = d.getLegs().get(i);
-//								if (minNumOfAlternativeDuties > legParams[l.getNdx()].numOfIncludingDuties)
-//									minNumOfAlternativeDuties = legParams[l.getNdx()].numOfIncludingDuties;
-//								if (minNumOfAlternativeDutiesWoDh > legParams[l.getNdx()].numOfIncludingDutiesWoDh)
-//									minNumOfAlternativeDutiesWoDh = legParams[l.getNdx()].numOfIncludingDutiesWoDh;
-//								totalNumOfAlternativeDuties += legParams[l.getNdx()].numOfIncludingDuties;
-//								totalNumOfAlternativeDutiesWoDh += legParams[l.getNdx()].numOfIncludingDutiesWoDh;
+//								if (minNumOfAlternativeDuties > solutionState.getLegStates()[l.getNdx()].numOfIncludingDuties)
+//									minNumOfAlternativeDuties = solutionState.getLegStates()[l.getNdx()].numOfIncludingDuties;
+//								if (minNumOfAlternativeDutiesWoDh > solutionState.getLegStates()[l.getNdx()].numOfIncludingDutiesWoDh)
+//									minNumOfAlternativeDutiesWoDh = solutionState.getLegStates()[l.getNdx()].numOfIncludingDutiesWoDh;
+//								totalNumOfAlternativeDuties += solutionState.getLegStates()[l.getNdx()].numOfIncludingDuties;
+//								totalNumOfAlternativeDutiesWoDh += solutionState.getLegStates()[l.getNdx()].numOfIncludingDutiesWoDh;
 //							}
 //							if (ds.minNumOfAlternativeDuties != minNumOfAlternativeDuties)
 //								System.out.println("!" + legToCover);
@@ -94,6 +97,58 @@ public class SolutionGenerator {
 //								System.out.println("!" + legToCover);
 //							if (ds.totalNumOfAlternativeDutiesWoDh != totalNumOfAlternativeDutiesWoDh)
 //								System.out.println("!" + legToCover);
+//						}
+//					});
+					/**
+					 * TEST BLOCK END
+					 * 
+					 */
+
+					/**
+					 * TEST BLOCK BEGIN
+					 * 
+					 * Checks state variables on LegState instances.
+					 * 
+					 */
+//					this.legs.forEach((leg) -> {
+//						if (leg.isCover()
+//								&& leg.hasPair(this.hbNdx)
+//								&& leg.getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
+////								&& (solutionState.getLegStates()[leg.getNdx()].numOfCoverings == 0)
+//								) {
+//							int numOfIncludingDuties = 0;
+//							int numOfIncludingDutiesWoDh = 0;
+//							int numOfIncludingEffectiveDuties = 0;
+//							int numOfIncludingEffectiveDutiesWoDh = 0;
+//
+//							Duty[] dutiesOfLeg = dutyIndexByLegNdx.getArray(leg.getNdx());
+//							for (Duty dutyOfLeg: dutiesOfLeg) {
+//								if (dutyOfLeg.hasPairing(this.hbNdx)
+//										&& dutyOfLeg.isValid(this.hbNdx)) {
+//									numOfIncludingDuties++;
+//									if ((dutyOfLeg.getNumOfLegsPassive() == 0)
+//											&& (solutionState.getDutyStates()[dutyOfLeg.getNdx()].numOfCoverings == 0)) {
+//										numOfIncludingDutiesWoDh++;
+//										if (dutyOfLeg.getBlockTimeInMinsActive() >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
+//											numOfIncludingEffectiveDutiesWoDh++;
+//										}
+//									}
+//									if (dutyOfLeg.getBlockTimeInMinsActive() - solutionState.getDutyStates()[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
+//										numOfIncludingEffectiveDuties++;
+//									}
+//								}
+//							}
+//
+//							if (!solutionState.getLegStates()[leg.getNdx()].valuesAreOk(numOfIncludingDuties, 
+//																						numOfIncludingDutiesWoDh, 
+//																						numOfIncludingEffectiveDuties, 
+//																						numOfIncludingEffectiveDutiesWoDh)) {
+//								logger.error("LegState values has not been set correctly for " + leg);
+//								solutionState.getLegStates()[leg.getNdx()].valuesAreOk(numOfIncludingDuties, 
+//																						numOfIncludingDutiesWoDh, 
+//																						numOfIncludingEffectiveDuties, 
+//																						numOfIncludingEffectiveDutiesWoDh);
+//							}
 //						}
 //					});
 					/**

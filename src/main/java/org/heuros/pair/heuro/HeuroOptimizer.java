@@ -74,7 +74,7 @@ public class HeuroOptimizer {
 
 			this.solutionState.initializeIteration();
 
-			SolutionGenerator solGen = new SolutionGenerator(this.legs, this.pairingGenerator);
+			SolutionGenerator solGen = new SolutionGenerator(this.legs, this.duties, this.dutyIndexByLegNdx, this.pairingGenerator);
 			int uncoveredLegs = solGen.generateSolution(solution, this.solutionState);
 
 			/**

@@ -26,4 +26,6 @@ public class HeurosSystemParam {
 	 * Maximum connection time limits that are designated in rule implementations can not exceed this value.
 	 */
 	public static int maxLegConnectionTimeInMins = 10 * 60;
+
+	public static int effectiveDutyBlockHourLimit = 4 * 60;
 }

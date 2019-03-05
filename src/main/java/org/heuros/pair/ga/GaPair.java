@@ -217,7 +217,7 @@ public class GaPair {
 //																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
 //																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
 
-				BiDirDutyPairingChecker dutyPairChecker = new BiDirDutyPairingChecker(hbNdx, HeurosDatasetParam.dutyProcessPeriodEndExc)
+				BiDirDutyPairingChecker dutyPairChecker = new BiDirDutyPairingChecker(hbNdx, HeurosDatasetParam.dutyProcessPeriodEndExc, HeurosSystemParam.effectiveDutyBlockHourLimit)
 																	.setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
 																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxPreDutySearchDeptInHours)
 																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
