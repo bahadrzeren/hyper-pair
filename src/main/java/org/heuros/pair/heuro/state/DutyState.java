@@ -24,7 +24,7 @@ public class DutyState {
 //	public int totalNumOfAlternativeDutiesWoDh = 0;
 	public boolean dhCritical = false;
 
-	public void reset() {
+	public void resetForNewIteration() {
 		this.numOfCoverings = 0;
 		this.numOfCoveringsActive = 0;
 		this.numOfCoveringsPassive = 0;

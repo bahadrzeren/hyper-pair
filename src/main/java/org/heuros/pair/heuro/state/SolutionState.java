@@ -53,29 +53,16 @@ public class SolutionState {
 	}
 
 	public void initializeIteration() {
-		this.legMaxState.numOfIncludingDuties = 0;
-		this.legMaxState.numOfIncludingDutiesWoDh = 0;
-		this.legMaxState.numOfIncludingEffectiveDuties = 0;
-		this.legMaxState.numOfIncludingEffectiveDutiesWoDh = 0;
 		for (int j = 0; j < legStates.length; j++) {
-			this.legStates[j].reset();
+			this.legStates[j].resetForNewIteration();
 			this.legStates[j].numOfIncludingDuties = this.legs.get(j).getNumOfIncludingDuties();
 			this.legStates[j].numOfIncludingDutiesWoDh = this.legs.get(j).getNumOfIncludingDutiesWoDh();
 			this.legStates[j].numOfIncludingEffectiveDuties = this.legs.get(j).getNumOfIncludingEffectiveDuties();
 			this.legStates[j].numOfIncludingEffectiveDutiesWoDh = this.legs.get(j).getNumOfIncludingEffectiveDutiesWoDh();
 			this.legStates[j].potentialDh = this.legs.get(j).isPotentialDh();
-
-			if (this.legMaxState.numOfIncludingDuties < this.legStates[j].numOfIncludingDuties)
-				this.legMaxState.numOfIncludingDuties = this.legStates[j].numOfIncludingDuties;
-			if (this.legMaxState.numOfIncludingDutiesWoDh < this.legStates[j].numOfIncludingDutiesWoDh)
-				this.legMaxState.numOfIncludingDutiesWoDh = this.legStates[j].numOfIncludingDutiesWoDh;
-			if (this.legMaxState.numOfIncludingEffectiveDuties < this.legStates[j].numOfIncludingEffectiveDuties)
-				this.legMaxState.numOfIncludingEffectiveDuties = this.legStates[j].numOfIncludingEffectiveDuties;
-			if (this.legMaxState.numOfIncludingEffectiveDutiesWoDh < this.legStates[j].numOfIncludingEffectiveDutiesWoDh)
-				this.legMaxState.numOfIncludingEffectiveDutiesWoDh = this.legStates[j].numOfIncludingEffectiveDutiesWoDh;
 		}
 		for (int j = 0; j < dutyStates.length; j++) {
-			this.dutyStates[j].reset();
+			this.dutyStates[j].resetForNewIteration();
 //			this.dutyParams[j].minNumOfAlternativeDuties = this.duties.get(j).getMinNumOfAlternativeDuties();
 //			this.dutyParams[j].minNumOfAlternativeDutiesWoDh = this.duties.get(j).getMinNumOfAlternativeDutiesWoDh();
 //			this.dutyParams[j].maxNumOfAlternativeDuties = this.duties.get(j).getMaxNumOfAlternativeDuties();
@@ -84,51 +71,55 @@ public class SolutionState {
 //			this.dutyParams[j].totalNumOfAlternativeDutiesWoDh = this.duties.get(j).getTotalNumOfAlternativeDutiesWoDh();
 			this.dutyStates[j].dhCritical = this.duties.get(j).isDhCritical();
 		}
+		this.calculateAndSetMaxValuesOfHeuristicsParameters();
 	}
 
-	private double getInclusionScore(LegState legState) {
-		return (1.0 * legState.numOfIncludingDuties) / this.legMaxState.numOfIncludingDuties;
+	private void calculateAndSetMaxValuesOfHeuristicsParameters() {
+		this.legMaxState.numOfIncludingDuties = 0;
+		this.legMaxState.numOfIncludingDutiesWoDh = 0;
+		this.legMaxState.numOfIncludingEffectiveDuties = 0;
+		this.legMaxState.numOfIncludingEffectiveDutiesWoDh = 0;
+		this.legMaxState.heuristicModifierValue = 0.0;
+		for (int j = 0; j < legStates.length; j++) {
+			if (this.legMaxState.numOfIncludingDuties < this.legStates[j].numOfIncludingDuties)
+				this.legMaxState.numOfIncludingDuties = this.legStates[j].numOfIncludingDuties;
+			if (this.legMaxState.numOfIncludingDutiesWoDh < this.legStates[j].numOfIncludingDutiesWoDh)
+				this.legMaxState.numOfIncludingDutiesWoDh = this.legStates[j].numOfIncludingDutiesWoDh;
+			if (this.legMaxState.numOfIncludingEffectiveDuties < this.legStates[j].numOfIncludingEffectiveDuties)
+				this.legMaxState.numOfIncludingEffectiveDuties = this.legStates[j].numOfIncludingEffectiveDuties;
+			if (this.legMaxState.numOfIncludingEffectiveDutiesWoDh < this.legStates[j].numOfIncludingEffectiveDutiesWoDh)
+				this.legMaxState.numOfIncludingEffectiveDutiesWoDh = this.legStates[j].numOfIncludingEffectiveDutiesWoDh;
+			if (this.legMaxState.heuristicModifierValue < this.legStates[j].heuristicModifierValue)
+				this.legMaxState.heuristicModifierValue = this.legStates[j].heuristicModifierValue;
+		}
 	}
-
-	private double getInclusionScoreWoDh(LegState legState) {
-		return (1.0 * legState.numOfIncludingDutiesWoDh) / this.legMaxState.numOfIncludingDutiesWoDh;
-	}
-
-	private double getEffectiveInclusionScore(LegState legState) {
-		return (1.0 * legState.numOfIncludingEffectiveDuties) / this.legMaxState.numOfIncludingEffectiveDuties;
-	}
-
-	private double getEffectiveInclusionScoreWoDh(LegState legState) {
-		return (1.0 * legState.numOfIncludingEffectiveDutiesWoDh) / this.legMaxState.numOfIncludingEffectiveDutiesWoDh;
-	}
-
-
 
 	public int getNextLegNdxToCover(int hbNdx) {
 		int res = -1;
 		int minNumOfDutiesWoDh = Integer.MAX_VALUE;
-		boolean isCritical = false;
+//		boolean isCritical = false;
 		for (int i = 0; i < this.legs.size(); i++) {
 			if (this.legs.get(i).isCover()
 					&& this.legs.get(i).hasPair(hbNdx)
 					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
 					&& (legStates[i].numOfCoverings == 0)) {
-				if (legStates[this.legs.get(i).getNdx()].potentialDh) {
-					if (!isCritical) {
-						isCritical = true;
-						res = i;
-					} else
+//				if (legStates[i].potentialDh) {
+//					if (!isCritical) {
+//						isCritical = true;
+//						minNumOfDutiesWoDh = legStates[i].numOfIncludingDutiesWoDh;
+//						res = i;
+//					} else
+//						if (minNumOfDutiesWoDh > legStates[i].numOfIncludingDutiesWoDh) {
+//							minNumOfDutiesWoDh = legStates[i].numOfIncludingDutiesWoDh;
+//							res = i;
+//						}
+//				} else
+//					if (!isCritical) {
 						if (minNumOfDutiesWoDh > legStates[i].numOfIncludingDutiesWoDh) {
 							minNumOfDutiesWoDh = legStates[i].numOfIncludingDutiesWoDh;
 							res = i;
 						}
-				} else
-					if (!isCritical) {
-						if (minNumOfDutiesWoDh > legStates[i].numOfIncludingDutiesWoDh) {
-							minNumOfDutiesWoDh = legStates[i].numOfIncludingDutiesWoDh;
-							res = i;
-						}
-					}
+//					}
 			}
 		}
 		return res;
@@ -136,162 +127,149 @@ public class SolutionState {
 
 	public void udpateStateVectors(Pair p) {
 
+		HashSet<Integer> legNdxs = new HashSet<Integer>();
 
-		HashSet<Integer> indLegNdxs = new HashSet<Integer>();
-
+		/*
+		 * First update COVERING states of the legs and duties that constitute new pairing.
+		 */
 		for (int i = 0; i < p.getNumOfDuties(); i++) {
 			Duty duty = p.getDuties().get(i);
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
 				Leg leg = duty.getLegs().get(j);
-				Duty[] dutiesOfLeg = this.dutyIndexByLegNdx.getArray(leg.getNdx());
-				for (int di = 0; di < dutiesOfLeg.length; di++) {
-					Duty dutyOfLeg = dutiesOfLeg[di];
-
-					if (dutyOfLeg.hasPairing(p.getHbNdx())
-							&& dutyOfLeg.isValid(p.getHbNdx())) {
-						if (leg.isCover()
-								&& (legStates[leg.getNdx()].numOfCoverings == 0)) {
-
-							boolean dutyOfLegEffectivenessAffected = (dutyOfLeg.getBlockTimeInMinsActive() - dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive >= HeurosSystemParam.effectiveDutyBlockHourLimit)
-																&& (dutyOfLeg.getBlockTimeInMinsActive() - dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive - leg.getBlockTimeInMins() < HeurosSystemParam.effectiveDutyBlockHourLimit);
-
-							boolean dutyOfLegWoDhAffected = (dutyOfLeg.getNumOfLegsPassive() == 0) && (dutyStates[dutyOfLeg.getNdx()].numOfCoverings == 0);
-
-							if (dutyOfLegWoDhAffected
-									|| dutyOfLegEffectivenessAffected) {
-
-								for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
-									Leg indLeg = dutyOfLeg.getLegs().get(li);
-
-									if (dutyOfLegEffectivenessAffected) {
-										legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties--;
-									}
-
-									if (indLeg.isCover()
-											&& (legStates[indLeg.getNdx()].numOfCoverings == 0)
-											&& dutyOfLegWoDhAffected) {
-
-										if (indLeg.getNdx() != leg.getNdx())
-											indLegNdxs.add(indLeg.getNdx());
-
-										legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
-										if (dutyOfLeg.getBlockTimeInMinsActive() >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
-											legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh--;
-										}
-
-//										Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
-//										for (int idi = 0; idi < dutiesOfIndLeg.length; idi++) {
-//											Duty dutieOfIndLeg = dutiesOfIndLeg[idi];
-//											if (dutieOfIndLeg.hasPairing(hbNdx)
-//													&& dutieOfIndLeg.isValid(hbNdx)) {
-//												dutyStates[dutieOfIndLeg.getNdx()].totalNumOfAlternativeDutiesWoDh--;
-//												if (dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh > legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
-//													dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
-//												/*
-//												 * TODO
-//												 * 
-//												 * This implementation does not guarantee to set exact maxNumOfAlternativeDutiesWoDh.
-//												 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
-//												 * Therefore the number of legs that has the same maxNumOfAlternativeDutiesWoDh might cause small disruptions.
-//												 *  
-//												 */
-//												if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh <= legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
-//													dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
-//											}
-//										}
-									}
-								}
-							}
-						}
-
-//						dutyStates[dutyOfLeg.getNdx()].numOfCoverings++;
-//						if (legStates[leg.getNdx()].numOfCoverings == 0) {
-//							dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoverings++;
-//							dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoverings += leg.getBlockTimeInMins();
-//						}
-//						dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoverings += leg.getBlockTimeInMins();
-
-						dutyStates[dutyOfLeg.getNdx()].numOfCoverings++;
-						dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoverings += leg.getBlockTimeInMins();
-						if (leg.isCover()) {
-							dutyStates[dutyOfLeg.getNdx()].numOfCoveringsActive++;
-							dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoveringsActive += leg.getBlockTimeInMins();
-						} else {
-							dutyStates[dutyOfLeg.getNdx()].numOfCoveringsPassive++;
-							dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoveringsPassive += leg.getBlockTimeInMins();
-						}
-						if (legStates[leg.getNdx()].numOfCoverings == 0) {
-							dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoverings++;
-							dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoverings += leg.getBlockTimeInMins();
-							if (leg.isCover()) {
-								dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoveringsActive++;
-								dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive += leg.getBlockTimeInMins();
-							} else {
-								dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoveringsPassive++;
-								dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsPassive += leg.getBlockTimeInMins();
-							}
-						}
-
-					}
-				}
+				legNdxs.add(leg.getNdx());
 				legStates[leg.getNdx()].numOfCoverings++;
 			}
 		}
 
-		indLegNdxs.forEach((indLegNdx) -> {
-			Leg indLeg = this.legs.get(indLegNdx);
-			if (legStates[indLeg.getNdx()].numOfCoverings == 0) {
-				int numOfNewDhCritDuties = 0;
-				Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
-				int[] numOfLegAssc = new int[this.legs.size()];
-				int maxLegAssc = 0;
-				Leg legWithMaxAssc = null;
-				int numOfDhFreeDuties = 0;
-				for (Duty dutyOfIndLeg : dutiesOfIndLeg) {
-					if (dutyOfIndLeg.hasPairing(p.getHbNdx())
-							&& dutyOfIndLeg.isValid(p.getHbNdx())
-							&& (dutyStates[dutyOfIndLeg.getNdx()].numOfCoverings == 0)) {
-						numOfDhFreeDuties++;
-						for (int ili = 0; ili < dutyOfIndLeg.getLegs().size(); ili++) {
-							Leg ascLeg = dutyOfIndLeg.getLegs().get(ili);
-							numOfLegAssc[ascLeg.getNdx()]++;
-							if (maxLegAssc < numOfLegAssc[ascLeg.getNdx()]) {
-								maxLegAssc = numOfLegAssc[ascLeg.getNdx()];
-								legWithMaxAssc = ascLeg;
-							}
+//		HashSet<Integer> indLegNdxs = new HashSet<Integer>();
+
+		/*
+		 * Set dutyOfLeg TOTALIZERs.
+		 */
+		legNdxs.forEach((legNdx) -> {
+			Leg leg = this.legs.get(legNdx);
+			Duty[] dutiesOfLeg = this.dutyIndexByLegNdx.getArray(leg.getNdx());
+			for (int di = 0; di < dutiesOfLeg.length; di++) {
+				Duty dutyOfLeg = dutiesOfLeg[di];
+				if (dutyOfLeg.hasPairing(p.getHbNdx())
+						&& dutyOfLeg.isValid(p.getHbNdx())) {
+
+					dutyStates[dutyOfLeg.getNdx()].numOfCoverings++;
+					dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoverings += leg.getBlockTimeInMins();
+					if (leg.isCover()) {
+						dutyStates[dutyOfLeg.getNdx()].numOfCoveringsActive++;
+						dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoveringsActive += leg.getBlockTimeInMins();
+					} else {
+						dutyStates[dutyOfLeg.getNdx()].numOfCoveringsPassive++;
+						dutyStates[dutyOfLeg.getNdx()].blockTimeOfCoveringsPassive += leg.getBlockTimeInMins();
+					}
+					if (legStates[leg.getNdx()].numOfCoverings == 1) {
+						dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoverings++;
+						dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoverings += leg.getBlockTimeInMins();
+						if (leg.isCover()) {
+							dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoveringsActive++;
+							dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive += leg.getBlockTimeInMins();
+						} else {
+							dutyStates[dutyOfLeg.getNdx()].numOfDistinctCoveringsPassive++;
+							dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsPassive += leg.getBlockTimeInMins();
 						}
 					}
-				}
-				if ((maxLegAssc > 0)
-						&& (maxLegAssc == numOfDhFreeDuties)) {
-					legStates[indLeg.getNdx()].potentialDh = true;
-					Duty[] critDutyCands = this.dutyIndexByLegNdx.getArray(legWithMaxAssc.getNdx());
-					for (Duty critDutyCand : critDutyCands) {
-						if (critDutyCand.hasPairing(p.getHbNdx())
-								&& critDutyCand.isValid(p.getHbNdx())
-//								&& (dutyStates[critDutyCand.getNdx()].numOfCoverings == 0)
-								) {
 
-							boolean hasIndLeg = false;
-							for (int cli = 0; cli < critDutyCand.getLegs().size(); cli++) {
-								if (critDutyCand.getLegs().get(cli).getNdx() == indLegNdx) {
-									hasIndLeg = true;
-									break;
+					boolean isDhStateChanged = (dutyOfLeg.getNumOfLegsPassive() == 0) && (dutyStates[dutyOfLeg.getNdx()].numOfCoverings == 1);
+					boolean isEffectivenessChanged = leg.isCover()
+														&& (legStates[leg.getNdx()].numOfCoverings == 1)
+														&& (dutyOfLeg.getBlockTimeInMinsActive() 
+																- dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive 
+																+ leg.getBlockTimeInMins() >= HeurosSystemParam.effectiveDutyBlockHourLimit)
+														&& (dutyOfLeg.getBlockTimeInMinsActive() 
+																- dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive < HeurosSystemParam.effectiveDutyBlockHourLimit);
+
+					if (isDhStateChanged
+							|| isEffectivenessChanged) {
+						for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
+							Leg indLeg = dutyOfLeg.getLegs().get(li);
+
+//							if (indLeg.isCover()
+//									&& (legStates[indLeg.getNdx()].numOfCoverings == 0)
+//									&& indLeg.hasPair(p.getHbNdx())
+//									&& (indLeg.getNdx() != leg.getNdx()))
+//								indLegNdxs.add(indLeg.getNdx());
+
+							if (isEffectivenessChanged) {
+								legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties--;
+							}
+
+							if (isDhStateChanged) {
+								legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
+								if (dutyOfLeg.getBlockTimeInMinsActive() >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
+									legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh--;
 								}
 							}
-							if (!hasIndLeg) {
-								if (!dutyStates[critDutyCand.getNdx()].dhCritical)
-									numOfNewDhCritDuties++;
-								dutyStates[critDutyCand.getNdx()].dhCritical = true;
-							}
 						}
 					}
-				}
-				if (numOfNewDhCritDuties > 0) {
-//					logger.info(indLeg + " -> newCritDuties: " + numOfNewDhCritDuties);
 				}
 			}
 		});
+
+//		indLegNdxs.forEach((indLegNdx) -> {
+//			Leg indLeg = this.legs.get(indLegNdx);
+//			if (legStates[indLeg.getNdx()].numOfCoverings == 0) {
+//				int numOfNewDhCritDuties = 0;
+//				Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
+//				int[] numOfLegAssc = new int[this.legs.size()];
+//				int maxLegAssc = 0;
+//				Leg legWithMaxAssc = null;
+//				int numOfDhFreeDuties = 0;
+//				for (Duty dutyOfIndLeg : dutiesOfIndLeg) {
+//					if (dutyOfIndLeg.hasPairing(p.getHbNdx())
+//							&& dutyOfIndLeg.isValid(p.getHbNdx())
+//							&& (dutyStates[dutyOfIndLeg.getNdx()].numOfCoverings == 0)
+//							) {
+//						numOfDhFreeDuties++;
+//						for (int ili = 0; ili < dutyOfIndLeg.getLegs().size(); ili++) {
+//							Leg ascLeg = dutyOfIndLeg.getLegs().get(ili);
+//							if (indLeg.getNdx() != ascLeg.getNdx()) {
+//								numOfLegAssc[ascLeg.getNdx()]++;
+//								if (maxLegAssc < numOfLegAssc[ascLeg.getNdx()]) {
+//									maxLegAssc = numOfLegAssc[ascLeg.getNdx()];
+//									legWithMaxAssc = ascLeg;
+//								}
+//							}
+//						}
+//					}
+//				}
+//				if ((maxLegAssc > 0)
+//						&& (maxLegAssc == numOfDhFreeDuties)) {
+//					legStates[indLeg.getNdx()].potentialDh = true;
+//					Duty[] critDutyCands = this.dutyIndexByLegNdx.getArray(legWithMaxAssc.getNdx());
+//					for (Duty critDutyCand : critDutyCands) {
+//						if (critDutyCand.hasPairing(p.getHbNdx())
+//								&& critDutyCand.isValid(p.getHbNdx())
+////								&& (dutyStates[critDutyCand.getNdx()].numOfCoverings == 0)
+//								) {
+//
+//							boolean hasIndLeg = false;
+//							for (int cli = 0; cli < critDutyCand.getLegs().size(); cli++) {
+//								if (critDutyCand.getLegs().get(cli).getNdx() == indLegNdx) {
+//									hasIndLeg = true;
+//									break;
+//								}
+//							}
+//							if (!hasIndLeg) {
+//								if (!dutyStates[critDutyCand.getNdx()].dhCritical)
+//									numOfNewDhCritDuties++;
+//								dutyStates[critDutyCand.getNdx()].dhCritical = true;
+//							}
+//						}
+//					}
+//				}
+//				if (numOfNewDhCritDuties > 0) {
+//					logger.info(indLeg + " -> newCritDuties: " + numOfNewDhCritDuties);
+//				}
+//			}
+//		});
+
+		this.calculateAndSetMaxValuesOfHeuristicsParameters();
 	}
 
 	public double finalizeIteration(List<Pair> solution, int uncoveredLegs) {
@@ -300,13 +278,41 @@ public class SolutionState {
 		int numOfPairDays = 0;
 		int numOfPairs = 0;
 
+		/*
+		 * Calculate heuristic cost to be able to calculate Heuristic Modifier.
+		 */
 		for (int i = 0; i < solution.size(); i++) {
-			fitness += getPairCost(2, solution.get(i));
-			numOfDuties += solution.get(i).getNumOfDuties();
-			numOfPairDays += solution.get(i).getNumOfDaysTouched();
+			Pair p = solution.get(i);
+			fitness += getPairCost(2, p);
+			numOfDuties += p.getNumOfDuties();
+			numOfPairDays += p.getNumOfDaysTouched();
 			numOfPairs++;
+
+			for (int j = 0; j < p.getNumOfDuties(); j++) {
+				Duty d = p.getDuties().get(j);
+				double effectiveCost = 0.0;
+				if (this.dutyStates[d.getNdx()].blockTimeOfCoveringsActive < HeurosSystemParam.effectiveDutyBlockHourLimit) {
+					effectiveCost += (HeurosSystemParam.effectiveDutyBlockHourLimit - this.dutyStates[d.getNdx()].blockTimeOfCoveringsActive);
+				}
+				for (int k = 0; k < d.getNumOfLegs(); k++) {
+					Leg l = d.getLegs().get(k);
+					if (l.isCover()) {
+						/*
+						 * Add effective cost (mins diff.) to heuristicModifier.
+						 */
+						legStates[l.getNdx()].heuristicModifierValue = effectiveCost;
+						/*
+						 * Add dh cost (block time of the dh leg) to heuristicModifier.
+						 */
+						legStates[l.getNdx()].heuristicModifierValue += ((legStates[l.getNdx()].numOfCoverings - 1) * l.getBlockTimeInMins() / 2.0);
+					}
+				}
+			}
 		}
 
+		/*
+		 * Calculate standard cost and solution statistics.
+		 */
 		int numOfLegsFromTheFleet = 0;
 		int numOfDeadheadLegsFromTheFleet = 0;
 		int numOfLegsOutsideOfTheFleet = 0;
@@ -318,14 +324,12 @@ public class SolutionState {
 					numOfLegsFromTheFleet++;
 				if (this.legStates[i].numOfCoverings > 1) {
 					fitness += (2.0 * (this.legStates[i].numOfCoverings - 1) * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
-//					fitness += (numOfLegCoverings[i] - 1) * 100;
 					numOfDeadheads += (this.legStates[i].numOfCoverings - 1);
 					numOfDeadheadLegsFromTheFleet++;
 				}
 			} else {
 				if (this.legStates[i].numOfCoverings > 0) {
 					fitness += (2.0 * this.legStates[i].numOfCoverings * (this.legs.get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
-//					fitness += numOfLegCoverings[i] * 100;
 					numOfDeadheads += this.legStates[i].numOfCoverings;
 					numOfLegsOutsideOfTheFleet++;
 				}
