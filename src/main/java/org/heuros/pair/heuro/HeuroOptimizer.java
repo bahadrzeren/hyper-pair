@@ -114,7 +114,7 @@ public class HeuroOptimizer {
 			 * TEST BLOCK END
 			 */
 
-			double cost = solutionState.finalizeIteration(solution, uncoveredLegs);
+			double cost = solutionState.finalizeIteration(i + 1, solution, uncoveredLegs);
 
 			/*
 			 * Improvement test.

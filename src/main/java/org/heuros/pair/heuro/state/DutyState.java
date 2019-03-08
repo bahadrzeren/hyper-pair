@@ -1,5 +1,7 @@
 package org.heuros.pair.heuro.state;
 
+import org.heuros.data.model.Duty;
+
 public class DutyState {
 	public int numOfCoverings = 0;
 	public int numOfCoveringsActive = 0;
@@ -16,15 +18,20 @@ public class DutyState {
 	/*
 	 * Initial values are taken from Duty.
 	 */
-//	public int minNumOfAlternativeDuties = 0;
-//	public int minNumOfAlternativeDutiesWoDh = 0;
-//	public int maxNumOfAlternativeDuties = 0;
-//	public int maxNumOfAlternativeDutiesWoDh = 0;
-//	public int totalNumOfAlternativeDuties = 0;
-//	public int totalNumOfAlternativeDutiesWoDh = 0;
-	public boolean dhCritical = false;
+	public int minNumOfAlternativeDuties = 0;
+	public int minNumOfAlternativeDutiesWoDh = 0;
+	public int maxNumOfAlternativeDuties = 0;
+	public int maxNumOfAlternativeDutiesWoDh = 0;
+	public int totalNumOfAlternativeDuties = 0;
+	public int totalNumOfAlternativeDutiesWoDh = 0;
+	public int minNumOfAlternativeEffectiveDuties = 0;
+	public int minNumOfAlternativeEffectiveDutiesWoDh = 0;
+	public int maxNumOfAlternativeEffectiveDuties = 0;
+	public int maxNumOfAlternativeEffectiveDutiesWoDh = 0;
+	public int totalNumOfAlternativeEffectiveDuties = 0;
+	public int totalNumOfAlternativeEffectiveDutiesWoDh = 0;
 
-	public void resetForNewIteration() {
+	private void resetForNewIteration() {
 		this.numOfCoverings = 0;
 		this.numOfCoveringsActive = 0;
 		this.numOfCoveringsPassive = 0;
@@ -37,6 +44,21 @@ public class DutyState {
 		this.blockTimeOfDistinctCoverings = 0;
 		this.blockTimeOfDistinctCoveringsActive = 0;
 		this.blockTimeOfDistinctCoveringsPassive = 0;
-		this.dhCritical = false;
+	}
+
+	public void initialize(Duty duty) {
+		this.resetForNewIteration();
+		this.minNumOfAlternativeDuties = duty.getMinNumOfAlternativeDuties();
+		this.minNumOfAlternativeDutiesWoDh = duty.getMinNumOfAlternativeDutiesWoDh();
+		this.maxNumOfAlternativeDuties = duty.getMaxNumOfAlternativeDuties();
+		this.maxNumOfAlternativeDutiesWoDh = duty.getMaxNumOfAlternativeDutiesWoDh();
+		this.totalNumOfAlternativeDuties = duty.getTotalNumOfAlternativeDuties();
+		this.totalNumOfAlternativeDutiesWoDh = duty.getTotalNumOfAlternativeDutiesWoDh();		
+		this.minNumOfAlternativeEffectiveDuties = duty.getMinNumOfAlternativeEffectiveDuties();
+		this.minNumOfAlternativeEffectiveDutiesWoDh = duty.getMinNumOfAlternativeEffectiveDutiesWoDh();
+		this.maxNumOfAlternativeEffectiveDuties = duty.getMaxNumOfAlternativeEffectiveDuties();
+		this.maxNumOfAlternativeEffectiveDutiesWoDh = duty.getMaxNumOfAlternativeEffectiveDutiesWoDh();
+		this.totalNumOfAlternativeEffectiveDuties = duty.getTotalNumOfAlternativeEffectiveDuties();
+		this.totalNumOfAlternativeEffectiveDutiesWoDh = duty.getTotalNumOfAlternativeEffectiveDutiesWoDh();		
 	}
 }

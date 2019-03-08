@@ -10,14 +10,14 @@ import org.heuros.core.data.repo.DataRepository;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 
-public class PotentialDhChecker implements Callable<Boolean> {
+public class _PotentialDhChecker implements Callable<Boolean> {
 
-	private static Logger logger = Logger.getLogger(PotentialDhChecker.class);
+	private static Logger logger = Logger.getLogger(_PotentialDhChecker.class);
 
 	private int hbNdx = -1;
 	private LocalDateTime coverPeriodEndExc = null;
 
-	public PotentialDhChecker(int hbNdx, LocalDateTime coverPeriodEndExc) {
+	public _PotentialDhChecker(int hbNdx, LocalDateTime coverPeriodEndExc) {
 		this.hbNdx = hbNdx;
 		this.coverPeriodEndExc = coverPeriodEndExc;
 	}
@@ -26,7 +26,7 @@ public class PotentialDhChecker implements Callable<Boolean> {
 //	private List<Duty> duties = null;
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 
-	public PotentialDhChecker setLegRepository(DataRepository<Leg> legRepository) {
+	public _PotentialDhChecker setLegRepository(DataRepository<Leg> legRepository) {
 		this.legs = legRepository.getModels();
 		return this;
 	}
@@ -36,7 +36,7 @@ public class PotentialDhChecker implements Callable<Boolean> {
 //		return this;
 //	}
 
-	public PotentialDhChecker setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
+	public _PotentialDhChecker setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
 		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
 		return this;
 	}
@@ -112,8 +112,8 @@ public class PotentialDhChecker implements Callable<Boolean> {
 											}
 										}
 										if (!hasCriticalLeg) {
-											aDuty.setDhCritical(true);
-											l.setPotentialDh(true);
+//											aDuty.setDhCritical(true);
+//											l.setPotentialDh(true);
 										}
 			    					}
 								}
