@@ -21,8 +21,6 @@ public class SolutionState {
 	private LegState[] legStates = null;
 	private DutyState[] dutyStates = null;
 
-	private LegState legMaxState = null;
-
 	public SolutionState(List<Leg> legs,
 							List<Duty> duties,
 							OneDimIndexInt<Duty> dutyIndexByLegNdx) {
@@ -34,11 +32,9 @@ public class SolutionState {
 		this.dutyStates = new DutyState[this.duties.size()];
 
 		for (int j = 0; j < this.legStates.length; j++)
-			this.legStates[j] = new LegState();
+			this.legStates[j] = new LegState(this.legs.get(j));
 		for (int j = 0; j < this.dutyStates.length; j++)
-			this.dutyStates[j] = new DutyState();
-
-		this.legMaxState = new LegState();
+			this.dutyStates[j] = new DutyState(this.duties.get(j));
 	}
 
 	public LegState[] getLegStates() {
@@ -60,22 +56,22 @@ public class SolutionState {
 	}
 
 	private void calculateAndSetMaxValuesOfHeuristicsParameters() {
-		this.legMaxState.numOfIncludingDuties = 0;
-		this.legMaxState.numOfIncludingDutiesWoDh = 0;
-		this.legMaxState.numOfIncludingEffectiveDuties = 0;
-		this.legMaxState.numOfIncludingEffectiveDutiesWoDh = 0;
-		this.legMaxState.heuristicModifierValue = 0.0;
+		LegState.maxNumOfIncludingDuties = 0;
+		LegState.maxNumOfIncludingDutiesWoDh = 0;
+		LegState.maxNumOfIncludingEffectiveDuties = 0;
+		LegState.maxNumOfIncludingEffectiveDutiesWoDh = 0;
+		LegState.maxHeuristicModifierValue = 0.0;
 		for (int j = 0; j < legStates.length; j++) {
-			if (this.legMaxState.numOfIncludingDuties < this.legStates[j].numOfIncludingDuties)
-				this.legMaxState.numOfIncludingDuties = this.legStates[j].numOfIncludingDuties;
-			if (this.legMaxState.numOfIncludingDutiesWoDh < this.legStates[j].numOfIncludingDutiesWoDh)
-				this.legMaxState.numOfIncludingDutiesWoDh = this.legStates[j].numOfIncludingDutiesWoDh;
-			if (this.legMaxState.numOfIncludingEffectiveDuties < this.legStates[j].numOfIncludingEffectiveDuties)
-				this.legMaxState.numOfIncludingEffectiveDuties = this.legStates[j].numOfIncludingEffectiveDuties;
-			if (this.legMaxState.numOfIncludingEffectiveDutiesWoDh < this.legStates[j].numOfIncludingEffectiveDutiesWoDh)
-				this.legMaxState.numOfIncludingEffectiveDutiesWoDh = this.legStates[j].numOfIncludingEffectiveDutiesWoDh;
-			if (this.legMaxState.heuristicModifierValue < this.legStates[j].heuristicModifierValue)
-				this.legMaxState.heuristicModifierValue = this.legStates[j].heuristicModifierValue;
+			if (LegState.maxNumOfIncludingDuties < this.legStates[j].numOfIncludingDuties)
+				LegState.maxNumOfIncludingDuties = this.legStates[j].numOfIncludingDuties;
+			if (LegState.maxNumOfIncludingDutiesWoDh < this.legStates[j].numOfIncludingDutiesWoDh)
+				LegState.maxNumOfIncludingDutiesWoDh = this.legStates[j].numOfIncludingDutiesWoDh;
+			if (LegState.maxNumOfIncludingEffectiveDuties < this.legStates[j].numOfIncludingEffectiveDuties)
+				LegState.maxNumOfIncludingEffectiveDuties = this.legStates[j].numOfIncludingEffectiveDuties;
+			if (LegState.maxNumOfIncludingEffectiveDutiesWoDh < this.legStates[j].numOfIncludingEffectiveDutiesWoDh)
+				LegState.maxNumOfIncludingEffectiveDutiesWoDh = this.legStates[j].numOfIncludingEffectiveDutiesWoDh;
+			if (LegState.maxHeuristicModifierValue < this.legStates[j].heuristicModifierValue)
+				LegState.maxHeuristicModifierValue = this.legStates[j].heuristicModifierValue;
 		}
 	}
 
@@ -100,8 +96,8 @@ public class SolutionState {
 //						}
 //				} else
 //					if (!isCritical) {
-						if (highestScore < legStates[i].getDifficultyScoreOfTheLeg(this.legMaxState)) {
-							highestScore = legStates[i].getDifficultyScoreOfTheLeg(this.legMaxState);
+						if (highestScore < legStates[i].getDifficultyScoreOfTheLeg()) {
+							highestScore = legStates[i].getDifficultyScoreOfTheLeg();
 							res = i;
 						}
 //					}
@@ -168,6 +164,7 @@ public class SolutionState {
 																+ leg.getBlockTimeInMins() >= HeurosSystemParam.effectiveDutyBlockHourLimit)
 														&& (dutyOfLeg.getBlockTimeInMinsActive() 
 																- dutyStates[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive < HeurosSystemParam.effectiveDutyBlockHourLimit);
+					boolean isEffectivenessWoDhChanged = (dutyOfLeg.getBlockTimeInMinsActive() >= HeurosSystemParam.effectiveDutyBlockHourLimit);
 
 					if (isDhStateChanged
 							|| isEffectivenessChanged) {
@@ -186,7 +183,7 @@ public class SolutionState {
 
 							if (isDhStateChanged) {
 								legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh--;
-								if (dutyOfLeg.getBlockTimeInMinsActive() >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
+								if (isEffectivenessWoDhChanged) {
 									legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh--;
 								}
 							}
@@ -194,21 +191,53 @@ public class SolutionState {
 							Duty[] dutiesOfIndLeg = this.dutyIndexByLegNdx.getArray(indLeg.getNdx());
 							for (int idi = 0; idi < dutiesOfIndLeg.length; idi++) {
 								Duty dutieOfIndLeg = dutiesOfIndLeg[idi];
-								if (dutieOfIndLeg.hasPairing(hbNdx)
-										&& dutieOfIndLeg.isValid(hbNdx)) {
-									dutyStates[dutieOfIndLeg.getNdx()].totalNumOfAlternativeDutiesWoDh--;
-									if (dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh > legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
-										dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
-									/*
-									 * TODO
-									 * 
-									 * This implementation does not guarantee to set exact maxNumOfAlternativeDutiesWoDh.
-									 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
-									 * Therefore the number of legs that has the same maxNumOfAlternativeDutiesWoDh might cause small disruptions.
-									 *  
-									 */
-									if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh <= legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
-										dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
+								if (dutieOfIndLeg.hasPairing(p.getHbNdx())
+										&& dutieOfIndLeg.isValid(p.getHbNdx())) {
+									if (isEffectivenessChanged) {
+										dutyStates[dutieOfIndLeg.getNdx()].totalNumOfAlternativeEffectiveDuties--;
+										if (dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeEffectiveDuties > legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties)
+											dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeEffectiveDuties = legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties;
+										/*
+										 * TODO
+										 * 
+										 * This implementation does not guarantee to set exact maxNumOfAlternativeEffectiveDutiesWoDh.
+										 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
+										 * Therefore the number of legs that has the same maxNumOfAlternativeEffectiveDutiesWoDh might cause small disruptions.
+										 *  
+										 */
+										if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDuties <= legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties)
+											dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDuties = legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties;
+									}
+									if (isDhStateChanged) {
+										dutyStates[dutieOfIndLeg.getNdx()].totalNumOfAlternativeDutiesWoDh--;
+										if (isEffectivenessWoDhChanged) {
+											dutyStates[dutieOfIndLeg.getNdx()].totalNumOfAlternativeEffectiveDutiesWoDh--;
+											if (dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeEffectiveDutiesWoDh > legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh)
+												dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeEffectiveDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh;
+											/*
+											 * TODO
+											 * 
+											 * This implementation does not guarantee to set exact maxNumOfAlternativeEffectiveDutiesWoDh.
+											 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
+											 * Therefore the number of legs that has the same maxNumOfAlternativeEffectiveDutiesWoDh might cause small disruptions.
+											 *  
+											 */
+											if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh <= legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh)
+												dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh;
+										}
+										if (dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh > legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
+											dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
+										/*
+										 * TODO
+										 * 
+										 * This implementation does not guarantee to set exact maxNumOfAlternativeDutiesWoDh.
+										 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
+										 * Therefore the number of legs that has the same maxNumOfAlternativeDutiesWoDh might cause small disruptions.
+										 *  
+										 */
+										if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh <= legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
+											dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
+									}
 								}
 							}
 
@@ -298,10 +327,10 @@ public class SolutionState {
 			for (int j = 0; j < p.getNumOfDuties(); j++) {
 				Duty d = p.getDuties().get(j);
 				double effectiveCost = 0.0;
-				if (this.dutyStates[d.getNdx()].blockTimeOfCoveringsActive < HeurosSystemParam.effectiveDutyBlockHourLimit) {
-					effectiveCost += (HeurosSystemParam.effectiveDutyBlockHourLimit - this.dutyStates[d.getNdx()].blockTimeOfCoveringsActive);
-					fitness += effectiveCost;
-				}
+//				if (this.dutyStates[d.getNdx()].blockTimeOfCoveringsActive < HeurosSystemParam.effectiveDutyBlockHourLimit) {
+//					effectiveCost += (HeurosSystemParam.effectiveDutyBlockHourLimit - this.dutyStates[d.getNdx()].blockTimeOfCoveringsActive);
+//					fitness += effectiveCost;
+//				}
 				for (int k = 0; k < d.getNumOfLegs(); k++) {
 					Leg l = d.getLegs().get(k);
 					if (l.isCover()) {
@@ -313,9 +342,9 @@ public class SolutionState {
 						/*
 						 * Add dh cost (block time of the dh leg) to heuristicModifier.
 						 */
-						legStates[l.getNdx()].heuristicModifierValue += ((legStates[l.getNdx()].numOfCoverings - 1) * l.getBlockTimeInMins() / 2.0);
+						legStates[l.getNdx()].heuristicModifierValue += ((d.getNumOfLegsPassive() + legStates[l.getNdx()].numOfCoverings - 1) * 1.0 / 2.0);	//	l.getBlockTimeInMins()
 
-						fitness += ((legStates[l.getNdx()].numOfCoverings - 1) * l.getBlockTimeInMins() / 2.0);
+						fitness += ((d.getNumOfLegsPassive() + legStates[l.getNdx()].numOfCoverings - 1) * 1.0 / 2.0);	//	l.getBlockTimeInMins()
 					}
 				}
 			}

@@ -3,6 +3,23 @@ package org.heuros.pair.heuro.state;
 import org.heuros.data.model.Leg;
 
 public class LegState {
+
+	private Leg associatedLeg = null;
+
+	public LegState(Leg associatedLeg) {
+		this.associatedLeg = associatedLeg;
+	}
+
+
+
+	public static int maxNumOfIncludingDuties = 0;
+	public static int maxNumOfIncludingDutiesWoDh = 0;
+	public static int maxNumOfIncludingEffectiveDuties = 0;
+	public static int maxNumOfIncludingEffectiveDutiesWoDh = 0;
+	public static double maxHeuristicModifierValue = 0.0;
+
+
+
 	public int numOfCoverings = 0;
 	/*
 	 * Initial values are taken from Leg.
@@ -37,42 +54,47 @@ public class LegState {
 	/*
 	 * Difficulty Score calculations.
 	 */
-	private static double weightInclusionScore = 0.0;
-	private static double weightInclusionScoreWoDh = 0.4;
-	private static double weightEffectiveInclusionScore = 0.0;
-	private static double weightEffectiveInclusionScoreWoDh = 0.4;
-	private static double weightHeuristicModifier = 0.2;
+	public static double weightInclusionScore = 0.0;
+	public static double weightInclusionScoreWoDh = 0.5;
+	public static double weightEffectiveInclusionScore = 0.0;
+	public static double weightEffectiveInclusionScoreWoDh = 0.0;
+	public static double weightHeuristicModifier = 0.5;
 
-	private double getInclusionScore(LegState legMaxState) {
-		return (weightInclusionScore * (legMaxState.numOfIncludingDuties - this.numOfIncludingDuties)) / legMaxState.numOfIncludingDuties;
+	private double getInclusionScore() {
+		return (weightInclusionScore * (LegState.maxNumOfIncludingDuties - this.numOfIncludingDuties)) / LegState.maxNumOfIncludingDuties;
 	}
 
-	private double getInclusionScoreWoDh(LegState legMaxState) {
-		return (weightInclusionScoreWoDh * (legMaxState.numOfIncludingDutiesWoDh - this.numOfIncludingDutiesWoDh)) / legMaxState.numOfIncludingDutiesWoDh;
+	private double getInclusionScoreWoDh() {
+		return (weightInclusionScoreWoDh * (LegState.maxNumOfIncludingDutiesWoDh - this.numOfIncludingDutiesWoDh)) / LegState.maxNumOfIncludingDutiesWoDh;
 	}
 
-	private double getEffectiveInclusionScore(LegState legMaxState) {
-		return (weightEffectiveInclusionScore * (legMaxState.numOfIncludingEffectiveDuties - this.numOfIncludingEffectiveDuties)) / legMaxState.numOfIncludingEffectiveDuties;
+	private double getEffectiveInclusionScore() {
+		return (weightEffectiveInclusionScore * (LegState.maxNumOfIncludingEffectiveDuties - this.numOfIncludingEffectiveDuties)) / LegState.maxNumOfIncludingEffectiveDuties;
 	}
 
-	private double getEffectiveInclusionScoreWoDh(LegState legMaxState) {
-		return (weightEffectiveInclusionScoreWoDh * (legMaxState.numOfIncludingEffectiveDutiesWoDh - this.numOfIncludingEffectiveDutiesWoDh)) / legMaxState.numOfIncludingEffectiveDutiesWoDh;
+	private double getEffectiveInclusionScoreWoDh() {
+		return (weightEffectiveInclusionScoreWoDh * (LegState.maxNumOfIncludingEffectiveDutiesWoDh - this.numOfIncludingEffectiveDutiesWoDh)) / LegState.maxNumOfIncludingEffectiveDutiesWoDh;
 	}
 
-	private double getHeuristicModifierScore(LegState legMaxState) {
-		if (legMaxState.heuristicModifierValue > 0.0) {
-			return (weightHeuristicModifier * this.heuristicModifierValue) / legMaxState.heuristicModifierValue;
+	private double getHeuristicModifierScore() {
+		if (LegState.maxHeuristicModifierValue > 0.0) {
+			return (weightHeuristicModifier * this.heuristicModifierValue) / LegState.maxHeuristicModifierValue;
 		} else {
 			return 0.0;
 		}
 	}
 
-	public double getDifficultyScoreOfTheLeg(LegState legMaxState) {
-		return this.getInclusionScore(legMaxState)
-				+ this.getInclusionScoreWoDh(legMaxState)
-				+ this.getEffectiveInclusionScore(legMaxState)
-				+ this.getEffectiveInclusionScoreWoDh(legMaxState)
-				+ this.getHeuristicModifierScore(legMaxState);
+	public double getDifficultyScoreOfTheLeg() {
+		if (this.associatedLeg.isCover()
+				&& (this.numOfCoverings == 0)) {
+			return this.getInclusionScore()
+					+ this.getInclusionScoreWoDh()
+					+ this.getEffectiveInclusionScore()
+					+ this.getEffectiveInclusionScoreWoDh()
+					+ this.getHeuristicModifierScore();
+		} else {
+			return 0.0;
+		}
 	}
 
 	/*

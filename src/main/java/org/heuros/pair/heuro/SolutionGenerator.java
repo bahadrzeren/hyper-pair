@@ -9,6 +9,7 @@ import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.conf.HeurosDatasetParam;
 import org.heuros.pair.conf.HeurosSystemParam;
+import org.heuros.pair.heuro.state.DutyState;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairingGenerator;
 
@@ -78,25 +79,67 @@ public class SolutionGenerator {
 //							DutyState ds = solutionState.getDutyStates()[d.getNdx()];
 //							int minNumOfAlternativeDuties = Integer.MAX_VALUE;
 //							int minNumOfAlternativeDutiesWoDh = Integer.MAX_VALUE;
+//							int maxNumOfAlternativeDuties = 0;
+//							int maxNumOfAlternativeDutiesWoDh = 0;
 //							int totalNumOfAlternativeDuties = 0;
 //							int totalNumOfAlternativeDutiesWoDh = 0;
+//							int minNumOfAlternativeEffectiveDuties = Integer.MAX_VALUE;
+//							int minNumOfAlternativeEffectiveDutiesWoDh = Integer.MAX_VALUE;
+//							int maxNumOfAlternativeEffectiveDuties = 0;
+//							int maxNumOfAlternativeEffectiveDutiesWoDh = 0;
+//							int totalNumOfAlternativeEffectiveDuties = 0;
+//							int totalNumOfAlternativeEffectiveDutiesWoDh = 0;
 //							for (int i = 0; i < d.getNumOfLegs(); i++) {
 //								Leg l = d.getLegs().get(i);
 //								if (minNumOfAlternativeDuties > solutionState.getLegStates()[l.getNdx()].numOfIncludingDuties)
 //									minNumOfAlternativeDuties = solutionState.getLegStates()[l.getNdx()].numOfIncludingDuties;
 //								if (minNumOfAlternativeDutiesWoDh > solutionState.getLegStates()[l.getNdx()].numOfIncludingDutiesWoDh)
 //									minNumOfAlternativeDutiesWoDh = solutionState.getLegStates()[l.getNdx()].numOfIncludingDutiesWoDh;
+//								if (maxNumOfAlternativeDuties < solutionState.getLegStates()[l.getNdx()].numOfIncludingDuties)
+//									maxNumOfAlternativeDuties = solutionState.getLegStates()[l.getNdx()].numOfIncludingDuties;
+//								if (maxNumOfAlternativeDutiesWoDh < solutionState.getLegStates()[l.getNdx()].numOfIncludingDutiesWoDh)
+//									maxNumOfAlternativeDutiesWoDh = solutionState.getLegStates()[l.getNdx()].numOfIncludingDutiesWoDh;
 //								totalNumOfAlternativeDuties += solutionState.getLegStates()[l.getNdx()].numOfIncludingDuties;
 //								totalNumOfAlternativeDutiesWoDh += solutionState.getLegStates()[l.getNdx()].numOfIncludingDutiesWoDh;
+//
+//								if (minNumOfAlternativeEffectiveDuties > solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDuties)
+//									minNumOfAlternativeEffectiveDuties = solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDuties;
+//								if (minNumOfAlternativeEffectiveDutiesWoDh > solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDutiesWoDh)
+//									minNumOfAlternativeEffectiveDutiesWoDh = solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDutiesWoDh;
+//								if (maxNumOfAlternativeEffectiveDuties < solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDuties)
+//									maxNumOfAlternativeEffectiveDuties = solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDuties;
+//								if (maxNumOfAlternativeEffectiveDutiesWoDh < solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDutiesWoDh)
+//									maxNumOfAlternativeEffectiveDutiesWoDh = solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDutiesWoDh;
+//								totalNumOfAlternativeEffectiveDuties += solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDuties;
+//								totalNumOfAlternativeEffectiveDutiesWoDh += solutionState.getLegStates()[l.getNdx()].numOfIncludingEffectiveDutiesWoDh;
 //							}
-//							if (ds.minNumOfAlternativeDuties != minNumOfAlternativeDuties)
-//								System.out.println("!" + legToCover);
-//							if (ds.minNumOfAlternativeDutiesWoDh != minNumOfAlternativeDutiesWoDh)
-//								System.out.println("!" + legToCover);
-//							if (ds.totalNumOfAlternativeDuties != totalNumOfAlternativeDuties)
-//								System.out.println("!" + legToCover);
-//							if (ds.totalNumOfAlternativeDutiesWoDh != totalNumOfAlternativeDutiesWoDh)
-//								System.out.println("!" + legToCover);
+//							if (!ds.valuesAreOk(minNumOfAlternativeDuties, 
+//												minNumOfAlternativeDutiesWoDh, 
+//												maxNumOfAlternativeDuties, 
+//												maxNumOfAlternativeDutiesWoDh, 
+//												totalNumOfAlternativeDuties, 
+//												totalNumOfAlternativeDutiesWoDh, 
+//												minNumOfAlternativeEffectiveDuties, 
+//												minNumOfAlternativeEffectiveDutiesWoDh, 
+//												maxNumOfAlternativeEffectiveDuties, 
+//												maxNumOfAlternativeEffectiveDutiesWoDh, 
+//												totalNumOfAlternativeEffectiveDuties, 
+//												totalNumOfAlternativeEffectiveDutiesWoDh)) {
+//								logger.error("LegToCover: " + legToCover);
+//								logger.error("DutyState values has not been set correctly for " + d);
+//								ds.valuesAreOk(minNumOfAlternativeDuties, 
+//												minNumOfAlternativeDutiesWoDh, 
+//												maxNumOfAlternativeDuties, 
+//												maxNumOfAlternativeDutiesWoDh, 
+//												totalNumOfAlternativeDuties, 
+//												totalNumOfAlternativeDutiesWoDh, 
+//												minNumOfAlternativeEffectiveDuties, 
+//												minNumOfAlternativeEffectiveDutiesWoDh, 
+//												maxNumOfAlternativeEffectiveDuties, 
+//												maxNumOfAlternativeEffectiveDutiesWoDh, 
+//												totalNumOfAlternativeEffectiveDuties, 
+//												totalNumOfAlternativeEffectiveDutiesWoDh);
+//							}
 //						}
 //					});
 					/**

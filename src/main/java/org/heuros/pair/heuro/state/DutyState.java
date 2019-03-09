@@ -3,6 +3,12 @@ package org.heuros.pair.heuro.state;
 import org.heuros.data.model.Duty;
 
 public class DutyState {
+	private Duty associatedDuty = null;
+
+	public DutyState(Duty associatedDuty) {
+		this.associatedDuty = associatedDuty;
+	}
+
 	public int numOfCoverings = 0;
 	public int numOfCoveringsActive = 0;
 	public int numOfCoveringsPassive = 0;
@@ -31,6 +37,8 @@ public class DutyState {
 	public int totalNumOfAlternativeEffectiveDuties = 0;
 	public int totalNumOfAlternativeEffectiveDutiesWoDh = 0;
 
+	public double totalHeuristicModifier = 0.0;
+
 	private void resetForNewIteration() {
 		this.numOfCoverings = 0;
 		this.numOfCoveringsActive = 0;
@@ -53,12 +61,82 @@ public class DutyState {
 		this.maxNumOfAlternativeDuties = duty.getMaxNumOfAlternativeDuties();
 		this.maxNumOfAlternativeDutiesWoDh = duty.getMaxNumOfAlternativeDutiesWoDh();
 		this.totalNumOfAlternativeDuties = duty.getTotalNumOfAlternativeDuties();
-		this.totalNumOfAlternativeDutiesWoDh = duty.getTotalNumOfAlternativeDutiesWoDh();		
+		this.totalNumOfAlternativeDutiesWoDh = duty.getTotalNumOfAlternativeDutiesWoDh();
 		this.minNumOfAlternativeEffectiveDuties = duty.getMinNumOfAlternativeEffectiveDuties();
 		this.minNumOfAlternativeEffectiveDutiesWoDh = duty.getMinNumOfAlternativeEffectiveDutiesWoDh();
 		this.maxNumOfAlternativeEffectiveDuties = duty.getMaxNumOfAlternativeEffectiveDuties();
 		this.maxNumOfAlternativeEffectiveDutiesWoDh = duty.getMaxNumOfAlternativeEffectiveDutiesWoDh();
 		this.totalNumOfAlternativeEffectiveDuties = duty.getTotalNumOfAlternativeEffectiveDuties();
-		this.totalNumOfAlternativeEffectiveDutiesWoDh = duty.getTotalNumOfAlternativeEffectiveDutiesWoDh();		
+		this.totalNumOfAlternativeEffectiveDutiesWoDh = duty.getTotalNumOfAlternativeEffectiveDutiesWoDh();
 	}
+
+	private double getInclusionScore() {
+		return ((LegState.weightInclusionScore / LegState.maxNumOfIncludingDuties)
+				* ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) * LegState.maxNumOfIncludingDuties - this.totalNumOfAlternativeDuties));
+	}
+
+	private double getInclusionScoreWoDh() {
+		return ((LegState.weightInclusionScoreWoDh / LegState.maxNumOfIncludingDutiesWoDh)
+				* ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) * LegState.maxNumOfIncludingDutiesWoDh - this.totalNumOfAlternativeDutiesWoDh));
+	}
+
+	private double getEffectiveInclusionScore() {
+		return ((LegState.weightEffectiveInclusionScore / LegState.maxNumOfIncludingEffectiveDuties)
+				* ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) * LegState.maxNumOfIncludingEffectiveDuties - this.totalNumOfAlternativeEffectiveDuties));
+	}
+
+	private double getEffectiveInclusionScoreWoDh() {
+		return ((LegState.weightEffectiveInclusionScoreWoDh / LegState.maxNumOfIncludingEffectiveDutiesWoDh)
+				* ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) * LegState.maxNumOfIncludingEffectiveDutiesWoDh - this.totalNumOfAlternativeEffectiveDutiesWoDh));
+	}
+
+	private double getHeuristicModifierScore() {
+		if (LegState.maxHeuristicModifierValue > 0.0) {
+			return (this.totalHeuristicModifier * LegState.weightHeuristicModifier / LegState.maxHeuristicModifierValue);
+		} else {
+			return 0.0;
+		}
+	}
+
+	public double getDifficultyScoreOfTheLeg() {
+		if ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) > 0) {
+			return this.getInclusionScore()
+					+ this.getInclusionScoreWoDh()
+					+ this.getEffectiveInclusionScore()
+					+ this.getEffectiveInclusionScoreWoDh()
+					+ this.getHeuristicModifierScore();
+		} else {
+			return 0.0;
+		}
+	}
+
+	/*
+	 * Validation test.
+	 */
+	public boolean valuesAreOk(int minNumOfAlternativeDuties,
+								int minNumOfAlternativeDutiesWoDh,
+								int maxNumOfAlternativeDuties,
+								int maxNumOfAlternativeDutiesWoDh,
+								int totalNumOfAlternativeDuties,
+								int totalNumOfAlternativeDutiesWoDh,
+								int minNumOfAlternativeEffectiveDuties,
+								int minNumOfAlternativeEffectiveDutiesWoDh,
+								int maxNumOfAlternativeEffectiveDuties,
+								int maxNumOfAlternativeEffectiveDutiesWoDh,
+								int totalNumOfAlternativeEffectiveDuties,
+								int totalNumOfAlternativeEffectiveDutiesWoDh) {
+		return (this.minNumOfAlternativeDuties == minNumOfAlternativeDuties)
+				&& (this.minNumOfAlternativeDutiesWoDh == minNumOfAlternativeDutiesWoDh)
+//				&& (this.maxNumOfAlternativeDuties == maxNumOfAlternativeDuties)
+//				&& (this.maxNumOfAlternativeDutiesWoDh == maxNumOfAlternativeDutiesWoDh)
+				&& (this.totalNumOfAlternativeDuties == totalNumOfAlternativeDuties)
+				&& (this.totalNumOfAlternativeDutiesWoDh == totalNumOfAlternativeDutiesWoDh)
+				&& (this.minNumOfAlternativeEffectiveDuties == minNumOfAlternativeEffectiveDuties)
+				&& (this.minNumOfAlternativeEffectiveDutiesWoDh == minNumOfAlternativeEffectiveDutiesWoDh)
+//				&& (this.maxNumOfAlternativeEffectiveDuties == maxNumOfAlternativeEffectiveDuties)
+//				&& (this.maxNumOfAlternativeEffectiveDutiesWoDh == maxNumOfAlternativeEffectiveDutiesWoDh)
+				&& (this.totalNumOfAlternativeEffectiveDuties == totalNumOfAlternativeEffectiveDuties)
+				&& (this.totalNumOfAlternativeEffectiveDutiesWoDh == totalNumOfAlternativeEffectiveDutiesWoDh);
+	}
+
 }
