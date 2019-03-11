@@ -4,21 +4,17 @@ import org.heuros.data.model.Leg;
 
 public class LegState {
 
-	private Leg associatedLeg = null;
-
-	public LegState(Leg associatedLeg) {
-		this.associatedLeg = associatedLeg;
-	}
-
-
-
 	public static int maxNumOfIncludingDuties = 0;
 	public static int maxNumOfIncludingDutiesWoDh = 0;
 	public static int maxNumOfIncludingEffectiveDuties = 0;
 	public static int maxNumOfIncludingEffectiveDutiesWoDh = 0;
 	public static double maxHeuristicModifierValue = 0.0;
 
+	private Leg associatedLeg = null;
 
+	public LegState(Leg associatedLeg) {
+		this.associatedLeg = associatedLeg;
+	}
 
 	public int numOfCoverings = 0;
 	/*
@@ -37,7 +33,7 @@ public class LegState {
 		this.numOfIncludingEffectiveDutiesWoDh = 0;
 	}
 
-	public void initialize(Leg leg) {
+	public void initializeForNewIteration(Leg leg) {
 		this.resetForNewIteration();
 		this.numOfIncludingDuties = leg.getNumOfIncludingDuties();
 		this.numOfIncludingDutiesWoDh = leg.getNumOfIncludingDutiesWoDh();

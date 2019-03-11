@@ -11,13 +11,15 @@ public class DutyState {
 
 	public int numOfCoverings = 0;
 	public int numOfCoveringsActive = 0;
-	public int numOfCoveringsPassive = 0;
+	public int numOfCoveringsPassiveInt = 0;
+	public int numOfCoveringsPassiveExt = 0;
 	public int numOfDistinctCoverings = 0;
 	public int numOfDistinctCoveringsActive = 0;
 	public int numOfDistinctCoveringsPassive = 0;
 	public int blockTimeOfCoverings = 0;
 	public int blockTimeOfCoveringsActive = 0;
-	public int blockTimeOfCoveringsPassive = 0;
+	public int blockTimeOfCoveringsPassiveInt = 0;
+	public int blockTimeOfCoveringsPassiveExt = 0;
 	public int blockTimeOfDistinctCoverings = 0;
 	public int blockTimeOfDistinctCoveringsActive = 0;
 	public int blockTimeOfDistinctCoveringsPassive = 0;
@@ -37,24 +39,24 @@ public class DutyState {
 	public int totalNumOfAlternativeEffectiveDuties = 0;
 	public int totalNumOfAlternativeEffectiveDutiesWoDh = 0;
 
-	public double totalHeuristicModifier = 0.0;
-
 	private void resetForNewIteration() {
 		this.numOfCoverings = 0;
 		this.numOfCoveringsActive = 0;
-		this.numOfCoveringsPassive = 0;
+		this.numOfCoveringsPassiveInt = 0;
+		this.numOfCoveringsPassiveExt = 0;
 		this.numOfDistinctCoverings = 0;
 		this.numOfDistinctCoveringsActive = 0;
 		this.numOfDistinctCoveringsPassive = 0;
 		this.blockTimeOfCoverings = 0;
 		this.blockTimeOfCoveringsActive = 0;
-		this.blockTimeOfCoveringsPassive = 0;
+		this.blockTimeOfCoveringsPassiveInt = 0;
+		this.blockTimeOfCoveringsPassiveExt = 0;
 		this.blockTimeOfDistinctCoverings = 0;
 		this.blockTimeOfDistinctCoveringsActive = 0;
 		this.blockTimeOfDistinctCoveringsPassive = 0;
 	}
 
-	public void initialize(Duty duty) {
+	public void initializeForNewIteration(Duty duty) {
 		this.resetForNewIteration();
 		this.minNumOfAlternativeDuties = duty.getMinNumOfAlternativeDuties();
 		this.minNumOfAlternativeDutiesWoDh = duty.getMinNumOfAlternativeDutiesWoDh();
@@ -69,6 +71,11 @@ public class DutyState {
 		this.totalNumOfAlternativeEffectiveDuties = duty.getTotalNumOfAlternativeEffectiveDuties();
 		this.totalNumOfAlternativeEffectiveDutiesWoDh = duty.getTotalNumOfAlternativeEffectiveDutiesWoDh();
 	}
+
+	/*
+	 * Cumulative values that do not reset during optimization.
+	 */
+	public double totalHeuristicModifiers = 0.0;
 
 	private double getInclusionScore() {
 		return ((LegState.weightInclusionScore / LegState.maxNumOfIncludingDuties)
@@ -92,7 +99,7 @@ public class DutyState {
 
 	private double getHeuristicModifierScore() {
 		if (LegState.maxHeuristicModifierValue > 0.0) {
-			return (this.totalHeuristicModifier * LegState.weightHeuristicModifier / LegState.maxHeuristicModifierValue);
+			return (this.totalHeuristicModifiers * LegState.weightHeuristicModifier / LegState.maxHeuristicModifierValue);
 		} else {
 			return 0.0;
 		}
@@ -111,9 +118,39 @@ public class DutyState {
 	}
 
 	/*
-	 * Validation test.
+	 * Validation tests.
 	 */
-	public boolean valuesAreOk(int minNumOfAlternativeDuties,
+	public boolean stateVariablesAreOk(int numOfCoverings, 
+										int numOfCoveringsActive, 
+										int numOfCoveringsPassiveInt, 
+										int numOfCoveringsPassiveExt, 
+										int numOfDistinctCoverings, 
+										int numOfDistinctCoveringsActive, 
+										int numOfDistinctCoveringsPassive, 
+										int blockTimeOfCoverings, 
+										int blockTimeOfCoveringsActive, 
+										int blockTimeOfCoveringsPassiveInt, 
+										int blockTimeOfCoveringsPassiveExt, 
+										int blockTimeOfDistinctCoverings, 
+										int blockTimeOfDistinctCoveringsActive, 
+										int blockTimeOfDistinctCoveringsPassive) {
+		return (this.numOfCoverings == numOfCoverings)
+				&& (this.numOfCoveringsActive == numOfCoveringsActive)
+				&& (this.numOfCoveringsPassiveInt == numOfCoveringsPassiveInt)
+				&& (this.numOfCoveringsPassiveExt == numOfCoveringsPassiveExt)
+				&& (this.numOfDistinctCoverings == numOfDistinctCoverings)
+				&& (this.numOfDistinctCoveringsActive == numOfDistinctCoveringsActive)
+				&& (this.numOfDistinctCoveringsPassive == numOfDistinctCoveringsPassive)
+				&& (this.blockTimeOfCoverings == blockTimeOfCoverings)
+				&& (this.blockTimeOfCoveringsActive == blockTimeOfCoveringsActive)
+				&& (this.blockTimeOfCoveringsPassiveInt == blockTimeOfCoveringsPassiveInt)
+				&& (this.blockTimeOfCoveringsPassiveExt == blockTimeOfCoveringsPassiveExt)
+				&& (this.blockTimeOfDistinctCoverings == blockTimeOfDistinctCoverings)
+				&& (this.blockTimeOfDistinctCoveringsActive == blockTimeOfDistinctCoveringsActive)
+				&& (this.blockTimeOfDistinctCoveringsPassive == blockTimeOfDistinctCoveringsPassive);
+	}
+
+	public boolean totaizersAreOk(int minNumOfAlternativeDuties,
 								int minNumOfAlternativeDutiesWoDh,
 								int maxNumOfAlternativeDuties,
 								int maxNumOfAlternativeDutiesWoDh,
@@ -124,7 +161,8 @@ public class DutyState {
 								int maxNumOfAlternativeEffectiveDuties,
 								int maxNumOfAlternativeEffectiveDutiesWoDh,
 								int totalNumOfAlternativeEffectiveDuties,
-								int totalNumOfAlternativeEffectiveDutiesWoDh) {
+								int totalNumOfAlternativeEffectiveDutiesWoDh,
+								double totalHeuristicModifiers) {
 		return (this.minNumOfAlternativeDuties == minNumOfAlternativeDuties)
 				&& (this.minNumOfAlternativeDutiesWoDh == minNumOfAlternativeDutiesWoDh)
 //				&& (this.maxNumOfAlternativeDuties == maxNumOfAlternativeDuties)
@@ -136,7 +174,7 @@ public class DutyState {
 //				&& (this.maxNumOfAlternativeEffectiveDuties == maxNumOfAlternativeEffectiveDuties)
 //				&& (this.maxNumOfAlternativeEffectiveDutiesWoDh == maxNumOfAlternativeEffectiveDutiesWoDh)
 				&& (this.totalNumOfAlternativeEffectiveDuties == totalNumOfAlternativeEffectiveDuties)
-				&& (this.totalNumOfAlternativeEffectiveDutiesWoDh == totalNumOfAlternativeEffectiveDutiesWoDh);
+				&& (this.totalNumOfAlternativeEffectiveDutiesWoDh == totalNumOfAlternativeEffectiveDutiesWoDh)
+				&& (this.totalHeuristicModifiers == totalHeuristicModifiers);
 	}
-
 }
