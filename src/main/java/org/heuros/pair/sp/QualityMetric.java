@@ -42,10 +42,10 @@ public class QualityMetric {
 
 	private double difficultyScore = 0.0;
 
-//	private double getAvgActiveBlockTimePerDuty() {
-//		return (1.0 * this.activeBlocktimeInMins) / this.numOfDuties;
-//	}
-//
+	private double getAvgActiveBlockTimePerDuty() {
+		return (1.0 * this.activeBlocktimeInMins) / this.numOfDuties;
+	}
+
 //	private double getAvgAlternativeDutiesWoDhPerDuty() {
 //		return (1.0 * this.totalNumOfAlternativeDutiesWoDh) / this.numOfDuties;
 //	}
@@ -387,9 +387,12 @@ public class QualityMetric {
 	}
 
 	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
-		if ((qm.numOfLegs == 0)
-				|| (this.numOfDh < qm.numOfDh)
-				|| ((this.numOfDh == qm.numOfDh) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
+		if ((qm.numOfLegs == 0) || (this.numOfDh < qm.numOfDh)
+
+//				|| ((this.numOfDh == qm.numOfDh) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
+
+				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
+				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
 
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
@@ -409,9 +412,12 @@ public class QualityMetric {
 											int heuristicNo,
 											int currentDept,
 											QualityMetric bestQualSoFar) {
-		if ((bestQualSoFar == null)
-				|| (bestQualSoFar.numOfDh > this.numOfDh)
-				|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
+		if ((bestQualSoFar == null) || (bestQualSoFar.numOfDh > this.numOfDh)
+
+//				|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.totalNumOfAlternativeDutiesWoDh > this.totalNumOfAlternativeDutiesWoDh))
+
+				|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfDuties > this.numOfDuties))
+				|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfDuties == this.numOfDuties) && (bestQualSoFar.getAvgActiveBlockTimePerDuty() <= (1.0 * this.activeBlocktimeInMins + (currentDept - 1) * maxDutyBlockTimeInMins) / (this.numOfDuties + (currentDept - 1))))
 
 //				|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfDuties > this.numOfDuties))
 //				|| ((bestQualSoFar.numOfDh == this.numOfDh) && (bestQualSoFar.numOfDuties == this.numOfDuties) && (bestQualSoFar.getAvgActiveBlockTimePerDuty() < this.getAvgActiveBlockTimePerDuty()))
