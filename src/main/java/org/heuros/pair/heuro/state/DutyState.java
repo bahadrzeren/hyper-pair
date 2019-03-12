@@ -28,14 +28,14 @@ public class DutyState {
 	 */
 	public int minNumOfAlternativeDuties = 0;
 	public int minNumOfAlternativeDutiesWoDh = 0;
-	public int maxNumOfAlternativeDuties = 0;
-	public int maxNumOfAlternativeDutiesWoDh = 0;
+//	public int maxNumOfAlternativeDuties = 0;
+//	public int maxNumOfAlternativeDutiesWoDh = 0;
 	public int totalNumOfAlternativeDuties = 0;
 	public int totalNumOfAlternativeDutiesWoDh = 0;
 	public int minNumOfAlternativeEffectiveDuties = 0;
 	public int minNumOfAlternativeEffectiveDutiesWoDh = 0;
-	public int maxNumOfAlternativeEffectiveDuties = 0;
-	public int maxNumOfAlternativeEffectiveDutiesWoDh = 0;
+//	public int maxNumOfAlternativeEffectiveDuties = 0;
+//	public int maxNumOfAlternativeEffectiveDutiesWoDh = 0;
 	public int totalNumOfAlternativeEffectiveDuties = 0;
 	public int totalNumOfAlternativeEffectiveDutiesWoDh = 0;
 
@@ -60,14 +60,14 @@ public class DutyState {
 		this.resetForNewIteration();
 		this.minNumOfAlternativeDuties = duty.getMinNumOfAlternativeDuties();
 		this.minNumOfAlternativeDutiesWoDh = duty.getMinNumOfAlternativeDutiesWoDh();
-		this.maxNumOfAlternativeDuties = duty.getMaxNumOfAlternativeDuties();
-		this.maxNumOfAlternativeDutiesWoDh = duty.getMaxNumOfAlternativeDutiesWoDh();
+//		this.maxNumOfAlternativeDuties = duty.getMaxNumOfAlternativeDuties();
+//		this.maxNumOfAlternativeDutiesWoDh = duty.getMaxNumOfAlternativeDutiesWoDh();
 		this.totalNumOfAlternativeDuties = duty.getTotalNumOfAlternativeDuties();
 		this.totalNumOfAlternativeDutiesWoDh = duty.getTotalNumOfAlternativeDutiesWoDh();
 		this.minNumOfAlternativeEffectiveDuties = duty.getMinNumOfAlternativeEffectiveDuties();
 		this.minNumOfAlternativeEffectiveDutiesWoDh = duty.getMinNumOfAlternativeEffectiveDutiesWoDh();
-		this.maxNumOfAlternativeEffectiveDuties = duty.getMaxNumOfAlternativeEffectiveDuties();
-		this.maxNumOfAlternativeEffectiveDutiesWoDh = duty.getMaxNumOfAlternativeEffectiveDutiesWoDh();
+//		this.maxNumOfAlternativeEffectiveDuties = duty.getMaxNumOfAlternativeEffectiveDuties();
+//		this.maxNumOfAlternativeEffectiveDutiesWoDh = duty.getMaxNumOfAlternativeEffectiveDutiesWoDh();
 		this.totalNumOfAlternativeEffectiveDuties = duty.getTotalNumOfAlternativeEffectiveDuties();
 		this.totalNumOfAlternativeEffectiveDutiesWoDh = duty.getTotalNumOfAlternativeEffectiveDutiesWoDh();
 	}
@@ -105,7 +105,7 @@ public class DutyState {
 		}
 	}
 
-	public double getDifficultyScoreOfTheLeg() {
+	public double getDifficultyScore() {
 		if ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) > 0) {
 			return this.getInclusionScore()
 					+ this.getInclusionScoreWoDh()
@@ -152,14 +152,14 @@ public class DutyState {
 
 	public boolean totaizersAreOk(int minNumOfAlternativeDuties,
 								int minNumOfAlternativeDutiesWoDh,
-								int maxNumOfAlternativeDuties,
-								int maxNumOfAlternativeDutiesWoDh,
+//								int maxNumOfAlternativeDuties,
+//								int maxNumOfAlternativeDutiesWoDh,
 								int totalNumOfAlternativeDuties,
 								int totalNumOfAlternativeDutiesWoDh,
 								int minNumOfAlternativeEffectiveDuties,
 								int minNumOfAlternativeEffectiveDutiesWoDh,
-								int maxNumOfAlternativeEffectiveDuties,
-								int maxNumOfAlternativeEffectiveDutiesWoDh,
+//								int maxNumOfAlternativeEffectiveDuties,
+//								int maxNumOfAlternativeEffectiveDutiesWoDh,
 								int totalNumOfAlternativeEffectiveDuties,
 								int totalNumOfAlternativeEffectiveDutiesWoDh,
 								double totalHeuristicModifiers) {
@@ -176,5 +176,35 @@ public class DutyState {
 				&& (this.totalNumOfAlternativeEffectiveDuties == totalNumOfAlternativeEffectiveDuties)
 				&& (this.totalNumOfAlternativeEffectiveDutiesWoDh == totalNumOfAlternativeEffectiveDutiesWoDh)
 				&& (this.totalHeuristicModifiers == totalHeuristicModifiers);
+	}
+
+	@Override
+	public String toString() {
+		return "numOfCoverings: " + numOfCoverings +
+				", numOfCoveringsActive: " + numOfCoveringsActive +
+				", numOfCoveringsPassiveInt: " + numOfCoveringsPassiveInt +
+				", numOfCoveringsPassiveExt: " + numOfCoveringsPassiveExt +
+				", numOfDistinctCoverings: " + numOfDistinctCoverings +
+				", numOfDistinctCoveringsActive: " + numOfDistinctCoveringsActive +
+				", numOfDistinctCoveringsPassive: " + numOfDistinctCoveringsPassive +
+				", blockTimeOfCoverings: " + blockTimeOfCoverings +
+				", blockTimeOfCoveringsActive: " + blockTimeOfCoveringsActive +
+				", blockTimeOfCoveringsPassiveInt: " + blockTimeOfCoveringsPassiveInt +
+				", blockTimeOfCoveringsPassiveExt: " + blockTimeOfCoveringsPassiveExt +
+				", blockTimeOfDistinctCoverings: " + blockTimeOfDistinctCoverings +
+				", blockTimeOfDistinctCoveringsActive: " + blockTimeOfDistinctCoveringsActive +
+				", blockTimeOfDistinctCoveringsPassive: " + blockTimeOfDistinctCoveringsPassive +
+				", minNumOfAlternativeDuties: " + minNumOfAlternativeDuties +
+//				", maxNumOfAlternativeDuties: " + maxNumOfAlternativeDuties +
+				", totalNumOfAlternativeDuties: " + totalNumOfAlternativeDuties +
+				", minNumOfAlternativeDutiesWoDh: " + minNumOfAlternativeDutiesWoDh +
+//				", maxNumOfAlternativeDutiesWoDh: " + maxNumOfAlternativeDutiesWoDh +
+				", totalNumOfAlternativeDutiesWoDh: " + totalNumOfAlternativeDutiesWoDh +
+				", minNumOfAlternativeEffectiveDuties: " + minNumOfAlternativeEffectiveDuties +
+//				", maxNumOfAlternativeEffectiveDuties: " + maxNumOfAlternativeEffectiveDuties +
+				", totalNumOfAlternativeEffectiveDuties: " + totalNumOfAlternativeEffectiveDuties +
+				", minNumOfAlternativeEffectiveDutiesWoDh: " + minNumOfAlternativeEffectiveDutiesWoDh +
+//				", maxNumOfAlternativeEffectiveDutiesWoDh: " + maxNumOfAlternativeEffectiveDutiesWoDh +
+				", totalNumOfAlternativeEffectiveDutiesWoDh: " + totalNumOfAlternativeEffectiveDutiesWoDh;
 	}
 }

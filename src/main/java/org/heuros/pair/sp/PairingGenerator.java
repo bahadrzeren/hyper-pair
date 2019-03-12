@@ -66,7 +66,7 @@ public class PairingGenerator {
 
 	public Pair generatePairing(Leg legToCover,
 								int heuristicNo,
-								DutyState[] dutyParams) throws CloneNotSupportedException {
+								DutyState[] dutyStates) throws CloneNotSupportedException {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
@@ -82,7 +82,7 @@ public class PairingGenerator {
 
 //			long startTime = System.nanoTime();
 
-//if (legToCover.getNdx() == 1650)
+//if (legToCover.getNdx() == 5831)
 //System.out.println();
 
 			NetworkExplorer networkExplorer = new NetworkExplorer(this.duties, 
@@ -92,12 +92,9 @@ public class PairingGenerator {
 													.build(legToCover, 
 															coveringDuties, 
 															heuristicNo, 
-															dutyParams);
+															dutyStates);
 
 //			long subNetworkBuiltTime = System.nanoTime();
-
-//if (legToCover.getNdx() == 145)
-//System.out.println();
 
 			NodeQualityMetric[] sourceDutyNodes = networkExplorer.getSourceNodeQms();
 
@@ -136,52 +133,142 @@ public class PairingGenerator {
 			 * 
 			 */
 			int failedNodeNdxAltD = Integer.MAX_VALUE;
+
 //			for (int k = 0; k < sourceDutyNodes.length; k++) {
+//				int numOfDh = 0;
+//				int dhDurationInMins = 0;
+//				int activeBlocktimeInMins = 0;
+//				int numOfDuties = 0;
+//				int numOfLegs = 0;
 //				int minNumOfAlternativeDuties = Integer.MAX_VALUE;
 //				int minNumOfAlternativeDutiesWoDh = Integer.MAX_VALUE;
 //				int maxNumOfAlternativeDuties = 0;
 //				int maxNumOfAlternativeDutiesWoDh = 0;
 //				int totalNumOfAlternativeDuties = 0;
 //				int totalNumOfAlternativeDutiesWoDh = 0;
+//				int minNumOfAlternativeEffectiveDuties = Integer.MAX_VALUE;
+//				int minNumOfAlternativeEffectiveDutiesWoDh = Integer.MAX_VALUE;
+//				int maxNumOfAlternativeEffectiveDuties = 0;
+//				int maxNumOfAlternativeEffectiveDutiesWoDh = 0;
+//				int totalNumOfAlternativeEffectiveDuties = 0;
+//				int totalNumOfAlternativeEffectiveDutiesWoDh = 0;
+//				double difficultyScore = 0.0;
 //
 //				NodeQualityMetric nodeQualityMetric = sourceDutyNodes[k];
-//				QualityMetric qualityMetric = new QualityMetric(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
 //
-//				if (minNumOfAlternativeDuties > dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDuties)
-//					minNumOfAlternativeDuties = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDuties;
-//				if (minNumOfAlternativeDutiesWoDh > dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDutiesWoDh)
-//					minNumOfAlternativeDutiesWoDh = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDutiesWoDh;
-//				if (maxNumOfAlternativeDuties < dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].maxNumOfAlternativeDuties)
-//					maxNumOfAlternativeDuties = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].maxNumOfAlternativeDuties;
-//				if (maxNumOfAlternativeDutiesWoDh < dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].maxNumOfAlternativeDutiesWoDh)
-//					maxNumOfAlternativeDutiesWoDh = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].maxNumOfAlternativeDutiesWoDh;
-//				totalNumOfAlternativeDuties += dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].totalNumOfAlternativeDuties;
-//				totalNumOfAlternativeDutiesWoDh += dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].totalNumOfAlternativeDutiesWoDh;
+//				Duty d = nodeQualityMetric.getParent().getNodeOwner();
+//
+//				QualityMetric qualityMetric = new QualityMetric(nodeQualityMetric.getParent().getNodeOwner(), dutyStates[d.getNdx()]);
+//
+//				numOfDh += d.getNumOfLegsPassive() + dutyStates[d.getNdx()].numOfCoverings;
+//				dhDurationInMins += d.getBlockTimeInMinsPassive() + dutyStates[d.getNdx()].blockTimeOfCoverings;
+//				activeBlocktimeInMins += d.getBlockTimeInMinsActive() - dutyStates[d.getNdx()].blockTimeOfCoveringsActive;
+//				numOfDuties++;
+//				numOfLegs += d.getNumOfLegs();
+//
+//				if (minNumOfAlternativeDuties > dutyStates[d.getNdx()].minNumOfAlternativeDuties)
+//					minNumOfAlternativeDuties = dutyStates[d.getNdx()].minNumOfAlternativeDuties;
+//				if (minNumOfAlternativeDutiesWoDh > dutyStates[d.getNdx()].minNumOfAlternativeDutiesWoDh)
+//					minNumOfAlternativeDutiesWoDh = dutyStates[d.getNdx()].minNumOfAlternativeDutiesWoDh;
+////				if (maxNumOfAlternativeDuties < dutyStates[d.getNdx()].maxNumOfAlternativeDuties)
+////					maxNumOfAlternativeDuties = dutyStates[d.getNdx()].maxNumOfAlternativeDuties;
+////				if (maxNumOfAlternativeDutiesWoDh < dutyStates[d.getNdx()].maxNumOfAlternativeDutiesWoDh)
+////					maxNumOfAlternativeDutiesWoDh = dutyStates[d.getNdx()].maxNumOfAlternativeDutiesWoDh;
+//				totalNumOfAlternativeDuties += dutyStates[d.getNdx()].totalNumOfAlternativeDuties;
+//				totalNumOfAlternativeDutiesWoDh += dutyStates[d.getNdx()].totalNumOfAlternativeDutiesWoDh;
+//
+//				if (minNumOfAlternativeEffectiveDuties > dutyStates[d.getNdx()].minNumOfAlternativeEffectiveDuties)
+//					minNumOfAlternativeEffectiveDuties = dutyStates[d.getNdx()].minNumOfAlternativeEffectiveDuties;
+//				if (minNumOfAlternativeEffectiveDutiesWoDh > dutyStates[d.getNdx()].minNumOfAlternativeEffectiveDutiesWoDh)
+//					minNumOfAlternativeEffectiveDutiesWoDh = dutyStates[d.getNdx()].minNumOfAlternativeEffectiveDutiesWoDh;
+////				if (maxNumOfAlternativeEffectiveDuties < dutyStates[d.getNdx()].maxNumOfAlternativeEffectiveDuties)
+////					maxNumOfAlternativeEffectiveDuties = dutyStates[d.getNdx()].maxNumOfAlternativeEffectiveDuties;
+////				if (maxNumOfAlternativeEffectiveDutiesWoDh < dutyStates[d.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh)
+////					maxNumOfAlternativeEffectiveDutiesWoDh = dutyStates[d.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh;
+//				totalNumOfAlternativeEffectiveDuties += dutyStates[d.getNdx()].totalNumOfAlternativeEffectiveDuties;
+//				totalNumOfAlternativeEffectiveDutiesWoDh += dutyStates[d.getNdx()].totalNumOfAlternativeEffectiveDutiesWoDh;
+//
+//				difficultyScore += dutyStates[d.getNdx()].getDifficultyScore();
 //
 //				while (nodeQualityMetric.getNextNodeMetric() != null) {
 //					nodeQualityMetric = nodeQualityMetric.getNextNodeMetric();
-//					qualityMetric.addToQualityMetricFw(nodeQualityMetric.getParent().getNodeOwner(), dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()]);
 //
-//					if (minNumOfAlternativeDuties > dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDuties)
-//						minNumOfAlternativeDuties = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDuties;
-//					if (minNumOfAlternativeDutiesWoDh > dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDutiesWoDh)
-//						minNumOfAlternativeDutiesWoDh = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].minNumOfAlternativeDutiesWoDh;
-//					if (maxNumOfAlternativeDuties < dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].maxNumOfAlternativeDuties)
-//						maxNumOfAlternativeDuties = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].maxNumOfAlternativeDuties;
-//					if (maxNumOfAlternativeDutiesWoDh < dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].maxNumOfAlternativeDutiesWoDh)
-//						maxNumOfAlternativeDutiesWoDh = dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].maxNumOfAlternativeDutiesWoDh;
-//					totalNumOfAlternativeDuties += dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].totalNumOfAlternativeDuties;
-//					totalNumOfAlternativeDutiesWoDh += dutyParams[nodeQualityMetric.getParent().getNodeOwner().getNdx()].totalNumOfAlternativeDutiesWoDh;
+//					d = nodeQualityMetric.getParent().getNodeOwner();
+//
+//					qualityMetric.addToQualityMetricFw(nodeQualityMetric.getParent().getNodeOwner(), dutyStates[d.getNdx()]);
+//
+//					numOfDh += d.getNumOfLegsPassive() + dutyStates[d.getNdx()].numOfCoverings;
+//					dhDurationInMins += d.getBlockTimeInMinsPassive() + dutyStates[d.getNdx()].blockTimeOfCoverings;
+//					activeBlocktimeInMins += d.getBlockTimeInMinsActive() - dutyStates[d.getNdx()].blockTimeOfCoveringsActive;
+//					numOfDuties++;
+//					numOfLegs += d.getNumOfLegs();
+//
+//					if (minNumOfAlternativeDuties > dutyStates[d.getNdx()].minNumOfAlternativeDuties)
+//						minNumOfAlternativeDuties = dutyStates[d.getNdx()].minNumOfAlternativeDuties;
+//					if (minNumOfAlternativeDutiesWoDh > dutyStates[d.getNdx()].minNumOfAlternativeDutiesWoDh)
+//						minNumOfAlternativeDutiesWoDh = dutyStates[d.getNdx()].minNumOfAlternativeDutiesWoDh;
+////					if (maxNumOfAlternativeDuties < dutyStates[d.getNdx()].maxNumOfAlternativeDuties)
+////						maxNumOfAlternativeDuties = dutyStates[d.getNdx()].maxNumOfAlternativeDuties;
+////					if (maxNumOfAlternativeDutiesWoDh < dutyStates[d.getNdx()].maxNumOfAlternativeDutiesWoDh)
+////						maxNumOfAlternativeDutiesWoDh = dutyStates[d.getNdx()].maxNumOfAlternativeDutiesWoDh;
+//					totalNumOfAlternativeDuties += dutyStates[d.getNdx()].totalNumOfAlternativeDuties;
+//					totalNumOfAlternativeDutiesWoDh += dutyStates[d.getNdx()].totalNumOfAlternativeDutiesWoDh;
+//
+//					if (minNumOfAlternativeEffectiveDuties > dutyStates[d.getNdx()].minNumOfAlternativeEffectiveDuties)
+//						minNumOfAlternativeEffectiveDuties = dutyStates[d.getNdx()].minNumOfAlternativeEffectiveDuties;
+//					if (minNumOfAlternativeEffectiveDutiesWoDh > dutyStates[d.getNdx()].minNumOfAlternativeEffectiveDutiesWoDh)
+//						minNumOfAlternativeEffectiveDutiesWoDh = dutyStates[d.getNdx()].minNumOfAlternativeEffectiveDutiesWoDh;
+////					if (maxNumOfAlternativeEffectiveDuties < dutyStates[d.getNdx()].maxNumOfAlternativeEffectiveDuties)
+////						maxNumOfAlternativeEffectiveDuties = dutyStates[d.getNdx()].maxNumOfAlternativeEffectiveDuties;
+////					if (maxNumOfAlternativeEffectiveDutiesWoDh < dutyStates[d.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh)
+////						maxNumOfAlternativeEffectiveDutiesWoDh = dutyStates[d.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh;
+//					totalNumOfAlternativeEffectiveDuties += dutyStates[d.getNdx()].totalNumOfAlternativeEffectiveDuties;
+//					totalNumOfAlternativeEffectiveDutiesWoDh += dutyStates[d.getNdx()].totalNumOfAlternativeEffectiveDutiesWoDh;
+//
+//					difficultyScore += dutyStates[d.getNdx()].getDifficultyScore();
 //				}
 //				nodeQualityMetric = sourceDutyNodes[k];
-//				if (!nodeQualityMetric.getQual().hasTheSameValues(minNumOfAlternativeDuties, minNumOfAlternativeDutiesWoDh,
-//																	maxNumOfAlternativeDuties, maxNumOfAlternativeDutiesWoDh, 
-//																	totalNumOfAlternativeDuties, totalNumOfAlternativeDutiesWoDh)) {
+//				if (!nodeQualityMetric.getQual().hasTheSameValues(numOfDh, 
+//																	dhDurationInMins, 
+//																	activeBlocktimeInMins, 
+//																	numOfDuties, 
+//																	numOfLegs, 
+//																	minNumOfAlternativeDuties, 
+//																	minNumOfAlternativeDutiesWoDh, 
+////																	maxNumOfAlternativeDuties, 
+////																	maxNumOfAlternativeDutiesWoDh, 
+//																	totalNumOfAlternativeDuties, 
+//																	totalNumOfAlternativeDutiesWoDh, 
+//																	minNumOfAlternativeEffectiveDuties, 
+//																	minNumOfAlternativeEffectiveDutiesWoDh, 
+////																	maxNumOfAlternativeEffectiveDuties, 
+////																	maxNumOfAlternativeEffectiveDutiesWoDh, 
+//																	totalNumOfAlternativeEffectiveDuties, 
+//																	totalNumOfAlternativeEffectiveDutiesWoDh, 
+//																	difficultyScore)) {
 //					logger.error("!");
 //					logger.error(legToCover);
 //					logger.error(qualityMetric);
 //					logger.error(nodeQualityMetric);
 //					failedNodeNdxAltD = k;
+//					nodeQualityMetric.getQual().hasTheSameValues(numOfDh, 
+//																	dhDurationInMins, 
+//																	activeBlocktimeInMins, 
+//																	numOfDuties, 
+//																	numOfLegs, 
+//																	minNumOfAlternativeDuties, 
+//																	minNumOfAlternativeDutiesWoDh, 
+////																	maxNumOfAlternativeDuties, 
+////																	maxNumOfAlternativeDutiesWoDh, 
+//																	totalNumOfAlternativeDuties, 
+//																	totalNumOfAlternativeDutiesWoDh, 
+//																	minNumOfAlternativeEffectiveDuties, 
+//																	minNumOfAlternativeEffectiveDutiesWoDh, 
+////																	maxNumOfAlternativeEffectiveDuties, 
+////																	maxNumOfAlternativeEffectiveDutiesWoDh, 
+//																	totalNumOfAlternativeEffectiveDuties, 
+//																	totalNumOfAlternativeEffectiveDutiesWoDh, 
+//																	difficultyScore);
 //					break;
 //				}
 //			}
@@ -203,7 +290,7 @@ public class PairingGenerator {
 
 		    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
 
-		    			currentPair.pairQ.addToQualityMetricFw(d, dutyParams[d.getNdx()]);
+		    			currentPair.pairQ.addToQualityMetricFw(d, dutyStates[d.getNdx()]);
 		    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
 
 						if (d.isHbArr(this.hbNdx)) {
@@ -230,7 +317,7 @@ public class PairingGenerator {
 									Duty nd = nqm.getParent().getNodeOwner();
 
 									if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
-										currentPair.pairQ.addToQualityMetricFw(nd, dutyParams[nd.getNdx()]);
+										currentPair.pairQ.addToQualityMetricFw(nd, dutyStates[nd.getNdx()]);
 										pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, nd);
 										if (nd.isHbArr(this.hbNdx)) {
 											if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {

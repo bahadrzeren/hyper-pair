@@ -127,103 +127,97 @@ public class SolutionGenerator {
 					 * Checks DutyState state variables.
 					 * 
 					 */
-					int[] legsCoveringVector = new int[this.legs.size()];
-					for (int i = 0; i < solution.size(); i++) {
-						Pair pair = solution.get(i);
-						for (int j = 0; j < pair.getNumOfDuties(); j++) {
-							Duty duty = pair.getDuties().get(j);
-							for (int k = 0; k < duty.getNumOfLegs(); k++) {
-								Leg leg = duty.getLegs().get(k);
-								legsCoveringVector[leg.getNdx()]++;
-							}
-						}
-					}
+//					int[] legsCoveringVector = new int[this.legs.size()];
+//					for (int i = 0; i < solution.size(); i++) {
+//						Pair pair = solution.get(i);
+//						for (int j = 0; j < pair.getNumOfDuties(); j++) {
+//							Duty duty = pair.getDuties().get(j);
+//							for (int k = 0; k < duty.getNumOfLegs(); k++) {
+//								Leg leg = duty.getLegs().get(k);
+//								legsCoveringVector[leg.getNdx()]++;
+//							}
+//						}
+//					}
 
-					this.duties.forEach((d) -> {
-						if (d.isValid(this.hbNdx)
-								&& d.hasPairing(this.hbNdx)) {
-							DutyState ds = solutionState.getDutyStates()[d.getNdx()];
-							int numOfCoverings = 0;
-							int numOfCoveringsActive = 0;
-							int numOfCoveringsPassiveInt = 0;
-							int numOfCoveringsPassiveExt = 0;
-							int numOfDistinctCoverings = 0;
-							int numOfDistinctCoveringsActive = 0;
-							int numOfDistinctCoveringsPassive = 0;
-							int blockTimeOfCoverings = 0;
-							int blockTimeOfCoveringsActive = 0;
-							int blockTimeOfCoveringsPassiveInt = 0;
-							int blockTimeOfCoveringsPassiveExt = 0;
-							int blockTimeOfDistinctCoverings = 0;
-							int blockTimeOfDistinctCoveringsActive = 0;
-							int blockTimeOfDistinctCoveringsPassive = 0;
-
-//if (d.getNdx() == 818)
-//System.out.println();
-
-							for (int i = 0; i < d.getNumOfLegs(); i++) {
-								Leg l = d.getLegs().get(i);
-
-//if (l.getNdx() == 108)
-//System.out.println();
-
-								if (legsCoveringVector[l.getNdx()] > 0) {
-									numOfCoverings += legsCoveringVector[l.getNdx()];
-									blockTimeOfCoverings += legsCoveringVector[l.getNdx()] * l.getBlockTimeInMins();
-									numOfDistinctCoverings++;
-									blockTimeOfDistinctCoverings += l.getBlockTimeInMins();
-									if (l.isCover()) {
-										numOfCoveringsActive++;
-										blockTimeOfCoveringsActive += l.getBlockTimeInMins();
-										numOfDistinctCoveringsActive++;
-										blockTimeOfDistinctCoveringsActive += l.getBlockTimeInMins();
-										if (legsCoveringVector[l.getNdx()] > 1) {
-											numOfCoveringsPassiveInt += (legsCoveringVector[l.getNdx()] - 1);
-											blockTimeOfCoveringsPassiveInt += (legsCoveringVector[l.getNdx()] - 1) * l.getBlockTimeInMins();
-											numOfDistinctCoveringsPassive++;
-											blockTimeOfDistinctCoveringsPassive += l.getBlockTimeInMins();
-										}
-									} else {
-										numOfCoveringsPassiveExt += legsCoveringVector[l.getNdx()];
-										blockTimeOfCoveringsPassiveExt += legsCoveringVector[l.getNdx()] * l.getBlockTimeInMins();
-										numOfDistinctCoveringsPassive++;
-										blockTimeOfDistinctCoveringsPassive += l.getBlockTimeInMins();
-									}
-								}
-							}
-							if (!ds.stateVariablesAreOk(numOfCoverings, 
-														numOfCoveringsActive, 
-														numOfCoveringsPassiveInt, 
-														numOfCoveringsPassiveExt, 
-														numOfDistinctCoverings, 
-														numOfDistinctCoveringsActive, 
-														numOfDistinctCoveringsPassive, 
-														blockTimeOfCoverings, 
-														blockTimeOfCoveringsActive, 
-														blockTimeOfCoveringsPassiveInt, 
-														blockTimeOfCoveringsPassiveExt, 
-														blockTimeOfDistinctCoverings, 
-														blockTimeOfDistinctCoveringsActive, 
-														blockTimeOfDistinctCoveringsPassive)) {
-								logger.error("LegToCover: " + legToCover);
-								logger.error("DutyState values has not been set correctly for " + d);
-								ds.stateVariablesAreOk(numOfCoverings, 
-														numOfCoveringsActive, 
-														numOfCoveringsPassiveInt, 
-														numOfCoveringsPassiveExt, 
-														numOfDistinctCoverings, 
-														numOfDistinctCoveringsActive, 
-														numOfDistinctCoveringsPassive, 
-														blockTimeOfCoverings, 
-														blockTimeOfCoveringsActive, 
-														blockTimeOfCoveringsPassiveInt, 
-														blockTimeOfCoveringsPassiveExt, 
-														blockTimeOfDistinctCoverings, 
-														blockTimeOfDistinctCoveringsActive, 
-														blockTimeOfDistinctCoveringsPassive);
-							}
-						}
-					});
+//					this.duties.forEach((d) -> {
+//						if (d.isValid(this.hbNdx)
+//								&& d.hasPairing(this.hbNdx)) {
+//							DutyState ds = solutionState.getDutyStates()[d.getNdx()];
+//							int numOfCoverings = 0;
+//							int numOfCoveringsActive = 0;
+//							int numOfCoveringsPassiveInt = 0;
+//							int numOfCoveringsPassiveExt = 0;
+//							int numOfDistinctCoverings = 0;
+//							int numOfDistinctCoveringsActive = 0;
+//							int numOfDistinctCoveringsPassive = 0;
+//							int blockTimeOfCoverings = 0;
+//							int blockTimeOfCoveringsActive = 0;
+//							int blockTimeOfCoveringsPassiveInt = 0;
+//							int blockTimeOfCoveringsPassiveExt = 0;
+//							int blockTimeOfDistinctCoverings = 0;
+//							int blockTimeOfDistinctCoveringsActive = 0;
+//							int blockTimeOfDistinctCoveringsPassive = 0;
+//
+//							for (int i = 0; i < d.getNumOfLegs(); i++) {
+//								Leg l = d.getLegs().get(i);
+//
+//								if (legsCoveringVector[l.getNdx()] > 0) {
+//									numOfCoverings += legsCoveringVector[l.getNdx()];
+//									blockTimeOfCoverings += legsCoveringVector[l.getNdx()] * l.getBlockTimeInMins();
+//									numOfDistinctCoverings++;
+//									blockTimeOfDistinctCoverings += l.getBlockTimeInMins();
+//									if (l.isCover()) {
+//										numOfCoveringsActive++;
+//										blockTimeOfCoveringsActive += l.getBlockTimeInMins();
+//										numOfDistinctCoveringsActive++;
+//										blockTimeOfDistinctCoveringsActive += l.getBlockTimeInMins();
+//										if (legsCoveringVector[l.getNdx()] > 1) {
+//											numOfCoveringsPassiveInt += (legsCoveringVector[l.getNdx()] - 1);
+//											blockTimeOfCoveringsPassiveInt += (legsCoveringVector[l.getNdx()] - 1) * l.getBlockTimeInMins();
+//											numOfDistinctCoveringsPassive++;
+//											blockTimeOfDistinctCoveringsPassive += l.getBlockTimeInMins();
+//										}
+//									} else {
+//										numOfCoveringsPassiveExt += legsCoveringVector[l.getNdx()];
+//										blockTimeOfCoveringsPassiveExt += legsCoveringVector[l.getNdx()] * l.getBlockTimeInMins();
+//										numOfDistinctCoveringsPassive++;
+//										blockTimeOfDistinctCoveringsPassive += l.getBlockTimeInMins();
+//									}
+//								}
+//							}
+//							if (!ds.stateVariablesAreOk(numOfCoverings, 
+//														numOfCoveringsActive, 
+//														numOfCoveringsPassiveInt, 
+//														numOfCoveringsPassiveExt, 
+//														numOfDistinctCoverings, 
+//														numOfDistinctCoveringsActive, 
+//														numOfDistinctCoveringsPassive, 
+//														blockTimeOfCoverings, 
+//														blockTimeOfCoveringsActive, 
+//														blockTimeOfCoveringsPassiveInt, 
+//														blockTimeOfCoveringsPassiveExt, 
+//														blockTimeOfDistinctCoverings, 
+//														blockTimeOfDistinctCoveringsActive, 
+//														blockTimeOfDistinctCoveringsPassive)) {
+//								logger.error("LegToCover: " + legToCover);
+//								logger.error("DutyState values has not been set correctly for " + d);
+//								ds.stateVariablesAreOk(numOfCoverings, 
+//														numOfCoveringsActive, 
+//														numOfCoveringsPassiveInt, 
+//														numOfCoveringsPassiveExt, 
+//														numOfDistinctCoverings, 
+//														numOfDistinctCoveringsActive, 
+//														numOfDistinctCoveringsPassive, 
+//														blockTimeOfCoverings, 
+//														blockTimeOfCoveringsActive, 
+//														blockTimeOfCoveringsPassiveInt, 
+//														blockTimeOfCoveringsPassiveExt, 
+//														blockTimeOfDistinctCoverings, 
+//														blockTimeOfDistinctCoveringsActive, 
+//														blockTimeOfDistinctCoveringsPassive);
+//							}
+//						}
+//					});
 					/**
 					 * TEST BLOCK END
 					 * 

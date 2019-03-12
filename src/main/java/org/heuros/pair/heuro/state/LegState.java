@@ -105,4 +105,16 @@ public class LegState {
 				&& (this.numOfIncludingEffectiveDuties == numOfIncludingEffectiveDuties)
 				&& (this.numOfIncludingEffectiveDutiesWoDh == numOfIncludingEffectiveDutiesWoDh);
 	}
+
+	@Override
+	public String toString() {
+		return "numOfCoverings: " + numOfCoverings + 
+				", numOfIncludingDuties: " + numOfIncludingDuties + 
+				", numOfIncludingDutiesWoDh: " + numOfIncludingDutiesWoDh + 
+				", numOfIncludingEffectiveDuties: " + numOfIncludingEffectiveDuties + 
+				", numOfIncludingEffectiveDutiesWoDh: " + numOfIncludingEffectiveDutiesWoDh + 
+				", numOfIterations: " + numOfIterations + 
+				", heuristicModifierValue: " + heuristicModifierValue;
+		
+	}
 }

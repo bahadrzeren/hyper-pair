@@ -233,16 +233,16 @@ public class SolutionState {
 											dutyStates[dutieOfIndLeg.getNdx()].totalNumOfAlternativeEffectiveDuties--;
 											if (dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeEffectiveDuties > legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties)
 												dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeEffectiveDuties = legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties;
-											/*
-											 * TODO
-											 * 
-											 * This implementation does not guarantee to set exact maxNumOfAlternativeEffectiveDutiesWoDh.
-											 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
-											 * Therefore the number of legs that has the same maxNumOfAlternativeEffectiveDutiesWoDh might cause small disruptions.
-											 *  
-											 */
-											if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDuties <= legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties)
-												dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDuties = legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties;
+//											/*
+//											 * TODO
+//											 * 
+//											 * This implementation does not guarantee to set exact maxNumOfAlternativeEffectiveDutiesWoDh.
+//											 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
+//											 * Therefore the number of legs that has the same maxNumOfAlternativeEffectiveDutiesWoDh might cause small disruptions.
+//											 *  
+//											 */
+//											if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDuties <= legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties)
+//												dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDuties = legStates[indLeg.getNdx()].numOfIncludingEffectiveDuties;
 										}
 										if (isDhStateChanged) {
 											dutyStates[dutieOfIndLeg.getNdx()].totalNumOfAlternativeDutiesWoDh--;
@@ -250,29 +250,29 @@ public class SolutionState {
 												dutyStates[dutieOfIndLeg.getNdx()].totalNumOfAlternativeEffectiveDutiesWoDh--;
 												if (dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeEffectiveDutiesWoDh > legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh)
 													dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeEffectiveDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh;
-												/*
-												 * TODO
-												 * 
-												 * This implementation does not guarantee to set exact maxNumOfAlternativeEffectiveDutiesWoDh.
-												 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
-												 * Therefore the number of legs that has the same maxNumOfAlternativeEffectiveDutiesWoDh might cause small disruptions.
-												 *  
-												 */
-												if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh <= legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh)
-													dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh;
+//												/*
+//												 * TODO
+//												 * 
+//												 * This implementation does not guarantee to set exact maxNumOfAlternativeEffectiveDutiesWoDh.
+//												 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
+//												 * Therefore the number of legs that has the same maxNumOfAlternativeEffectiveDutiesWoDh might cause small disruptions.
+//												 *  
+//												 */
+//												if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh <= legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh)
+//													dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeEffectiveDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingEffectiveDutiesWoDh;
 											}
 											if (dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh > legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
 												dutyStates[dutieOfIndLeg.getNdx()].minNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
-											/*
-											 * TODO
-											 * 
-											 * This implementation does not guarantee to set exact maxNumOfAlternativeDutiesWoDh.
-											 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
-											 * Therefore the number of legs that has the same maxNumOfAlternativeDutiesWoDh might cause small disruptions.
-											 *  
-											 */
-											if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh <= legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
-												dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
+//											/*
+//											 * TODO
+//											 * 
+//											 * This implementation does not guarantee to set exact maxNumOfAlternativeDutiesWoDh.
+//											 * We did not want to make the code more complex by adding another state variable that is needed to be maintained during the iterations.
+//											 * Therefore the number of legs that has the same maxNumOfAlternativeDutiesWoDh might cause small disruptions.
+//											 *  
+//											 */
+//											if (dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh <= legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh)
+//												dutyStates[dutieOfIndLeg.getNdx()].maxNumOfAlternativeDutiesWoDh = legStates[indLeg.getNdx()].numOfIncludingDutiesWoDh;
 										}
 									}
 								}
