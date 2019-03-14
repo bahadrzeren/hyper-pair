@@ -11,7 +11,7 @@ public class HeurosSystemParam {
 	public static int maxPreDutySearchDeptInHours = 48;
 	public static int maxNetDutySearchDeptInHours = 24;
 
-	public static int maxDutyBlockTimeInMins = 60 * 10;
+	public static int maxDutyBlockTimeInMins = 60 * 8;	//	10;
 
 	public static int briefPeriodBeforeDutyHb = 60;
 	public static int briefPeriodBeforeDutyNonHb = 60;

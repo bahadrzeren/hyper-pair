@@ -77,27 +77,27 @@ public class DutyState {
 	 */
 	public double totalHeuristicModifiers = 0.0;
 
-	private double getInclusionScore() {
-		return ((LegState.weightInclusionScore / LegState.maxNumOfIncludingDuties)
-				* ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) * LegState.maxNumOfIncludingDuties - this.totalNumOfAlternativeDuties));
+	private double getTotalInclusionScore() {
+		return this.associatedDuty.getNumOfLegsActive() 
+				- ((LegState.weightInclusionScore * this.totalNumOfAlternativeDuties) / LegState.maxNumOfIncludingDuties);
 	}
 
-	private double getInclusionScoreWoDh() {
-		return ((LegState.weightInclusionScoreWoDh / LegState.maxNumOfIncludingDutiesWoDh)
-				* ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) * LegState.maxNumOfIncludingDutiesWoDh - this.totalNumOfAlternativeDutiesWoDh));
+	private double getTotalInclusionScoreWoDh() {
+		return (this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive)
+				- ((LegState.weightInclusionScoreWoDh * this.totalNumOfAlternativeDutiesWoDh) / LegState.maxNumOfIncludingDutiesWoDh);
 	}
 
-	private double getEffectiveInclusionScore() {
-		return ((LegState.weightEffectiveInclusionScore / LegState.maxNumOfIncludingEffectiveDuties)
-				* ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) * LegState.maxNumOfIncludingEffectiveDuties - this.totalNumOfAlternativeEffectiveDuties));
+	private double getTotalEffectiveInclusionScore() {
+		return this.associatedDuty.getNumOfLegsActive()
+				- ((LegState.weightEffectiveInclusionScore * this.totalNumOfAlternativeEffectiveDuties) / LegState.maxNumOfIncludingEffectiveDuties);
 	}
 
-	private double getEffectiveInclusionScoreWoDh() {
-		return ((LegState.weightEffectiveInclusionScoreWoDh / LegState.maxNumOfIncludingEffectiveDutiesWoDh)
-				* ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) * LegState.maxNumOfIncludingEffectiveDutiesWoDh - this.totalNumOfAlternativeEffectiveDutiesWoDh));
+	private double getTotalEffectiveInclusionScoreWoDh() {
+		return (this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive)
+				- ((LegState.weightEffectiveInclusionScoreWoDh * this.totalNumOfAlternativeEffectiveDutiesWoDh) / LegState.maxNumOfIncludingEffectiveDutiesWoDh);
 	}
 
-	private double getHeuristicModifierScore() {
+	private double getTotalHeuristicModifierScore() {
 		if (LegState.maxHeuristicModifierValue > 0.0) {
 			return (this.totalHeuristicModifiers * LegState.weightHeuristicModifier / LegState.maxHeuristicModifierValue);
 		} else {
@@ -107,11 +107,11 @@ public class DutyState {
 
 	public double getDifficultyScore() {
 		if ((this.associatedDuty.getNumOfLegsActive() - this.numOfCoveringsActive) > 0) {
-			return this.getInclusionScore()
-					+ this.getInclusionScoreWoDh()
-					+ this.getEffectiveInclusionScore()
-					+ this.getEffectiveInclusionScoreWoDh()
-					+ this.getHeuristicModifierScore();
+			return this.getTotalInclusionScore()
+					+ this.getTotalInclusionScoreWoDh()
+					+ this.getTotalEffectiveInclusionScore()
+					+ this.getTotalEffectiveInclusionScoreWoDh()
+					+ this.getTotalHeuristicModifierScore();
 		} else {
 			return 0.0;
 		}

@@ -261,13 +261,12 @@ public class HyperPair {
 																				.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
 			pricingNetwork.buildNetwork();
 
-			PairingGenerator pairingGenerator = new PairingGenerator(HeurosSystemParam.maxPairingLengthInDays,
-																		HeurosSystemParam.maxDutyBlockTimeInMins)
-//																			.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
-																			.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-																			.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-																			.setPricingNetwork(pricingNetwork)
-																			.setDutyRepository(pairOptimizationContext.getDutyRepository());
+			PairingGenerator pairingGenerator = new PairingGenerator()
+//																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
+																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
+																	.setPricingNetwork(pricingNetwork)
+																	.setDutyRepository(pairOptimizationContext.getDutyRepository());
 
 			HyperChromoDecoder pairChromosomeDecoder = new HyperChromoDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())

@@ -57,19 +57,19 @@ public class LegState {
 	public static double weightHeuristicModifier = 0.5;
 
 	private double getInclusionScore() {
-		return (weightInclusionScore * (LegState.maxNumOfIncludingDuties - this.numOfIncludingDuties)) / LegState.maxNumOfIncludingDuties;
+		return (weightInclusionScore * (1.0 - (1.0 * this.numOfIncludingDuties / LegState.maxNumOfIncludingDuties)));
 	}
 
 	private double getInclusionScoreWoDh() {
-		return (weightInclusionScoreWoDh * (LegState.maxNumOfIncludingDutiesWoDh - this.numOfIncludingDutiesWoDh)) / LegState.maxNumOfIncludingDutiesWoDh;
+		return (weightInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingDutiesWoDh / LegState.maxNumOfIncludingDutiesWoDh)));
 	}
 
 	private double getEffectiveInclusionScore() {
-		return (weightEffectiveInclusionScore * (LegState.maxNumOfIncludingEffectiveDuties - this.numOfIncludingEffectiveDuties)) / LegState.maxNumOfIncludingEffectiveDuties;
+		return (weightEffectiveInclusionScore * (1.0 - (1.0 * this.numOfIncludingEffectiveDuties / LegState.maxNumOfIncludingEffectiveDuties)));
 	}
 
 	private double getEffectiveInclusionScoreWoDh() {
-		return (weightEffectiveInclusionScoreWoDh * (LegState.maxNumOfIncludingEffectiveDutiesWoDh - this.numOfIncludingEffectiveDutiesWoDh)) / LegState.maxNumOfIncludingEffectiveDutiesWoDh;
+		return (weightEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectiveDutiesWoDh / LegState.maxNumOfIncludingEffectiveDutiesWoDh)));
 	}
 
 	private double getHeuristicModifierScore() {
@@ -83,6 +83,13 @@ public class LegState {
 	public double getDifficultyScoreOfTheLeg() {
 		if (this.associatedLeg.isCover()
 				&& (this.numOfCoverings == 0)) {
+//			double v1 = this.getInclusionScore();
+//			double v2 = this.getInclusionScoreWoDh();
+//			double v3 = this.getEffectiveInclusionScore();
+//			double v4 = this.getEffectiveInclusionScoreWoDh();
+//			double v5 = this.getHeuristicModifierScore();
+//if (v1 + v2 + v3 + v4 + v5 > 1.0)
+//System.out.println();
 			return this.getInclusionScore()
 					+ this.getInclusionScoreWoDh()
 					+ this.getEffectiveInclusionScore()

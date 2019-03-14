@@ -9,6 +9,7 @@ import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
+import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.DutyState;
 import org.heuros.rule.PairRuleContext;
 
@@ -20,8 +21,6 @@ public class PairingGenerator {
 	 * TODO Single base assumption!!!
 	 */
 	private int hbNdx = 0;
-	private int maxPairingLengthInDays = 0;
-	private int maxDutyBlockTimeInMins = 0;
 
 	private PairRuleContext pairRuleContext = null;
 
@@ -30,10 +29,7 @@ public class PairingGenerator {
 
 	private List<Duty> duties = null;
 
-	public PairingGenerator(int maxPairingLengthInDays,
-							int maxDutyBlockTimeInMins) {
-		this.maxPairingLengthInDays = maxPairingLengthInDays;
-		this.maxDutyBlockTimeInMins = maxDutyBlockTimeInMins;
+	public PairingGenerator() {
 	}
 
 	public PairingGenerator setPairRuleContext(PairRuleContext pairRuleContext) {
@@ -85,10 +81,7 @@ public class PairingGenerator {
 //if (legToCover.getNdx() == 5831)
 //System.out.println();
 
-			NetworkExplorer networkExplorer = new NetworkExplorer(this.duties, 
-																		this.maxPairingLengthInDays, 
-																		this.maxDutyBlockTimeInMins,
-																		this.dutyLegOvernightConnNetwork)
+			NetworkExplorer networkExplorer = new NetworkExplorer(this.duties, this.dutyLegOvernightConnNetwork)
 													.build(legToCover, 
 															coveringDuties, 
 															heuristicNo, 
@@ -311,7 +304,7 @@ public class PairingGenerator {
 							 */
 							if (this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair)) {
 
-								int dept = this.maxPairingLengthInDays - 1;
+								int dept = HeurosSystemParam.maxPairingLengthInDays - 1;
 								while (nqm.getNextNodeMetric() != null) {
 									nqm = nqm.getNextNodeMetric();
 									Duty nd = nqm.getParent().getNodeOwner();

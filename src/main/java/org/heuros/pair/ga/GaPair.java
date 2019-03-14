@@ -261,12 +261,10 @@ public class GaPair {
 																				.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
 			pricingNetwork.buildNetwork();
 
-			PairingGenerator pairingGenerator = new PairingGenerator(HeurosSystemParam.maxPairingLengthInDays,
-																		HeurosSystemParam.maxDutyBlockTimeInMins)
-																			.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-																			.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-																			.setPricingNetwork(pricingNetwork)
-																			.setDutyRepository(pairOptimizationContext.getDutyRepository());
+			PairingGenerator pairingGenerator = new PairingGenerator().setPairRuleContext(pairOptimizationContext.getPairRuleContext())
+																		.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
+																		.setPricingNetwork(pricingNetwork)
+																		.setDutyRepository(pairOptimizationContext.getDutyRepository());
 
 			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())

@@ -10,6 +10,7 @@ import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
+import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.DutyState;
 
 public class NetworkExplorer {
@@ -22,8 +23,6 @@ public class NetworkExplorer {
 	private int hbNdx = 0;
 
 	private List<Duty> duties = null;
-	private int maxPairingLengthInDays = 0;
-	private int maxDutyBlockTimeInMins = 0;
 
 	private OneDimIndexInt<Duty> dutyIndexByDepLegNdx = null;
 	private OneDimIndexInt<Duty> dutyIndexByArrLegNdx = null;
@@ -57,8 +56,6 @@ public class NetworkExplorer {
 	private int maxBwDeptReached = Integer.MAX_VALUE;
 
 	public NetworkExplorer(List<Duty> duties,
-								int maxPairingLengthInDays,
-								int maxDutyBlockTimeInMins, 
 								DutyLegOvernightConnNetwork pricingNetwork) {
 		this.duties = duties;
 		this.sourceDuties = new boolean[this.duties.size()];
@@ -67,10 +64,8 @@ public class NetworkExplorer {
 
 		this.bestNodeQuality = new NodeQualityVector[this.duties.size()];
 
-		this.maxPairingLengthInDays = maxPairingLengthInDays;
-		this.maxFwDeptReached = maxPairingLengthInDays;
-		this.maxBwDeptReached = maxPairingLengthInDays;
-		this.maxDutyBlockTimeInMins = maxDutyBlockTimeInMins;
+		this.maxFwDeptReached = HeurosSystemParam.maxPairingLengthInDays;
+		this.maxBwDeptReached = HeurosSystemParam.maxPairingLengthInDays;
 
 		this.dutyIndexByDepLegNdx = pricingNetwork.getDutyIndexByDepLegNdx();
 		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
@@ -282,13 +277,13 @@ public class NetworkExplorer {
 						/*
 						 * Because of having no connection duties we must add qualityMetric here for 1day pairings.
 						 */
-						this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(maxPairingLengthInDays, duty, cumulativeQual);
+						this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(HeurosSystemParam.maxPairingLengthInDays, duty, cumulativeQual);
 						this.addSourceDuty(heuristicNo, duty, false);
 						hbArrFound[duty.getNdx()] = true;
 					} else 
 						if (heuristicNo > 0) {
-							maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(this.maxPairingLengthInDays);
-							if (this.fwNetworkSearch(duty, cumulativeQual, true, maxMinDateDept, this.maxPairingLengthInDays - 1)) {
+							maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
+							if (this.fwNetworkSearch(duty, cumulativeQual, true, maxMinDateDept, HeurosSystemParam.maxPairingLengthInDays - 1)) {
 								this.addSourceDuty(heuristicNo, duty, false);
 								hbArrFound[duty.getNdx()] = true;
 							}
@@ -296,22 +291,22 @@ public class NetworkExplorer {
 				} else
 					if (heuristicNo > 0) {
 						if (duty.isHbArr(this.hbNdx)) {
-							maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(this.maxPairingLengthInDays - 1);
-							this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(maxPairingLengthInDays, duty, cumulativeQual);
-//							if (this.bwNetworkSearch(duty, true, maxMinDateDept, this.maxPairingLengthInDays)) {
+							maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(HeurosSystemParam.maxPairingLengthInDays - 1);
+							this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(HeurosSystemParam.maxPairingLengthInDays, duty, cumulativeQual);
+//							if (this.bwNetworkSearch(duty, true, maxMinDateDept, HeurosSystemParam.maxPairingLengthInDays)) {
 //								hbArrFound[duty.getNdx()] = true;
 //							}
-							treeOfBwDuties.add(new BwRootNodeInfo(duty, maxMinDateDept, this.maxPairingLengthInDays).initRootNode());
+							treeOfBwDuties.add(new BwRootNodeInfo(duty, maxMinDateDept, HeurosSystemParam.maxPairingLengthInDays).initRootNode());
 						} else {
-							maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(this.maxPairingLengthInDays - 1);
-							if (this.fwNetworkSearch(duty, cumulativeQual, false, maxMinDateDept, this.maxPairingLengthInDays - 2)) {
+							maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays - 1);
+							if (this.fwNetworkSearch(duty, cumulativeQual, false, maxMinDateDept, HeurosSystemParam.maxPairingLengthInDays - 2)) {
 								hbArrFound[duty.getNdx()] = true;
-								maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(this.maxPairingLengthInDays - 2);
+								maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(HeurosSystemParam.maxPairingLengthInDays - 2);
 //								/*
 //								 * We need to use the best quality metric that is found for the root duty so far.
 //								 */
-//								this.bwNetworkSearch(duty, false, maxMinDateDept, this.maxPairingLengthInDays - 1);
-								treeOfBwDuties.add(new BwRootNodeInfo(duty, maxMinDateDept, this.maxPairingLengthInDays - 1).initRootNode());
+//								this.bwNetworkSearch(duty, false, maxMinDateDept, HeurosSystemParam.maxPairingLengthInDays - 1);
+								treeOfBwDuties.add(new BwRootNodeInfo(duty, maxMinDateDept, HeurosSystemParam.maxPairingLengthInDays - 1).initRootNode());
 							}
 						}
 					}
@@ -363,14 +358,14 @@ public class NetworkExplorer {
 		 * HB arr duty
 		 */
 		if (nQv == null) {
-			nQv = new NodeQualityVector(maxPairingLengthInDays, nd, dps[nd.getNdx()]);
+			nQv = new NodeQualityVector(HeurosSystemParam.maxPairingLengthInDays, nd, dps[nd.getNdx()]);
 			this.bestNodeQuality[nd.getNdx()] = nQv;
 		}
 		/*
 		 * Non HB arr duty
 		 */
 		if (pQv == null) {
-			pQv = new NodeQualityVector(this.heuristicNo, maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
+			pQv = new NodeQualityVector(this.heuristicNo, HeurosSystemParam.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
 			this.bestNodeQuality[pd.getNdx()] = pQv;
 		} else {
 			pQv.checkAndMerge(this.heuristicNo, nQv);
@@ -427,7 +422,7 @@ public class NetworkExplorer {
 								if (!this.isNodeVisitedFw(nd, dept, maxMinDateDept)) {
 									fwCumulative.addToQualityMetricFw(nd, dps[nd.getNdx()]);
 									if ((sourceNodeQmArray.length == 0)
-													|| fwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, heuristicNo, dept, sourceNodeQmArray[0].getQual())) {
+													|| fwCumulative.doesItWorthToGoDeeper(dept, sourceNodeQmArray[0].getQual())) {
 										if (this.fwNetworkSearch(nd, fwCumulative, hbDep, maxMinDateDept, dept - 1)) {
 											this.fwRegister(pd, nd);
 											res = true;
@@ -477,7 +472,7 @@ public class NetworkExplorer {
 		NodeQualityVector nQv = this.bestNodeQuality[nd.getNdx()];
 		NodeQualityVector pQv = this.bestNodeQuality[pd.getNdx()];
 		if (pQv == null) {
-			pQv = new NodeQualityVector(this.heuristicNo, this.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
+			pQv = new NodeQualityVector(this.heuristicNo, HeurosSystemParam.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
 			this.bestNodeQuality[pd.getNdx()] = pQv;
 		} else {
 			res = pQv.checkAndMerge(this.heuristicNo, nQv);
@@ -505,7 +500,7 @@ public class NetworkExplorer {
 			 * RootDuty.QualVector[X, X, Q, X]
 			 * 
 			 */
-			while (bestNodeQuality[duty.getNdx()].getQuals()[maxPairingLengthInDays - this.maxDept] == null) {
+			while (bestNodeQuality[duty.getNdx()].getQuals()[HeurosSystemParam.maxPairingLengthInDays - this.maxDept] == null) {
 				this.maxDept--;
 			}
 			setNodeVisitedBw(this.duty, this.maxDept, this.maxMinDateDept);
@@ -557,19 +552,16 @@ public class NetworkExplorer {
 									this.bwRegister(pd, ndInfo.duty);
 									this.setNodeVisitedBw(pd, dept, ndInfo.maxMinDateDept);
 								} else {
-									bwCumulative.injectValues(this.bestNodeQuality[ndInfo.duty.getNdx()].getQuals()[maxPairingLengthInDays - dept - 1].getQual());
+									bwCumulative.injectValues(this.bestNodeQuality[ndInfo.duty.getNdx()].getQuals()[HeurosSystemParam.maxPairingLengthInDays - dept - 1].getQual());
 									bwCumulative.addToQualityMetricBw(pd, dps[pd.getNdx()]);
 
 									if ((bestNodeQuality[pd.getNdx()] == null)
-											|| (bestNodeQuality[pd.getNdx()].getQuals()[maxPairingLengthInDays - dept] == null)
-											|| bwCumulative.isBetterThan(this.heuristicNo, bestNodeQuality[pd.getNdx()].getQuals()[maxPairingLengthInDays - dept].getQual())
+											|| (bestNodeQuality[pd.getNdx()].getQuals()[HeurosSystemParam.maxPairingLengthInDays - dept] == null)
+											|| bwCumulative.isBetterThan(this.heuristicNo, bestNodeQuality[pd.getNdx()].getQuals()[HeurosSystemParam.maxPairingLengthInDays - dept].getQual())
 											) {
 
 										if ((sourceNodeQmArray.length == 0)
-												|| bwCumulative.doesItWorthToGoDeeper(this.maxDutyBlockTimeInMins, 
-																						heuristicNo, 
-																						dept, 
-																						sourceNodeQmArray[0].getQual())) {
+												|| bwCumulative.doesItWorthToGoDeeper(dept, sourceNodeQmArray[0].getQual())) {
 											this.bwRegister(pd, ndInfo.duty);
 											this.setNodeVisitedBw(pd, dept, ndInfo.maxMinDateDept);
 											treeOfDuties.add(new BwRootNodeInfo(pd, ndInfo.maxMinDateDept, dept));

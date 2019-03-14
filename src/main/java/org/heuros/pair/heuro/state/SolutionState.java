@@ -363,7 +363,8 @@ public class SolutionState {
 			for (int j = 0; j < p.getNumOfDuties(); j++) {
 				Duty d = p.getDuties().get(j);
 
-				double numOfCoveringsPassive = dutyStates[d.getNdx()].numOfCoveringsPassiveExt + dutyStates[d.getNdx()].numOfCoveringsPassiveInt / 2.0;	//	l.getBlockTimeInMins()
+				double numOfCoveringsPassive = dutyStates[d.getNdx()].numOfCoveringsPassiveExt + dutyStates[d.getNdx()].numOfCoveringsPassiveInt;	//	l.getBlockTimeInMins()
+
 				fitness += numOfCoveringsPassive;
 
 				dutyStates[d.getNdx()].totalHeuristicModifiers = 0.0;
