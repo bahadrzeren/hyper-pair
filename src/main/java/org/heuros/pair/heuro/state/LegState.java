@@ -124,11 +124,15 @@ public class LegState {
 	public double getDifficultyScoreOfTheLeg() {
 		if (this.associatedLeg.isCover()
 				&& (this.numOfCoverings == 0)) {
-//			double v1 = this.getInclusionScore();
-//			double v2 = this.getInclusionScoreWoDh();
-//			double v3 = this.getEffectiveInclusionScore();
-//			double v4 = this.getEffectiveInclusionScoreWoDh();
-//			double v5 = this.getHeuristicModifierScore();
+			double v1 = this.getDutyInclusionScore();
+			double v2 = this.getDutyInclusionScoreWoDh();
+			double v3 = this.getDutyEffectiveInclusionScore();
+			double v4 = this.getDutyEffectiveInclusionScoreWoDh();
+			double v5 = this.getPairInclusionScore();
+			double v6 = this.getPairInclusionScoreWoDh();
+			double v7 = this.getPairEffectiveInclusionScore();
+			double v8 = this.getPairEffectiveInclusionScoreWoDh();
+			double v9 = this.getHeuristicModifierScore();
 //if (v1 + v2 + v3 + v4 + v5 > 1.0)
 //System.out.println();
 			return this.getDutyInclusionScore()

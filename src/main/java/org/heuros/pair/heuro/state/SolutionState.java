@@ -60,6 +60,11 @@ public class SolutionState {
 		LegState.maxNumOfIncludingDutiesWoDh = 0;
 		LegState.maxNumOfIncludingEffectiveDuties = 0;
 		LegState.maxNumOfIncludingEffectiveDutiesWoDh = 0;
+		LegState.maxNumOfIncludingPairs = 0;
+		LegState.maxNumOfIncludingPairsWoDh = 0;
+		LegState.maxNumOfIncludingEffectivePairs = 0;
+		LegState.maxNumOfIncludingEffectivePairsWoDh = 0;
+
 		LegState.maxHeuristicModifierValue = 0.0;
 		for (int j = 0; j < legStates.length; j++) {
 			if (LegState.maxNumOfIncludingDuties < this.legStates[j].numOfIncludingDuties)
@@ -70,6 +75,16 @@ public class SolutionState {
 				LegState.maxNumOfIncludingEffectiveDuties = this.legStates[j].numOfIncludingEffectiveDuties;
 			if (LegState.maxNumOfIncludingEffectiveDutiesWoDh < this.legStates[j].numOfIncludingEffectiveDutiesWoDh)
 				LegState.maxNumOfIncludingEffectiveDutiesWoDh = this.legStates[j].numOfIncludingEffectiveDutiesWoDh;
+
+			if (LegState.maxNumOfIncludingPairs < this.legStates[j].numOfIncludingPairs)
+				LegState.maxNumOfIncludingPairs = this.legStates[j].numOfIncludingPairs;
+			if (LegState.maxNumOfIncludingPairsWoDh < this.legStates[j].numOfIncludingPairsWoDh)
+				LegState.maxNumOfIncludingPairsWoDh = this.legStates[j].numOfIncludingPairsWoDh;
+			if (LegState.maxNumOfIncludingEffectivePairs < this.legStates[j].numOfIncludingEffectivePairs)
+				LegState.maxNumOfIncludingEffectivePairs = this.legStates[j].numOfIncludingEffectivePairs;
+			if (LegState.maxNumOfIncludingEffectivePairsWoDh < this.legStates[j].numOfIncludingEffectivePairsWoDh)
+				LegState.maxNumOfIncludingEffectivePairsWoDh = this.legStates[j].numOfIncludingEffectivePairsWoDh;
+
 			if (LegState.maxHeuristicModifierValue < this.legStates[j].heuristicModifierValue)
 				LegState.maxHeuristicModifierValue = this.legStates[j].heuristicModifierValue;
 		}

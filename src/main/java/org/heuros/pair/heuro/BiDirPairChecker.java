@@ -117,29 +117,29 @@ public class BiDirPairChecker implements Callable<Boolean> {
 							}
 						}
 					}
-				} else
-					if (duty.isHbArr(this.hbNdx)) {
-						maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(HeurosSystemParam.maxPairingLengthInDays - 1);
-						Leg[] pls = this.prevDebriefLegIndexByDutyNdx.getArray(duty.getNdx());
-						for (Leg pl : pls) {
-							Duty[] pds = this.dutyIndexByArrLegNdx.getArray(pl.getNdx());
-							for (Duty pd : pds) {
-								if (pd.isHbDep(this.hbNdx)
-										&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
-												|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))) {
-									pairing[1] = pd;
-									numOfDhs += pd.getNumOfLegsPassive();
-									totalActiveBlockTime += pd.getBlockTimeInMinsActive();
-									setIncludingPairings(pairing, 2, numOfDhs, totalActiveBlockTime);
-									numOfDhs -= pd.getNumOfLegsPassive();
-									totalActiveBlockTime -= pd.getBlockTimeInMinsActive();
-									pairing[1] = null;
-									numOfProbablePairings++;
-								}
-							}
-						}
-					} else {
-						//	Not implemented!
+//				} else
+//					if (duty.isHbArr(this.hbNdx)) {
+//						maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(HeurosSystemParam.maxPairingLengthInDays - 1);
+//						Leg[] pls = this.prevDebriefLegIndexByDutyNdx.getArray(duty.getNdx());
+//						for (Leg pl : pls) {
+//							Duty[] pds = this.dutyIndexByArrLegNdx.getArray(pl.getNdx());
+//							for (Duty pd : pds) {
+//								if (pd.isHbDep(this.hbNdx)
+//										&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
+//												|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))) {
+//									pairing[1] = pd;
+//									numOfDhs += pd.getNumOfLegsPassive();
+//									totalActiveBlockTime += pd.getBlockTimeInMinsActive();
+//									setIncludingPairings(pairing, 2, numOfDhs, totalActiveBlockTime);
+//									numOfDhs -= pd.getNumOfLegsPassive();
+//									totalActiveBlockTime -= pd.getBlockTimeInMinsActive();
+//									pairing[1] = null;
+//									numOfProbablePairings++;
+//								}
+//							}
+//						}
+//					} else {
+//						//	Not implemented!
 					}
 			}
 		}

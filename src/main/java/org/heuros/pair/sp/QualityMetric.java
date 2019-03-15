@@ -396,10 +396,14 @@ public class QualityMetric {
 	}
 
 	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
+
+//if ((!theLast) && (this.numOfDuties != qm.numOfDuties))
+//System.out.println();
+
 		if ((qm.numOfLegs == 0) || (this.numOfDh < qm.numOfDh)
 
-//				|| ((this.numOfDh == qm.numOfDh) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
-//				|| ((this.numOfDh == qm.numOfDh) && (this.getAvgActiveBlockTimePerDuty() == qm.getAvgActiveBlockTimePerDuty()) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
+				|| ((this.numOfDh == qm.numOfDh) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
+				|| ((this.numOfDh == qm.numOfDh) && (this.getAvgActiveBlockTimePerDuty() == qm.getAvgActiveBlockTimePerDuty()) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
 
 //				|| ((this.numOfDh == qm.numOfDh) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
 
@@ -411,8 +415,8 @@ public class QualityMetric {
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgDifficultyScorePerDuty() > qm.getAvgDifficultyScorePerDuty()))
 
-				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
-				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
+//				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
+//				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
 
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDhCriticalDuties < qm.numOfDhCriticalDuties))
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDhCriticalDuties == qm.numOfDhCriticalDuties) && (this.numOfDuties < qm.numOfDuties))
