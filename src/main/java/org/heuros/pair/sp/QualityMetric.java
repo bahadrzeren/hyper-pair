@@ -1,6 +1,6 @@
 package org.heuros.pair.sp;
 
-import org.heuros.data.model.DutyView;
+import org.heuros.data.model.Duty;
 import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.DutyState;
 
@@ -47,9 +47,9 @@ public class QualityMetric {
 //		return (1.0 * this.totalNumOfAlternativeDutiesWoDh) / this.numOfDuties;
 //	}
 
-	private double getAvgDifficultyScorePerDuty() {
-		return this.totalDifficultyScore / this.numOfDuties;
-	}
+//	private double getAvgDifficultyScorePerDuty() {
+//		return this.totalDifficultyScore / this.numOfDuties;
+//	}
 
 	private double getAvgActiveBlockTimePerDuty() {
 		return (1.0 * this.activeBlocktimeInMins) / this.numOfDuties;
@@ -103,7 +103,7 @@ public class QualityMetric {
 		this.totalDifficultyScore = qmToCopy.totalDifficultyScore;
 	}
 
-	public QualityMetric(DutyView d,
+	public QualityMetric(Duty d,
 							DutyState dp) {
 		this.numOfDh = (d.getNumOfLegsPassive() + dp.numOfCoverings);
 		this.dhDurationInMins = (d.getBlockTimeInMinsPassive() + dp.blockTimeOfCoverings);
@@ -207,7 +207,7 @@ public class QualityMetric {
 	 * @param d
 	 * @param dp
 	 */
-	public void addToQualityMetricFw(DutyView d,
+	public void addToQualityMetricFw(Duty d,
 									DutyState dp) {
 		/*
 		 * TODO
@@ -258,7 +258,7 @@ public class QualityMetric {
 	}
 
 
-	public void addToQualityMetricBw(DutyView d,
+	public void addToQualityMetricBw(Duty d,
 										DutyState dp) {
 		this.numOfDh += (d.getNumOfLegsPassive() + dp.numOfCoverings);
 		this.dhDurationInMins += (d.getBlockTimeInMinsPassive() + dp.blockTimeOfCoverings);
@@ -343,8 +343,8 @@ public class QualityMetric {
 		this.totalDifficultyScore += leadingDutyQm.totalDifficultyScore;
 	}
 
-	public void removeLastDutyQualityMetric(DutyView d,
-										DutyState dp) {
+	public void removeLastDutyQualityMetric(Duty d,
+											DutyState dp) {
 		this.numOfDh -= (d.getNumOfLegsPassive() + dp.numOfCoverings);
 		this.dhDurationInMins -= (d.getBlockTimeInMinsPassive() + dp.blockTimeOfCoverings);
 		this.activeBlocktimeInMins -= (d.getBlockTimeInMinsActive() - dp.blockTimeOfCoveringsActive);
@@ -398,9 +398,12 @@ public class QualityMetric {
 	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
 		if ((qm.numOfLegs == 0) || (this.numOfDh < qm.numOfDh)
 
+//				|| ((this.numOfDh == qm.numOfDh) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
+//				|| ((this.numOfDh == qm.numOfDh) && (this.getAvgActiveBlockTimePerDuty() == qm.getAvgActiveBlockTimePerDuty()) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
+
 //				|| ((this.numOfDh == qm.numOfDh) && (this.totalNumOfAlternativeDutiesWoDh < qm.totalNumOfAlternativeDutiesWoDh))
 
-				|| ((this.numOfDh == qm.numOfDh) && (this.getAvgDifficultyScorePerDuty() > qm.getAvgDifficultyScorePerDuty()))
+//				|| ((this.numOfDh == qm.numOfDh) && (this.getAvgDifficultyScorePerDuty() > qm.getAvgDifficultyScorePerDuty()))
 
 //				|| ((this.numOfDh == qm.numOfDh) && (this.minNumOfAlternativeDutiesWoDh < qm.minNumOfAlternativeDutiesWoDh))
 //				|| ((this.numOfDh == qm.numOfDh) && (this.minNumOfAlternativeDutiesWoDh == qm.minNumOfAlternativeDutiesWoDh) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
@@ -408,8 +411,8 @@ public class QualityMetric {
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgDifficultyScorePerDuty() > qm.getAvgDifficultyScorePerDuty()))
 
-//				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
-//				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
+				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties < qm.numOfDuties))
+				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDuties == qm.numOfDuties) && (this.getAvgActiveBlockTimePerDuty() > qm.getAvgActiveBlockTimePerDuty()))
 
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDhCriticalDuties < qm.numOfDhCriticalDuties))
 //				|| ((this.numOfDh == qm.numOfDh) && (this.numOfDhCriticalDuties == qm.numOfDhCriticalDuties) && (this.numOfDuties < qm.numOfDuties))

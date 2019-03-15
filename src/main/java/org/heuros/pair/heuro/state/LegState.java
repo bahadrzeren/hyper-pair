@@ -8,6 +8,12 @@ public class LegState {
 	public static int maxNumOfIncludingDutiesWoDh = 0;
 	public static int maxNumOfIncludingEffectiveDuties = 0;
 	public static int maxNumOfIncludingEffectiveDutiesWoDh = 0;
+
+	public static int maxNumOfIncludingPairs = 0;
+	public static int maxNumOfIncludingPairsWoDh = 0;
+	public static int maxNumOfIncludingEffectivePairs = 0;
+	public static int maxNumOfIncludingEffectivePairsWoDh = 0;
+
 	public static double maxHeuristicModifierValue = 0.0;
 
 	private Leg associatedLeg = null;
@@ -25,12 +31,21 @@ public class LegState {
 	public int numOfIncludingEffectiveDuties = 0;
 	public int numOfIncludingEffectiveDutiesWoDh = 0;
 
+	public int numOfIncludingPairs = 0;
+	public int numOfIncludingPairsWoDh = 0;
+	public int numOfIncludingEffectivePairs = 0;
+	public int numOfIncludingEffectivePairsWoDh = 0;
+
 	private void resetForNewIteration() {
 		this.numOfCoverings = 0;
 		this.numOfIncludingDuties = 0;
 		this.numOfIncludingDutiesWoDh = 0;
 		this.numOfIncludingEffectiveDuties = 0;
 		this.numOfIncludingEffectiveDutiesWoDh = 0;
+		this.numOfIncludingPairs = 0;
+		this.numOfIncludingPairsWoDh = 0;
+		this.numOfIncludingEffectivePairs = 0;
+		this.numOfIncludingEffectivePairsWoDh = 0;
 	}
 
 	public void initializeForNewIteration(Leg leg) {
@@ -39,6 +54,10 @@ public class LegState {
 		this.numOfIncludingDutiesWoDh = leg.getNumOfIncludingDutiesWoDh();
 		this.numOfIncludingEffectiveDuties = leg.getNumOfIncludingEffectiveDuties();
 		this.numOfIncludingEffectiveDutiesWoDh = leg.getNumOfIncludingEffectiveDutiesWoDh();
+		this.numOfIncludingPairs = leg.getNumOfIncludingPairs();
+		this.numOfIncludingPairsWoDh = leg.getNumOfIncludingPairsWoDh();
+		this.numOfIncludingEffectivePairs = leg.getNumOfIncludingEffectivePairs();
+		this.numOfIncludingEffectivePairsWoDh = leg.getNumOfIncludingEffectivePairsWoDh();
 	}
 
 	/*
@@ -50,26 +69,48 @@ public class LegState {
 	/*
 	 * Difficulty Score calculations.
 	 */
-	public static double weightInclusionScore = 0.0;
-	public static double weightInclusionScoreWoDh = 0.5;
-	public static double weightEffectiveInclusionScore = 0.0;
-	public static double weightEffectiveInclusionScoreWoDh = 0.0;
-	public static double weightHeuristicModifier = 0.5;
+	public static double weightDutyInclusionScore = 0.0;
+	public static double weightDutyInclusionScoreWoDh = 1.0;
+	public static double weightDutyEffectiveInclusionScore = 0.0;
+	public static double weightDutyEffectiveInclusionScoreWoDh = 0.0;
 
-	private double getInclusionScore() {
-		return (weightInclusionScore * (1.0 - (1.0 * this.numOfIncludingDuties / LegState.maxNumOfIncludingDuties)));
+	public static double weightPairInclusionScore = 0.0;
+	public static double weightPairInclusionScoreWoDh = 0.0;
+	public static double weightPairEffectiveInclusionScore = 0.0;
+	public static double weightPairEffectiveInclusionScoreWoDh = 0.0;
+
+	public static double weightHeuristicModifier = 0.0;
+
+	private double getDutyInclusionScore() {
+		return (weightDutyInclusionScore * (1.0 - (1.0 * this.numOfIncludingDuties / LegState.maxNumOfIncludingDuties)));
 	}
 
-	private double getInclusionScoreWoDh() {
-		return (weightInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingDutiesWoDh / LegState.maxNumOfIncludingDutiesWoDh)));
+	private double getDutyInclusionScoreWoDh() {
+		return (weightDutyInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingDutiesWoDh / LegState.maxNumOfIncludingDutiesWoDh)));
 	}
 
-	private double getEffectiveInclusionScore() {
-		return (weightEffectiveInclusionScore * (1.0 - (1.0 * this.numOfIncludingEffectiveDuties / LegState.maxNumOfIncludingEffectiveDuties)));
+	private double getDutyEffectiveInclusionScore() {
+		return (weightDutyEffectiveInclusionScore * (1.0 - (1.0 * this.numOfIncludingEffectiveDuties / LegState.maxNumOfIncludingEffectiveDuties)));
 	}
 
-	private double getEffectiveInclusionScoreWoDh() {
-		return (weightEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectiveDutiesWoDh / LegState.maxNumOfIncludingEffectiveDutiesWoDh)));
+	private double getDutyEffectiveInclusionScoreWoDh() {
+		return (weightDutyEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectiveDutiesWoDh / LegState.maxNumOfIncludingEffectiveDutiesWoDh)));
+	}
+
+	private double getPairInclusionScore() {
+		return (weightPairInclusionScore * (1.0 - (1.0 * this.numOfIncludingPairs / LegState.maxNumOfIncludingPairs)));
+	}
+
+	private double getPairInclusionScoreWoDh() {
+		return (weightPairInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingPairsWoDh / LegState.maxNumOfIncludingPairsWoDh)));
+	}
+
+	private double getPairEffectiveInclusionScore() {
+		return (weightPairEffectiveInclusionScore * (1.0 - (1.0 * this.numOfIncludingEffectivePairs / LegState.maxNumOfIncludingEffectivePairs)));
+	}
+
+	private double getPairEffectiveInclusionScoreWoDh() {
+		return (weightPairEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectivePairsWoDh / LegState.maxNumOfIncludingEffectivePairsWoDh)));
 	}
 
 	private double getHeuristicModifierScore() {
@@ -90,10 +131,14 @@ public class LegState {
 //			double v5 = this.getHeuristicModifierScore();
 //if (v1 + v2 + v3 + v4 + v5 > 1.0)
 //System.out.println();
-			return this.getInclusionScore()
-					+ this.getInclusionScoreWoDh()
-					+ this.getEffectiveInclusionScore()
-					+ this.getEffectiveInclusionScoreWoDh()
+			return this.getDutyInclusionScore()
+					+ this.getDutyInclusionScoreWoDh()
+					+ this.getDutyEffectiveInclusionScore()
+					+ this.getDutyEffectiveInclusionScoreWoDh()
+					+ this.getPairInclusionScore()
+					+ this.getPairInclusionScoreWoDh()
+					+ this.getPairEffectiveInclusionScore()
+					+ this.getPairEffectiveInclusionScoreWoDh()
 					+ this.getHeuristicModifierScore();
 		} else {
 			return 0.0;
@@ -104,13 +149,21 @@ public class LegState {
 	 * Validation test.
 	 */
 	public boolean valuesAreOk(int numOfIncludingDuties,
-			int numOfIncludingDutiesWoDh,
-			int numOfIncludingEffectiveDuties,
-			int numOfIncludingEffectiveDutiesWoDh) {
+								int numOfIncludingDutiesWoDh,
+								int numOfIncludingEffectiveDuties,
+								int numOfIncludingEffectiveDutiesWoDh,
+								int numOfIncludingPairs,
+								int numOfIncludingPairsWoDh,
+								int numOfIncludingEffectivePairs,
+								int numOfIncludingEffectivePairsWoDh) {
 		return (this.numOfIncludingDuties == numOfIncludingDuties)
 				&& (this.numOfIncludingDutiesWoDh == numOfIncludingDutiesWoDh)
 				&& (this.numOfIncludingEffectiveDuties == numOfIncludingEffectiveDuties)
-				&& (this.numOfIncludingEffectiveDutiesWoDh == numOfIncludingEffectiveDutiesWoDh);
+				&& (this.numOfIncludingEffectiveDutiesWoDh == numOfIncludingEffectiveDutiesWoDh)
+				&& (this.numOfIncludingPairs == numOfIncludingPairs)
+				&& (this.numOfIncludingPairsWoDh == numOfIncludingPairsWoDh)
+				&& (this.numOfIncludingEffectivePairs == numOfIncludingEffectivePairs)
+				&& (this.numOfIncludingEffectivePairsWoDh == numOfIncludingEffectivePairsWoDh);
 	}
 
 	@Override
@@ -120,6 +173,10 @@ public class LegState {
 				", numOfIncludingDutiesWoDh: " + numOfIncludingDutiesWoDh + 
 				", numOfIncludingEffectiveDuties: " + numOfIncludingEffectiveDuties + 
 				", numOfIncludingEffectiveDutiesWoDh: " + numOfIncludingEffectiveDutiesWoDh + 
+				", numOfIncludingPairs: " + numOfIncludingPairs + 
+				", numOfIncludingPairsWoDh: " + numOfIncludingPairsWoDh + 
+				", numOfIncludingEffectivePairs: " + numOfIncludingEffectivePairs + 
+				", numOfIncludingEffectivePairsWoDh: " + numOfIncludingEffectivePairsWoDh + 
 				", numOfIterations: " + numOfIterations + 
 				", heuristicModifierValue: " + heuristicModifierValue;
 		

@@ -236,14 +236,6 @@ public class HeuroPair {
 				if (legPairCheckCall.get())
 					logger.info("legPairCheck job is completed!");
 
-//				_PotentialDhChecker potentialDhChecker = new _PotentialDhChecker(hbNdx, HeurosDatasetParam.legCoverPeriodEndExc)
-//																	.setLegRepository(pairOptimizationContext.getLegRepository())
-////																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
-//																	.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx());
-////				pairInitCalls.add(executorService.submit(legPairChecker));
-//				Future<Boolean> potentialDhCheckCall = executorService.submit(potentialDhChecker);
-//				if (potentialDhCheckCall.get())
-//					logger.info("potentialDhCheck job is completed!");
 			}
 
 //			for (int i = 0; i < pairInitCalls.size(); i++) {
@@ -256,8 +248,6 @@ public class HeuroPair {
 //				}
 //			}
 
-			executorService.shutdown();
-
 			DutyLegOvernightConnNetwork pricingNetwork = new DutyLegOvernightConnNetwork(HeurosDatasetParam.dutyProcessPeriodEndExc, 
 																				HeurosSystemParam.maxNetDutySearchDeptInHours, 
 																				HeurosSystemParam.maxPairingLengthInDays)
@@ -266,6 +256,18 @@ public class HeuroPair {
 																				.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
 																				.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
 			pricingNetwork.buildNetwork();
+
+			BiDirPairChecker pairChecker = new BiDirPairChecker()
+//																.setLegRepository(pairOptimizationContext.getLegRepository())
+																.setDutyRepository(pairOptimizationContext.getDutyRepository())
+//																.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
+																.setPricingNetwork(pricingNetwork);
+			//pairInitCalls.add(executorService.submit(legPairChecker));
+			Future<Boolean> pairCheckCall = executorService.submit(pairChecker);
+			if (pairCheckCall.get())
+				logger.info("pairCheck job is completed!");
+
+			executorService.shutdown();
 
 			PairingGenerator pairingGenerator = new PairingGenerator()
 //																			.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())

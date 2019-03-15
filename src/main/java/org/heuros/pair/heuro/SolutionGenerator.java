@@ -8,8 +8,6 @@ import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.conf.HeurosDatasetParam;
-import org.heuros.pair.conf.HeurosSystemParam;
-import org.heuros.pair.heuro.state.DutyState;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairingGenerator;
 
