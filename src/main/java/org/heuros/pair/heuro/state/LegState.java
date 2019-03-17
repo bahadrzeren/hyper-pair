@@ -2,7 +2,7 @@ package org.heuros.pair.heuro.state;
 
 import org.heuros.data.model.Leg;
 
-public class LegState {
+public class LegState implements Cloneable {
 
 	public static int maxNumOfIncludingDuties = 0;
 	public static int maxNumOfIncludingDutiesWoDh = 0;
@@ -15,6 +15,11 @@ public class LegState {
 	public static int maxNumOfIncludingEffectivePairsWoDh = 0;
 
 	public static double maxHeuristicModifierValue = 0.0;
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return (LegState) super.clone();
+	}
 
 	private Leg associatedLeg = null;
 
@@ -70,12 +75,12 @@ public class LegState {
 	 * Difficulty Score calculations.
 	 */
 	public static double weightDutyInclusionScore = 0.0;
-	public static double weightDutyInclusionScoreWoDh = 1.0;
+	public static double weightDutyInclusionScoreWoDh = 0.0;
 	public static double weightDutyEffectiveInclusionScore = 0.0;
 	public static double weightDutyEffectiveInclusionScoreWoDh = 0.0;
 
 	public static double weightPairInclusionScore = 0.0;
-	public static double weightPairInclusionScoreWoDh = 0.0;
+	public static double weightPairInclusionScoreWoDh = 1.0;
 	public static double weightPairEffectiveInclusionScore = 0.0;
 	public static double weightPairEffectiveInclusionScoreWoDh = 0.0;
 
@@ -124,17 +129,17 @@ public class LegState {
 	public double getDifficultyScoreOfTheLeg() {
 		if (this.associatedLeg.isCover()
 				&& (this.numOfCoverings == 0)) {
-			double v1 = this.getDutyInclusionScore();
-			double v2 = this.getDutyInclusionScoreWoDh();
-			double v3 = this.getDutyEffectiveInclusionScore();
-			double v4 = this.getDutyEffectiveInclusionScoreWoDh();
-			double v5 = this.getPairInclusionScore();
-			double v6 = this.getPairInclusionScoreWoDh();
-			double v7 = this.getPairEffectiveInclusionScore();
-			double v8 = this.getPairEffectiveInclusionScoreWoDh();
-			double v9 = this.getHeuristicModifierScore();
-//if (v1 + v2 + v3 + v4 + v5 > 1.0)
-//System.out.println();
+//			double v1 = this.getDutyInclusionScore();
+//			double v2 = this.getDutyInclusionScoreWoDh();
+//			double v3 = this.getDutyEffectiveInclusionScore();
+//			double v4 = this.getDutyEffectiveInclusionScoreWoDh();
+//			double v5 = this.getPairInclusionScore();
+//			double v6 = this.getPairInclusionScoreWoDh();
+//			double v7 = this.getPairEffectiveInclusionScore();
+//			double v8 = this.getPairEffectiveInclusionScoreWoDh();
+//			double v9 = this.getHeuristicModifierScore();
+////if (v1 + v2 + v3 + v4 + v5 > 1.0)
+////System.out.println();
 			return this.getDutyInclusionScore()
 					+ this.getDutyInclusionScoreWoDh()
 					+ this.getDutyEffectiveInclusionScore()

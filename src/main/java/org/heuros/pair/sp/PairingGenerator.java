@@ -52,15 +52,9 @@ public class PairingGenerator {
 		return this;
 	}
 
-	private class PairWithQuality {
-		public Pair pair = null;
-		public QualityMetric pairQ = null;
-		public NodeQualityMetric pairNq = null;
-	}
-
 //	private Random random = new Random();
 
-	public Pair generatePairing(Leg legToCover,
+	public PairWithQuality[] generatePairing(Leg legToCover,
 								int heuristicNo,
 								DutyState[] dutyStates) throws CloneNotSupportedException {
 
@@ -70,8 +64,12 @@ public class PairingGenerator {
 		currentPair.pair = Pair.newInstance(this.hbNdx);
 		currentPair.pairQ = new QualityMetric();
 
-		PairWithQuality bestPair = new PairWithQuality();
-		bestPair.pairQ = new QualityMetric();
+		PairWithQuality[] bestPairs = new PairWithQuality[HeurosSystemParam.maxNumOfPairingEvals];
+		for (int i = 0; i < bestPairs.length; i++) {
+			PairWithQuality pairWithQuality = new PairWithQuality();
+			pairWithQuality.pairQ = new QualityMetric();
+			bestPairs[i] = pairWithQuality;
+		}
 
 		if ((coveringDuties != null)
 				&& (coveringDuties.length > 0)) {
@@ -273,8 +271,9 @@ public class PairingGenerator {
 				int j = i;
 
 				NodeQualityMetric nqm = sourceDutyNodes[j];
+				int numOfDutiesNdx = nqm.getQual().getNumOfDuties() - 1;
 
-				if (nqm.getQual().isBetterThan(heuristicNo, bestPair.pairQ)) {
+				if (nqm.getQual().isBetterThan(heuristicNo, bestPairs[numOfDutiesNdx].pairQ)) {
 
 					Duty d = nqm.getParent().getNodeOwner();
 
@@ -289,10 +288,10 @@ public class PairingGenerator {
 						if (d.isHbArr(this.hbNdx)) {
 			    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
 			    				if (currentPair.pair.isComplete(this.hbNdx)) {
-			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
-			    						bestPair.pair = (Pair) currentPair.pair.clone();
-			    						bestPair.pairQ.injectValues(currentPair.pairQ);
-			    						bestPair.pairNq = sourceDutyNodes[j];
+			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[numOfDutiesNdx].pairQ)) {
+			    						bestPairs[numOfDutiesNdx].pair = (Pair) currentPair.pair.clone();
+			    						bestPairs[numOfDutiesNdx].pairQ.injectValues(currentPair.pairQ);
+			    						bestPairs[numOfDutiesNdx].pairNq = sourceDutyNodes[j];
 			    						pairingGenerationNodeNdx = i;
 			    					}
 			    				} else
@@ -315,10 +314,10 @@ public class PairingGenerator {
 										if (nd.isHbArr(this.hbNdx)) {
 											if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
 							    				if (currentPair.pair.isComplete(this.hbNdx)) {
-							    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPair.pairQ)) {
-							    						bestPair.pair = (Pair) currentPair.pair.clone();
-							    						bestPair.pairQ.injectValues(currentPair.pairQ);
-							    						bestPair.pairNq = sourceDutyNodes[j];
+							    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[numOfDutiesNdx].pairQ)) {
+							    						bestPairs[numOfDutiesNdx].pair = (Pair) currentPair.pair.clone();
+							    						bestPairs[numOfDutiesNdx].pairQ.injectValues(currentPair.pairQ);
+							    						bestPairs[numOfDutiesNdx].pairNq = sourceDutyNodes[j];
 							    						pairingGenerationNodeNdx = i;
 							    						break;
 							    					}
@@ -387,7 +386,7 @@ public class PairingGenerator {
 //							") - " + bestPair.pair.getNumOfDuties() + "d pair is generated for the leg " + legToCover);
 		}
 
-		return bestPair.pair;
+		return bestPairs;
 	}
 
 //	private boolean validatePath(int heuristicNo,

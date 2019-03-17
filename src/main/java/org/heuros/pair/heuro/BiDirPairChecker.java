@@ -23,9 +23,9 @@ public class BiDirPairChecker implements Callable<Boolean> {
 	private int hbNdx = 0;
 
 	private OneDimIndexInt<Duty> dutyIndexByDepLegNdx = null;
-	private OneDimIndexInt<Duty> dutyIndexByArrLegNdx = null;
+//	private OneDimIndexInt<Duty> dutyIndexByArrLegNdx = null;
 	private OneDimUniqueIndexInt<Leg> nextBriefLegIndexByDutyNdx = null;
-	private OneDimUniqueIndexInt<Leg> prevDebriefLegIndexByDutyNdx = null;
+//	private OneDimUniqueIndexInt<Leg> prevDebriefLegIndexByDutyNdx = null;
 
 	public BiDirPairChecker() {
 	}
@@ -51,9 +51,9 @@ public class BiDirPairChecker implements Callable<Boolean> {
 
 	public BiDirPairChecker setPricingNetwork(DutyLegOvernightConnNetwork pricingNetwork) {
 		this.dutyIndexByDepLegNdx = pricingNetwork.getDutyIndexByDepLegNdx();
-		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
+//		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
 		this.nextBriefLegIndexByDutyNdx = pricingNetwork.getNextBriefLegIndexByDutyNdx();
-		this.prevDebriefLegIndexByDutyNdx = pricingNetwork.getPrevDebriefLegIndexByDutyNdx();
+//		this.prevDebriefLegIndexByDutyNdx = pricingNetwork.getPrevDebriefLegIndexByDutyNdx();
 		return this;
 	}
 
@@ -62,13 +62,16 @@ public class BiDirPairChecker implements Callable<Boolean> {
 			for (int j = 0; j < pairing[i].getNumOfLegs(); j++) {
 				Leg l = pairing[i].getLegs().get(j);
 
-				l.incNumOfIncludingPairs();
-				if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties)
-					l.incNumOfIncludingEffectivePairs();
-				if (numOfDhs == 0) {
-					l.incNumOfIncludingPairsWoDh();
+				if (l.isCover()
+						&& l.hasPair(hbNdx)) {
+					l.incNumOfIncludingPairs();
 					if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties)
-						l.incNumOfIncludingEffectivePairsWoDh();
+						l.incNumOfIncludingEffectivePairs();
+					if (numOfDhs == 0) {
+						l.incNumOfIncludingPairsWoDh();
+						if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties)
+							l.incNumOfIncludingEffectivePairsWoDh();
+					}
 				}
 			}
 		}
@@ -87,8 +90,6 @@ public class BiDirPairChecker implements Callable<Boolean> {
 			if (duty.isValid(this.hbNdx)
 				&& duty.hasPairing(this.hbNdx)) {
 
-				LocalDate maxMinDateDept = null;
-
 				pairing[0] = duty;
 				int numOfDhs = duty.getNumOfLegsPassive();
 				int totalActiveBlockTime = duty.getBlockTimeInMinsActive();
@@ -98,7 +99,7 @@ public class BiDirPairChecker implements Callable<Boolean> {
 						setIncludingPairings(pairing, 1, numOfDhs, totalActiveBlockTime);
 						numOfProbablePairings++;
 					} else {
-						maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
+						LocalDate maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
 						Leg[] nls = this.nextBriefLegIndexByDutyNdx.getArray(duty.getNdx());
 						for (Leg nl : nls) {
 							Duty[] nds = this.dutyIndexByDepLegNdx.getArray(nl.getNdx());

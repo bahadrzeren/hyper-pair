@@ -1,6 +1,7 @@
 package org.heuros.pair.heuro;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
@@ -9,6 +10,7 @@ import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.conf.HeurosDatasetParam;
 import org.heuros.pair.heuro.state.SolutionState;
+import org.heuros.pair.sp.PairWithQuality;
 import org.heuros.pair.sp.PairingGenerator;
 
 public class SolutionGenerator {
@@ -36,7 +38,7 @@ public class SolutionGenerator {
 	}
 
 	public int generateSolution(List<Pair> solution,
-									SolutionState solutionState) {
+									SolutionState solutionState) throws InterruptedException, ExecutionException {
 
 		logger.info("Solution generation process is started!");
 
@@ -52,18 +54,19 @@ public class SolutionGenerator {
 
 			int heuristicNo = 1;
 
-			Pair p = null;
+			PairWithQuality[] pqs = null;
 			try {
-				p = this.pairingGenerator.generatePairing(legToCover, 
+				pqs = this.pairingGenerator.generatePairing(legToCover, 
 															heuristicNo,
-															solutionState.getDutyStates());
+															solutionState.getActiveDutyStates());
 			} catch (CloneNotSupportedException ex) {
 				logger.error(ex);
 			}
 
+			Pair p = solutionState.chooseBestPairing(legToCover, pqs);
+
 			if (p != null) {
-				if (p.getFirstDuty().getBriefTime(hbNdx).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
-					solutionState.udpateStateVectors(p);
+				
 					solution.add(p);
 
 
@@ -302,7 +305,7 @@ public class SolutionGenerator {
 					 * TEST BLOCK END
 					 * 
 					 */
-				}
+
 			} else {
 				logger.error("Pairing could not be found for " + legToCover);
 				uncoveredLegs++;

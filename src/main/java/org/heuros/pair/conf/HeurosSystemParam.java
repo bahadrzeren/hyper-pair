@@ -28,4 +28,6 @@ public class HeurosSystemParam {
 	public static int maxLegConnectionTimeInMins = 10 * 60;
 
 	public static int effectiveDutyBlockHourLimit = 4 * 60;
+
+	public static int maxNumOfPairingEvals = maxPairingLengthInDays;
 }

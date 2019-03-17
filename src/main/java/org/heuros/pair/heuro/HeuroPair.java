@@ -276,10 +276,11 @@ public class HeuroPair {
 																			.setPricingNetwork(pricingNetwork)
 																			.setDutyRepository(pairOptimizationContext.getDutyRepository());
 
-			HeuroOptimizer pairOptimizer = new HeuroOptimizer().setLegRepository(pairOptimizationContext.getLegRepository())
-																.setDutyRepository(pairOptimizationContext.getDutyRepository())
-																.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-																.setPairingGenerator(pairingGenerator);
+			HeuroOptimizer pairOptimizer = new HeuroOptimizer(pairOptimizationContext.getLegRepository(),
+																pairOptimizationContext.getDutyRepository(),
+																pairOptimizationContext.getDutyIndexByLegNdx(),
+																pricingNetwork,
+																pairingGenerator);
 
 //			List<Pair> solution = 
 					pairOptimizer.doMinimize();

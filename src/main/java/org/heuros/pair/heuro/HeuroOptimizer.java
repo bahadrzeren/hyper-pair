@@ -2,9 +2,11 @@ package org.heuros.pair.heuro;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
+import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
@@ -31,31 +33,24 @@ public class HeuroOptimizer {
 	private List<Leg> legs = null;
 	private List<Duty> duties = null;
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+	private DutyLegOvernightConnNetwork pricingNetwork = null;
 	private PairingGenerator pairingGenerator = null;
 
 	private SolutionState solutionState = null;
 
-	public HeuroOptimizer setLegRepository(LegRepository legRepository) {
+	public HeuroOptimizer(LegRepository legRepository,
+							DutyRepository dutyRepository,
+							OneDimIndexInt<Duty> dutyIndexByLegNdx,
+							DutyLegOvernightConnNetwork pricingNetwork,
+							PairingGenerator pairingGenerator) {
 		this.legs = legRepository.getModels();
-		return this;
-	}
-
-	public HeuroOptimizer setDutyRepository(DutyRepository dutyRepository) {
 		this.duties = dutyRepository.getModels();
-		return this;
-	}
-
-	public HeuroOptimizer setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
 		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
-		return this;
-	}
-
-	public HeuroOptimizer setPairingGenerator(PairingGenerator pairingGenerator) {
+		this.pricingNetwork = pricingNetwork;
 		this.pairingGenerator = pairingGenerator;
-		return this;
 	}
 
-	public List<Pair> doMinimize() {
+	public List<Pair> doMinimize() throws InterruptedException, ExecutionException {
 		logger.info("Optimization process is started!");
 
 		double bestCost = Double.MAX_VALUE;
@@ -66,7 +61,8 @@ public class HeuroOptimizer {
 
 		this.solutionState = new SolutionState(this.legs,
 												this.duties,
-												this.dutyIndexByLegNdx);
+												this.dutyIndexByLegNdx,
+												this.pricingNetwork);
 
 		for (int i = 0; i < HeurosGaParameters.maxNumOfIterations; i++) {
 
