@@ -27,34 +27,22 @@ public class BiDirPairChecker implements Callable<Boolean> {
 	private OneDimUniqueIndexInt<Leg> nextBriefLegIndexByDutyNdx = null;
 //	private OneDimUniqueIndexInt<Leg> prevDebriefLegIndexByDutyNdx = null;
 
-	public BiDirPairChecker() {
-	}
-
 //	private List<Leg> legs = null;
 	private List<Duty> duties = null;
 //	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 
-//	public BiDirPairChecker setLegRepository(DataRepository<Leg> legRepository) {
+	public BiDirPairChecker(
+//							DataRepository<Leg> legRepository,
+							DataRepository<Duty> dutyRepository,
+//							OneDimIndexInt<Duty> dutyIndexByLegNdx,
+							DutyLegOvernightConnNetwork pricingNetwork) {
 //		this.legs = legRepository.getModels();
-//		return this;
-//	}
-
-	public BiDirPairChecker setDutyRepository(DataRepository<Duty> dutyRepository) {
 		this.duties = dutyRepository.getModels();
-		return this;
-	}
-
-//	public BiDirPairChecker setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
 //		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
-//		return this;
-//	}
-
-	public BiDirPairChecker setPricingNetwork(DutyLegOvernightConnNetwork pricingNetwork) {
 		this.dutyIndexByDepLegNdx = pricingNetwork.getDutyIndexByDepLegNdx();
 //		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
 		this.nextBriefLegIndexByDutyNdx = pricingNetwork.getNextBriefLegIndexByDutyNdx();
 //		this.prevDebriefLegIndexByDutyNdx = pricingNetwork.getPrevDebriefLegIndexByDutyNdx();
-		return this;
 	}
 
 	private void setIncludingPairings(Duty[] pairing, int numOfDuties, int numOfDhs, int totalActiveBlockTime) {

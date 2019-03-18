@@ -80,9 +80,9 @@ public class LegState implements Cloneable {
 	public static double weightDutyEffectiveInclusionScoreWoDh = 0.0;
 
 	public static double weightPairInclusionScore = 0.0;
-	public static double weightPairInclusionScoreWoDh = 1.0;
+	public static double weightPairInclusionScoreWoDh = 0.0;
 	public static double weightPairEffectiveInclusionScore = 0.0;
-	public static double weightPairEffectiveInclusionScoreWoDh = 0.0;
+	public static double weightPairEffectiveInclusionScoreWoDh = 1.0;
 
 	public static double weightHeuristicModifier = 0.0;
 
@@ -129,15 +129,15 @@ public class LegState implements Cloneable {
 	public double getDifficultyScoreOfTheLeg() {
 		if (this.associatedLeg.isCover()
 				&& (this.numOfCoverings == 0)) {
-//			double v1 = this.getDutyInclusionScore();
-//			double v2 = this.getDutyInclusionScoreWoDh();
-//			double v3 = this.getDutyEffectiveInclusionScore();
-//			double v4 = this.getDutyEffectiveInclusionScoreWoDh();
-//			double v5 = this.getPairInclusionScore();
-//			double v6 = this.getPairInclusionScoreWoDh();
-//			double v7 = this.getPairEffectiveInclusionScore();
-//			double v8 = this.getPairEffectiveInclusionScoreWoDh();
-//			double v9 = this.getHeuristicModifierScore();
+			double v1 = this.getDutyInclusionScore();
+			double v2 = this.getDutyInclusionScoreWoDh();
+			double v3 = this.getDutyEffectiveInclusionScore();
+			double v4 = this.getDutyEffectiveInclusionScoreWoDh();
+			double v5 = this.getPairInclusionScore();
+			double v6 = this.getPairInclusionScoreWoDh();
+			double v7 = this.getPairEffectiveInclusionScore();
+			double v8 = this.getPairEffectiveInclusionScoreWoDh();
+			double v9 = this.getHeuristicModifierScore();
 ////if (v1 + v2 + v3 + v4 + v5 > 1.0)
 ////System.out.println();
 			return this.getDutyInclusionScore()
@@ -157,19 +157,21 @@ public class LegState implements Cloneable {
 	/*
 	 * Validation test.
 	 */
-	public boolean valuesAreOk(int numOfIncludingDuties,
-								int numOfIncludingDutiesWoDh,
-								int numOfIncludingEffectiveDuties,
-								int numOfIncludingEffectiveDutiesWoDh,
-								int numOfIncludingPairs,
-								int numOfIncludingPairsWoDh,
-								int numOfIncludingEffectivePairs,
-								int numOfIncludingEffectivePairsWoDh) {
+	public boolean areDutyTotalizersOk(int numOfIncludingDuties,
+										int numOfIncludingDutiesWoDh,
+										int numOfIncludingEffectiveDuties,
+										int numOfIncludingEffectiveDutiesWoDh) {
 		return (this.numOfIncludingDuties == numOfIncludingDuties)
 				&& (this.numOfIncludingDutiesWoDh == numOfIncludingDutiesWoDh)
 				&& (this.numOfIncludingEffectiveDuties == numOfIncludingEffectiveDuties)
-				&& (this.numOfIncludingEffectiveDutiesWoDh == numOfIncludingEffectiveDutiesWoDh)
-				&& (this.numOfIncludingPairs == numOfIncludingPairs)
+				&& (this.numOfIncludingEffectiveDutiesWoDh == numOfIncludingEffectiveDutiesWoDh);
+	}
+
+	public boolean arePairTotalizersOk(int numOfIncludingPairs,
+										int numOfIncludingPairsWoDh,
+										int numOfIncludingEffectivePairs,
+										int numOfIncludingEffectivePairsWoDh) {
+		return (this.numOfIncludingPairs == numOfIncludingPairs)
 				&& (this.numOfIncludingPairsWoDh == numOfIncludingPairsWoDh)
 				&& (this.numOfIncludingEffectivePairs == numOfIncludingEffectivePairs)
 				&& (this.numOfIncludingEffectivePairsWoDh == numOfIncludingEffectivePairsWoDh);

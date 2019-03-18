@@ -29,30 +29,15 @@ public class PairingGenerator {
 
 	private List<Duty> duties = null;
 
-	public PairingGenerator() {
-	}
-
-	public PairingGenerator setPairRuleContext(PairRuleContext pairRuleContext) {
+	public PairingGenerator(PairRuleContext pairRuleContext,
+							OneDimIndexInt<Duty> dutyIndexByLegNdx,
+							DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork,
+							DutyRepository dutyRepository) {
 		this.pairRuleContext = pairRuleContext;
-		return this;
-	}
-
-	public PairingGenerator setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
 		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
-		return this;
-	}
-
-	public PairingGenerator setPricingNetwork(DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork) {
 		this.dutyLegOvernightConnNetwork = dutyLegOvernightConnNetwork;
-		return this;
-	}
-
-	public PairingGenerator setDutyRepository(DutyRepository dutyRepository) {
 		this.duties = dutyRepository.getModels();
-		return this;
 	}
-
-//	private Random random = new Random();
 
 	public PairWithQuality[] generatePairing(Leg legToCover,
 								int heuristicNo,

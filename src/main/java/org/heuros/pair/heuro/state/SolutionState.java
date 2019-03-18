@@ -1,5 +1,6 @@
 package org.heuros.pair.heuro.state;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -9,6 +10,7 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
+import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
@@ -20,6 +22,11 @@ import org.heuros.pair.sp.PairWithQuality;
 public class SolutionState {
 
 	private static Logger logger = Logger.getLogger(SolutionState.class);
+
+	/*
+	 * TODO Single base assumption!!!
+	 */
+	private int hbNdx = 0;
 
 	private List<Leg> legs = null;
 	private List<Duty> duties = null;
@@ -117,6 +124,35 @@ public class SolutionState {
 		return res;
 	}
 
+
+	private void setIncludingPairingsForTest(Duty[] pairing,
+												int numOfDuties,
+												int numOfDhs,
+												int totalActiveBlockTime,
+												int[] numOfPairs,
+												int[] numOfPairsWoDh,
+												int[] numOfEffectivePairs,
+												int[] numOfEffectivePairsWoDh) {
+		for (int i = 0; i < numOfDuties; i++) {
+			for (int j = 0; j < pairing[i].getNumOfLegs(); j++) {
+				Leg l = pairing[i].getLegs().get(j);
+
+				if (l.isCover()
+						&& l.hasPair(hbNdx)) {
+					numOfPairs[l.getNdx()]++;
+					if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties)
+						numOfEffectivePairs[l.getNdx()]++;
+					if (numOfDhs == 0) {
+						numOfPairsWoDh[l.getNdx()]++;
+						if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties)
+							numOfEffectivePairsWoDh[l.getNdx()]++;
+					}
+				}
+			}
+		}
+	}
+
+
 	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxNumOfPairingEvals);
 
 	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[] pqs) throws InterruptedException, ExecutionException {
@@ -164,13 +200,14 @@ public class SolutionState {
 			}
 		}
 
-//		this.activeLegStates = bestStateCalculator.getTempLegStates();
-//		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
+		this.activeLegStates = bestStateCalculator.getTempLegStates();
+		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
 
-		this.activeLegStates = lessStateCalculator.getTempLegStates();
-		this.activeDutyStates = lessStateCalculator.getTempDutyStates();
+//		this.activeLegStates = lessStateCalculator.getTempLegStates();
+//		this.activeDutyStates = lessStateCalculator.getTempDutyStates();
 
-logger.info("--- " + legToCover + " --- bestScore: " + bestDifficutlyScore + ", lessScore: " + lessDifficutlyScore + ", worstScore: " + worstDifficutlyScore);
+logger.info("--- " + legToCover);
+logger.info("bestScore: " + bestDifficutlyScore + ", lessScore: " + lessDifficutlyScore + ", worstScore: " + worstDifficutlyScore);
 //if (worstDifficutlyScore > lessDifficutlyScore)
 //	logger.info("worstScore: " + worstDifficutlyScore + " >>>>>>> lessScore: " + lessDifficutlyScore);
 if (lessDifficutlyScore > bestDifficutlyScore)
@@ -181,6 +218,84 @@ logger.info("LessDifficulty: " + lessStateCalculator.getPwq().pair.getNumOfDutie
 logger.info("BestDifficulty: " + bestStateCalculator.getPwq().pair.getNumOfDuties() + " - " + bestDifficutlyScore);
 
 		this.calculateAndSetMaxValuesOfHeuristicsParameters();
+
+
+		/**
+		 * TEST BLOCK BEGIN
+		 * 
+		 * Checks probable pairing numbers of Legs.
+		 * 
+		 */
+		int[] numOfPairs = new int[this.legs.size()];
+		int[] numOfPairsWoDh = new int[this.legs.size()];
+		int[] numOfEffectivePairs = new int[this.legs.size()];
+		int[] numOfEffectivePairsWoDh = new int[this.legs.size()];
+		OneDimIndexInt<Duty> dutyIndexByDepLegNdx = pricingNetwork.getDutyIndexByDepLegNdx();
+		OneDimUniqueIndexInt<Leg> nextBriefLegIndexByDutyNdx = pricingNetwork.getNextBriefLegIndexByDutyNdx();
+		LocalDate maxMinDateDept = null;
+		Duty[] pairing = new Duty[HeurosSystemParam.maxPairingLengthInDays];
+		for (int i = 0; i < this.duties.size(); i++) {
+			Duty d = this.duties.get(i);
+			if (d.isValid(this.hbNdx)
+					&& d.hasPairing(this.hbNdx)) {
+
+				if (d.isHbDep(this.hbNdx)) {
+
+					DutyState ds = activeDutyStates[d.getNdx()];
+					int numOfDhs = d.getNumOfLegsPassive() + ds.numOfCoveringsPassiveInt + ds.numOfCoveringsPassiveExt;
+					int totalActiveBlockTime = d.getBlockTimeInMinsActive() - ds.blockTimeOfCoveringsActive;
+					pairing[0] = d;
+
+					if (d.isHbArr(this.hbNdx)) {
+						this.setIncludingPairingsForTest(pairing, 1, numOfDhs, totalActiveBlockTime, numOfPairs, numOfPairsWoDh, numOfEffectivePairs, numOfEffectivePairsWoDh);
+					} else {
+						maxMinDateDept = d.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
+						Leg[] nls = nextBriefLegIndexByDutyNdx.getArray(d.getNdx());
+						for (Leg nl : nls) {
+							Duty[] nds = dutyIndexByDepLegNdx.getArray(nl.getNdx());
+							for (Duty nd : nds) {
+								if (nd.isHbArr(this.hbNdx)
+										&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))) {
+
+									numOfDhs += d.getNumOfLegsPassive() + ds.numOfCoveringsPassiveInt + ds.numOfCoveringsPassiveExt;
+									totalActiveBlockTime += d.getBlockTimeInMinsActive() - ds.blockTimeOfCoveringsActive;
+									pairing[1] = nd;
+
+									this.setIncludingPairingsForTest(pairing, 2, numOfDhs, totalActiveBlockTime, numOfPairs, numOfPairsWoDh, numOfEffectivePairs, numOfEffectivePairsWoDh);
+
+									numOfDhs -= d.getNumOfLegsPassive() + ds.numOfCoveringsPassiveInt + ds.numOfCoveringsPassiveExt;
+									totalActiveBlockTime -= d.getBlockTimeInMinsActive() - ds.blockTimeOfCoveringsActive;
+									pairing[1] = null;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		this.legs.forEach((l) -> {
+			if (l.isCover()
+				&& l.hasPair(hbNdx)) {
+				LegState ls = activeLegStates[l.getNdx()];
+				if (!ls.arePairTotalizersOk(numOfPairs[l.getNdx()],
+											numOfPairsWoDh[l.getNdx()],
+											numOfEffectivePairs[l.getNdx()],
+											numOfEffectivePairsWoDh[l.getNdx()])) {
+					logger.error("LegToCover: " + legToCover);
+					logger.error("Leg pair totalizers are not set correctly! " + l);
+					ls.arePairTotalizersOk(numOfPairs[l.getNdx()],
+											numOfPairsWoDh[l.getNdx()],
+											numOfEffectivePairs[l.getNdx()],
+											numOfEffectivePairsWoDh[l.getNdx()]);
+				}
+			}
+		});
+
+		/**
+		 * TEST BLOCK END
+		 * 
+		 */
 
 		return bestStateCalculator.getPwq().pair;
 	}

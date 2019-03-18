@@ -8,7 +8,6 @@ import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
-import org.heuros.pair.conf.HeurosDatasetParam;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairWithQuality;
 import org.heuros.pair.sp.PairingGenerator;
@@ -73,7 +72,7 @@ public class SolutionGenerator {
 					/**
 					 * TEST BLOCK BEGIN
 					 * 
-					 * Checks state variables on LegState instances.
+					 * Checks duty totalizers on LegState instances.
 					 * 
 					 */
 //					this.legs.forEach((leg) -> {
@@ -87,33 +86,36 @@ public class SolutionGenerator {
 //							int numOfIncludingEffectiveDuties = 0;
 //							int numOfIncludingEffectiveDutiesWoDh = 0;
 //
+//							/*
+//							 * Leg duty totalizers.
+//							 */
 //							Duty[] dutiesOfLeg = dutyIndexByLegNdx.getArray(leg.getNdx());
 //							for (Duty dutyOfLeg: dutiesOfLeg) {
 //								if (dutyOfLeg.hasPairing(this.hbNdx)
 //										&& dutyOfLeg.isValid(this.hbNdx)) {
 //									numOfIncludingDuties++;
 //									if ((dutyOfLeg.getNumOfLegsPassive() == 0)
-//											&& (solutionState.getDutyStates()[dutyOfLeg.getNdx()].numOfCoverings == 0)) {
+//											&& (solutionState.getActiveDutyStates()[dutyOfLeg.getNdx()].numOfCoverings == 0)) {
 //										numOfIncludingDutiesWoDh++;
 //										if (dutyOfLeg.getBlockTimeInMinsActive() >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
 //											numOfIncludingEffectiveDutiesWoDh++;
 //										}
 //									}
-//									if (dutyOfLeg.getBlockTimeInMinsActive() - solutionState.getDutyStates()[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
+//									if (dutyOfLeg.getBlockTimeInMinsActive() - solutionState.getActiveDutyStates()[dutyOfLeg.getNdx()].blockTimeOfDistinctCoveringsActive >= HeurosSystemParam.effectiveDutyBlockHourLimit) {
 //										numOfIncludingEffectiveDuties++;
 //									}
 //								}
 //							}
 //
-//							if (!solutionState.getLegStates()[leg.getNdx()].valuesAreOk(numOfIncludingDuties, 
-//																						numOfIncludingDutiesWoDh, 
-//																						numOfIncludingEffectiveDuties, 
-//																						numOfIncludingEffectiveDutiesWoDh)) {
+//							if (!solutionState.getActiveLegStates()[leg.getNdx()].areDutyTotalizersOk(numOfIncludingDuties, 
+//																										numOfIncludingDutiesWoDh, 
+//																										numOfIncludingEffectiveDuties, 
+//																										numOfIncludingEffectiveDutiesWoDh)) {
 //								logger.error("LegState values has not been set correctly for " + leg);
-//								solutionState.getLegStates()[leg.getNdx()].valuesAreOk(numOfIncludingDuties, 
-//																						numOfIncludingDutiesWoDh, 
-//																						numOfIncludingEffectiveDuties, 
-//																						numOfIncludingEffectiveDutiesWoDh);
+//								solutionState.getActiveLegStates()[leg.getNdx()].areDutyTotalizersOk(numOfIncludingDuties, 
+//																										numOfIncludingDutiesWoDh, 
+//																										numOfIncludingEffectiveDuties, 
+//																										numOfIncludingEffectiveDutiesWoDh);
 //							}
 //						}
 //					});
@@ -139,11 +141,11 @@ public class SolutionGenerator {
 //							}
 //						}
 //					}
-
+//
 //					this.duties.forEach((d) -> {
 //						if (d.isValid(this.hbNdx)
 //								&& d.hasPairing(this.hbNdx)) {
-//							DutyState ds = solutionState.getDutyStates()[d.getNdx()];
+//							DutyState ds = solutionState.getActiveDutyStates()[d.getNdx()];
 //							int numOfCoverings = 0;
 //							int numOfCoveringsActive = 0;
 //							int numOfCoveringsPassiveInt = 0;
