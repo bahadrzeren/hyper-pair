@@ -157,23 +157,23 @@ public class LegState implements Cloneable {
 	/*
 	 * Validation test.
 	 */
-	public boolean areDutyTotalizersOk(int numOfIncludingDuties,
-										int numOfIncludingDutiesWoDh,
+	public boolean areDutyTotalizersOk_ParamOrderingIsChanged(int numOfIncludingDuties,
 										int numOfIncludingEffectiveDuties,
+										int numOfIncludingDutiesWoDh,
 										int numOfIncludingEffectiveDutiesWoDh) {
 		return (this.numOfIncludingDuties == numOfIncludingDuties)
-				&& (this.numOfIncludingDutiesWoDh == numOfIncludingDutiesWoDh)
 				&& (this.numOfIncludingEffectiveDuties == numOfIncludingEffectiveDuties)
+				&& (this.numOfIncludingDutiesWoDh == numOfIncludingDutiesWoDh)
 				&& (this.numOfIncludingEffectiveDutiesWoDh == numOfIncludingEffectiveDutiesWoDh);
 	}
 
 	public boolean arePairTotalizersOk(int numOfIncludingPairs,
-										int numOfIncludingPairsWoDh,
 										int numOfIncludingEffectivePairs,
+										int numOfIncludingPairsWoDh,
 										int numOfIncludingEffectivePairsWoDh) {
 		return (this.numOfIncludingPairs == numOfIncludingPairs)
-				&& (this.numOfIncludingPairsWoDh == numOfIncludingPairsWoDh)
 				&& (this.numOfIncludingEffectivePairs == numOfIncludingEffectivePairs)
+				&& (this.numOfIncludingPairsWoDh == numOfIncludingPairsWoDh)
 				&& (this.numOfIncludingEffectivePairsWoDh == numOfIncludingEffectivePairsWoDh);
 	}
 

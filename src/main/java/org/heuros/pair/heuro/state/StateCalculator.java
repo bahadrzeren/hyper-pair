@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
@@ -14,6 +15,7 @@ import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.sp.PairWithQuality;
 
 public class StateCalculator implements Callable<Double> {
+	private static Logger logger = Logger.getLogger(StateCalculator.class);
 
 	/*
 	 * TODO Single base assumption!!!
@@ -27,6 +29,7 @@ public class StateCalculator implements Callable<Double> {
 	private LegState[] tempLegStates = null;
 	private DutyState[] tempDutyStates = null;
 	private PairWithQuality pwq = null;
+	private Leg legToCover = null;
 
 	private OneDimIndexInt<Duty> dutyIndexByDepLegNdx = null;
 	private OneDimIndexInt<Duty> dutyIndexByArrLegNdx = null;
@@ -36,6 +39,7 @@ public class StateCalculator implements Callable<Double> {
 	public StateCalculator(List<Leg> legs,
 							OneDimIndexInt<Duty> dutyIndexByLegNdx,
 							DutyLegOvernightConnNetwork pricingNetwork,
+							Leg legToCover,
 							LegState[] activeLegStates,
 							DutyState[] activeDutyStates,
 							PairWithQuality pwq) {
@@ -45,6 +49,7 @@ public class StateCalculator implements Callable<Double> {
 		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
 		this.nextBriefLegIndexByDutyNdx = pricingNetwork.getNextBriefLegIndexByDutyNdx();
 		this.prevDebriefLegIndexByDutyNdx = pricingNetwork.getPrevDebriefLegIndexByDutyNdx();
+		this.legToCover = legToCover;
 		this.activeLegStates = activeLegStates;
 		this.activeDutyStates = activeDutyStates;
 		this.pwq = pwq;
@@ -77,6 +82,7 @@ public class StateCalculator implements Callable<Double> {
 	}
 
 	private double decreasePairingTotalizers(double maxDifficultyScoreObtained,
+												Leg leg,
 												Duty[] pairing,
 												int numOfDuties,
 												boolean isEffectivenessChanged,
@@ -88,14 +94,43 @@ public class StateCalculator implements Callable<Double> {
 				Leg l = pairing[i].getLegs().get(j);
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
+
+if (l.getNdx() == 108) {
+	if (numOfDuties == 1)
+		logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[0].getNdx());
+	else
+		logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[0].getNdx() + ", " + pairing[1].getNdx());
+	logger.info("Leg covered: " + leg);
+	if (numOfDuties == 1)
+		logger.info(pairing[0]);
+	else {
+		logger.info(pairing[0]);
+		logger.info(pairing[1]);
+	}
+	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": isEffectivenessChanged: " + isEffectivenessChanged +
+																				", isDhStateChanged: " + isDhStateChanged +
+																				", isEffectivenessWoDhChanged: " + isEffectivenessWoDhChanged);
+	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
+																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
+																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
+																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
+}
+
 					if (isEffectivenessChanged)
-						l.decNumOfIncludingEffectivePairs();
+						this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs--;
 					if (isDhStateChanged) {
-						l.decNumOfIncludingPairsWoDh();
+						this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh--;
 						if (isEffectivenessWoDhChanged) {
-							l.decNumOfIncludingEffectivePairsWoDh();
+							this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh--;
 						}
 					}
+
+if (l.getNdx() == 108) {
+	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": After PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
+																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
+																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
+																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
+}
 
 					double newDifficultyScore = this.tempLegStates[l.getNdx()].getDifficultyScoreOfTheLeg();
 					if (newDifficultyScore > res)
@@ -127,6 +162,10 @@ public class StateCalculator implements Callable<Double> {
 		 */
 		for (int i = 0; i < pwq.pair.getNumOfDuties(); i++) {
 			Duty duty = pwq.pair.getDuties().get(i);
+
+if (duty.getNdx() == 874)
+System.out.println();
+
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
 				Leg leg = duty.getLegs().get(j);
 				legNdxs.add(leg.getNdx());
@@ -239,7 +278,7 @@ public class StateCalculator implements Callable<Double> {
 						if (dutyOfLeg.isHbDep(this.hbNdx)) {
 							if (dutyOfLeg.isHbArr(this.hbNdx)) {
 								maxDifficultyScoreObtained = this.decreasePairingTotalizers(maxDifficultyScoreObtained,
-																							pairing, 1,
+																							leg, pairing, 1,
 																							isEffectivenessChanged,
 																							isDhStateChanged,
 																							isEffectivenessWoDhChanged);
@@ -260,18 +299,19 @@ public class StateCalculator implements Callable<Double> {
 											totalActiveBlockTime += activeBlockTime;
 											pairing[1] = nd;
 
-											boolean isEffectivenessOfThePairChanged = (prevTotalActiveBlockTime / 2.0 >= HeurosSystemParam.effectiveDutyBlockHourLimit)
-																						&& (totalActiveBlockTime / 2.0 < HeurosSystemParam.effectiveDutyBlockHourLimit);
+											boolean isEffectivenessOfThePairChanged = leg.isCover()
+																						&& (this.tempLegStates[leg.getNdx()].numOfCoverings == 1)
+																						&& (prevTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0)
+																						&& (totalActiveBlockTime < HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0);
 											boolean isDhStateOfThePairChanged = isDhStateChanged && (numOfDhs == 0);
 											boolean isEffectivenessWoDhOfThePairChanged = isDhStateOfThePairChanged
-																							&& (prevTotalActiveBlockTime / 2.0 >= HeurosSystemParam.effectiveDutyBlockHourLimit)
-																							&& (totalActiveBlockTime / 2.0 < HeurosSystemParam.effectiveDutyBlockHourLimit);
+																							&& (prevTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0);
 
 											if (isEffectivenessOfThePairChanged
 													|| isDhStateOfThePairChanged
 													|| isEffectivenessWoDhOfThePairChanged) {
 												maxDifficultyScoreObtained = this.decreasePairingTotalizers(maxDifficultyScoreObtained,
-																											pairing, 2,
+																											leg, pairing, 2,
 																											isEffectivenessOfThePairChanged,
 																											isDhStateOfThePairChanged,
 																											isEffectivenessWoDhOfThePairChanged);
@@ -304,18 +344,19 @@ public class StateCalculator implements Callable<Double> {
 											totalActiveBlockTime += activeBlockTime;
 											pairing[1] = pd;
 
-											boolean isEffectivenessOfThePairChanged = (prevTotalActiveBlockTime / 2.0 >= HeurosSystemParam.effectiveDutyBlockHourLimit)
-																						&& (totalActiveBlockTime / 2.0 < HeurosSystemParam.effectiveDutyBlockHourLimit);
+											boolean isEffectivenessOfThePairChanged = leg.isCover()
+																						&& (this.tempLegStates[leg.getNdx()].numOfCoverings == 1)
+																						&& (prevTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0)
+																						&& (totalActiveBlockTime < HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0);
 											boolean isDhStateOfThePairChanged = isDhStateChanged && (numOfDhs == 0);
 											boolean isEffectivenessWoDhOfThePairChanged = isDhStateOfThePairChanged
-																							&& (prevTotalActiveBlockTime / 2.0 >= HeurosSystemParam.effectiveDutyBlockHourLimit)
-																							&& (totalActiveBlockTime / 2.0 < HeurosSystemParam.effectiveDutyBlockHourLimit);
+																							&& (prevTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0);
 
 											if (isEffectivenessOfThePairChanged
 													|| isDhStateOfThePairChanged
 													|| isEffectivenessWoDhOfThePairChanged) {
 												maxDifficultyScoreObtained = this.decreasePairingTotalizers(maxDifficultyScoreObtained,
-																											pairing, 2,
+																											leg, pairing, 2,
 																											isEffectivenessOfThePairChanged,
 																											isDhStateOfThePairChanged,
 																											isEffectivenessWoDhOfThePairChanged);
