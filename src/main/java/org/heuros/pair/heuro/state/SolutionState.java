@@ -125,8 +125,12 @@ public class SolutionState {
 	}
 
 
-	private void setIncludingPairingsForTest(Duty[] pairing,
+	private void setIncludingPairingsForTest(Leg legToCover,
+												int numOfDutiesOfChosenPair,
+												Duty[] pairing,
 												int numOfDuties,
+												int beforeNumOfDhs,
+												int beforeTotalActiveBlockTime,
 												int numOfDhs,
 												int totalActiveBlockTime,
 												int[] numOfPairs,
@@ -139,9 +143,34 @@ public class SolutionState {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-//if (l.getNdx() == 102) {
-//	System.out.println("Duty: " + pairing[0].getNdx() + ", " + pairing[i].getNdx());
-//	System.out.println("Before PairTots: " + numOfPairs[l.getNdx()] + ", " + numOfEffectivePairs[l.getNdx()] + ", " + numOfPairsWoDh[l.getNdx()] + ", " + numOfEffectivePairsWoDh[l.getNdx()]);
+					boolean beforeEffectivenessState = (beforeTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
+					boolean beforeDhState = (beforeNumOfDhs == 0);
+					boolean beforeEffectivenessWoDhState = beforeDhState && (beforeTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
+
+					boolean effectivenessState = (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
+					boolean dhState = (numOfDhs == 0);
+					boolean effectivenessWoDhState = dhState && (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
+
+//if (beforeEffectivenessState && (!effectivenessState)
+//		&& l.getNdx() == 114) {
+//	logger.info("xxxxxxxxxxxxxxxxxxxxxxx");
+//	if (numOfDuties == 1)
+//		logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": " + pairing[0].getNdx());
+//	else
+//		logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": " + pairing[0].getNdx() + ", " + pairing[1].getNdx());
+//	if (numOfDuties == 1)
+//		logger.info(pairing[0]);
+//	else {
+//		logger.info(pairing[0]);
+//		logger.info(pairing[1]);
+//	}
+//	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": effectivenessState: " + effectivenessState +
+//																		", dhState: " + dhState +
+//																		", effectivenessWoDhState: " + effectivenessWoDhState);
+//	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": Before PairTots: " + numOfPairs[l.getNdx()] + ", " +
+//																								numOfEffectivePairs[l.getNdx()] + ", " +
+//																								numOfPairsWoDh[l.getNdx()] + ", " +
+//																								numOfEffectivePairsWoDh[l.getNdx()]);
 //}
 
 					numOfPairs[l.getNdx()]++;
@@ -153,8 +182,12 @@ public class SolutionState {
 							numOfEffectivePairsWoDh[l.getNdx()]++;
 					}
 
-//if (l.getNdx() == 102) {
-//	System.out.println("After PairTots: " + numOfPairs[l.getNdx()] + ", " + numOfEffectivePairs[l.getNdx()] + ", " + numOfPairsWoDh[l.getNdx()] + ", " + numOfEffectivePairsWoDh[l.getNdx()]);
+//if (beforeEffectivenessState && (!effectivenessState)
+//		&& l.getNdx() == 114) {
+//	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": After PairTots: " + numOfPairs[l.getNdx()] + ", " +
+//																								numOfEffectivePairs[l.getNdx()] + ", " +
+//																								numOfPairsWoDh[l.getNdx()] + ", " +
+//																								numOfEffectivePairsWoDh[l.getNdx()]);
 //}
 
 				}
@@ -225,25 +258,6 @@ public class SolutionState {
 			}
 		}
 
-		this.activeLegStates = bestStateCalculator.getTempLegStates();
-		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
-
-//		this.activeLegStates = lessStateCalculator.getTempLegStates();
-//		this.activeDutyStates = lessStateCalculator.getTempDutyStates();
-
-//logger.info("--- " + legToCover);
-//logger.info("bestScore: " + bestDifficutlyScore + ", lessScore: " + lessDifficutlyScore + ", worstScore: " + worstDifficutlyScore);
-////if (worstDifficutlyScore > lessDifficutlyScore)
-////	logger.info("worstScore: " + worstDifficutlyScore + " >>>>>>> lessScore: " + lessDifficutlyScore);
-//if (lessDifficutlyScore > bestDifficutlyScore)
-//	logger.info("lessScore: " + lessDifficutlyScore + " >>>>>>> bestScore: " + bestDifficutlyScore);
-//if (lessStateCalculator.getPwq().pair.getNumOfDuties() > bestStateCalculator.getPwq().pair.getNumOfDuties())
-//	logger.info("lessNum: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " >>>>>>> bestNum: " + bestStateCalculator.getPwq().pair.getNumOfDuties());
-//logger.info("LessDifficulty: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " - " + lessDifficutlyScore);
-//logger.info("BestDifficulty: " + bestStateCalculator.getPwq().pair.getNumOfDuties() + " - " + bestDifficutlyScore);
-
-		this.calculateAndSetMaxValuesOfHeuristicsParameters();
-
 
 		/**
 		 * TEST BLOCK BEGIN
@@ -264,13 +278,30 @@ public class SolutionState {
 			if (d.isValid(this.hbNdx)
 					&& d.hasPairing(this.hbNdx)) {
 				if (d.isHbDep(this.hbNdx)) {
-					DutyState dst = activeDutyStates[d.getNdx()];
-					int numOfDhs = (d.getNumOfLegsPassive() + dst.numOfCoveringsActive);
+
+if (d.getNdx() == 1054)
+System.out.println();
+
+					DutyState beforeDst = activeDutyStates[d.getNdx()];
+					int beforeNumOfDhs = (d.getNumOfLegsPassive() + beforeDst.numOfCoveringsActive + beforeDst.numOfCoveringsPassiveInt + beforeDst.numOfCoveringsPassiveExt);
+					int beforeTotalActiveBlockTime = (d.getBlockTimeInMinsActive() - beforeDst.blockTimeOfCoveringsActive);
+					DutyState dst = bestStateCalculator.getTempDutyStates()[d.getNdx()];
+					int numOfDhs = (d.getNumOfLegsPassive() + dst.numOfCoveringsActive + dst.numOfCoveringsPassiveInt + dst.numOfCoveringsPassiveExt);
 					int totalActiveBlockTime = (d.getBlockTimeInMinsActive() - dst.blockTimeOfCoveringsActive);
 					pairing[0] = d;
 
 					if (d.isHbArr(this.hbNdx)) {
-						this.setIncludingPairingsForTest(pairing, 1, numOfDhs, totalActiveBlockTime, numOfPairs, numOfEffectivePairs, numOfPairsWoDh, numOfEffectivePairsWoDh);
+						this.setIncludingPairingsForTest(legToCover,
+															bestStateCalculator.getPwq().pair.getNumOfDuties(),
+															pairing, 1,
+															beforeNumOfDhs,
+															beforeTotalActiveBlockTime,
+															numOfDhs,
+															totalActiveBlockTime,
+															numOfPairs,
+															numOfEffectivePairs,
+															numOfPairsWoDh,
+															numOfEffectivePairsWoDh);
 					} else {
 						maxMinDateDept = d.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
 						Leg[] nls = nextBriefLegIndexByDutyNdx.getArray(d.getNdx());
@@ -280,15 +311,32 @@ public class SolutionState {
 								if (nd.isHbArr(this.hbNdx)
 										&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))) {
 
-									DutyState ndst = activeDutyStates[nd.getNdx()];
+if (d.getNdx() == 12142)
+System.out.println();
 
-									numOfDhs += (nd.getNumOfLegsPassive() + ndst.numOfCoveringsActive);
+									DutyState beforeNdst = activeDutyStates[nd.getNdx()];
+									beforeNumOfDhs += (nd.getNumOfLegsPassive() + beforeNdst.numOfCoveringsActive + beforeNdst.numOfCoveringsPassiveInt + beforeNdst.numOfCoveringsPassiveExt);
+									beforeTotalActiveBlockTime += (nd.getBlockTimeInMinsActive() - beforeNdst.blockTimeOfCoveringsActive);
+									DutyState ndst = bestStateCalculator.getTempDutyStates()[nd.getNdx()];
+									numOfDhs += (nd.getNumOfLegsPassive() + ndst.numOfCoveringsActive + ndst.numOfCoveringsPassiveInt + ndst.numOfCoveringsPassiveExt);
 									totalActiveBlockTime += (nd.getBlockTimeInMinsActive() - ndst.blockTimeOfCoveringsActive);
 									pairing[1] = nd;
 
-									this.setIncludingPairingsForTest(pairing, 2, numOfDhs, totalActiveBlockTime, numOfPairs, numOfEffectivePairs, numOfPairsWoDh, numOfEffectivePairsWoDh);
+									this.setIncludingPairingsForTest(legToCover,
+																		bestStateCalculator.getPwq().pair.getNumOfDuties(),
+																		pairing, 2,
+																		beforeNumOfDhs,
+																		beforeTotalActiveBlockTime,
+																		numOfDhs,
+																		totalActiveBlockTime,
+																		numOfPairs,
+																		numOfEffectivePairs,
+																		numOfPairsWoDh,
+																		numOfEffectivePairsWoDh);
 
-									numOfDhs -= (nd.getNumOfLegsPassive() + ndst.numOfCoveringsActive);
+									beforeNumOfDhs -= (nd.getNumOfLegsPassive() + beforeNdst.numOfCoveringsActive + beforeNdst.numOfCoveringsPassiveInt + beforeNdst.numOfCoveringsPassiveExt);
+									beforeTotalActiveBlockTime -= (nd.getBlockTimeInMinsActive() - beforeNdst.blockTimeOfCoveringsActive);
+									numOfDhs -= (nd.getNumOfLegsPassive() + ndst.numOfCoveringsActive + ndst.numOfCoveringsPassiveInt + ndst.numOfCoveringsPassiveExt);
 									totalActiveBlockTime -= (nd.getBlockTimeInMinsActive() - ndst.blockTimeOfCoveringsActive);
 									pairing[1] = null;
 								}
@@ -299,10 +347,11 @@ public class SolutionState {
 			}
 		}
 
-		this.legs.forEach((l) -> {
+		for (int i = 0; i < this.legs.size(); i++) {
+			Leg l = this.legs.get(i);
 			if (l.isCover()
 				&& l.hasPair(hbNdx)) {
-				LegState ls = activeLegStates[l.getNdx()];
+				LegState ls = bestStateCalculator.getTempLegStates()[l.getNdx()];
 				if (!ls.arePairTotalizersOk(numOfPairs[l.getNdx()],
 											numOfEffectivePairs[l.getNdx()],
 											numOfPairsWoDh[l.getNdx()],
@@ -327,12 +376,31 @@ public class SolutionState {
 //											l.getNumOfIncludingEffectivePairsWoDh());
 //				}
 			}
-		});
+		}
 
 		/**
 		 * TEST BLOCK END
 		 * 
 		 */
+
+		this.activeLegStates = bestStateCalculator.getTempLegStates();
+		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
+
+//		this.activeLegStates = lessStateCalculator.getTempLegStates();
+//		this.activeDutyStates = lessStateCalculator.getTempDutyStates();
+
+//logger.info("--- " + legToCover);
+//logger.info("bestScore: " + bestDifficutlyScore + ", lessScore: " + lessDifficutlyScore + ", worstScore: " + worstDifficutlyScore);
+////if (worstDifficutlyScore > lessDifficutlyScore)
+////	logger.info("worstScore: " + worstDifficutlyScore + " >>>>>>> lessScore: " + lessDifficutlyScore);
+//if (lessDifficutlyScore > bestDifficutlyScore)
+//	logger.info("lessScore: " + lessDifficutlyScore + " >>>>>>> bestScore: " + bestDifficutlyScore);
+//if (lessStateCalculator.getPwq().pair.getNumOfDuties() > bestStateCalculator.getPwq().pair.getNumOfDuties())
+//	logger.info("lessNum: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " >>>>>>> bestNum: " + bestStateCalculator.getPwq().pair.getNumOfDuties());
+//logger.info("LessDifficulty: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " - " + lessDifficutlyScore);
+//logger.info("BestDifficulty: " + bestStateCalculator.getPwq().pair.getNumOfDuties() + " - " + bestDifficutlyScore);
+
+		this.calculateAndSetMaxValuesOfHeuristicsParameters();
 
 		return bestStateCalculator.getPwq().pair;
 	}
