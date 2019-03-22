@@ -151,27 +151,27 @@ public class SolutionState {
 					boolean dhState = (numOfDhs == 0);
 					boolean effectivenessWoDhState = dhState && (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
 
-//if (beforeEffectivenessState && (!effectivenessState)
-//		&& l.getNdx() == 114) {
-//	logger.info("xxxxxxxxxxxxxxxxxxxxxxx");
-//	if (numOfDuties == 1)
-//		logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": " + pairing[0].getNdx());
-//	else
-//		logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": " + pairing[0].getNdx() + ", " + pairing[1].getNdx());
-//	if (numOfDuties == 1)
-//		logger.info(pairing[0]);
-//	else {
-//		logger.info(pairing[0]);
-//		logger.info(pairing[1]);
-//	}
-//	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": effectivenessState: " + effectivenessState +
-//																		", dhState: " + dhState +
-//																		", effectivenessWoDhState: " + effectivenessWoDhState);
-//	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": Before PairTots: " + numOfPairs[l.getNdx()] + ", " +
-//																								numOfEffectivePairs[l.getNdx()] + ", " +
-//																								numOfPairsWoDh[l.getNdx()] + ", " +
-//																								numOfEffectivePairsWoDh[l.getNdx()]);
-//}
+if (beforeEffectivenessState && (!effectivenessState)
+		&& l.getNdx() == 97) {
+	logger.info("xxxxxxxxxxxxxxxxxxxxxxx");
+	if (numOfDuties == 1)
+		logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": " + pairing[0].getNdx());
+	else
+		logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": " + pairing[0].getNdx() + ", " + pairing[1].getNdx());
+	if (numOfDuties == 1)
+		logger.info(pairing[0]);
+	else {
+		logger.info(pairing[0]);
+		logger.info(pairing[1]);
+	}
+	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": effectivenessState: " + effectivenessState +
+																		", dhState: " + dhState +
+																		", effectivenessWoDhState: " + effectivenessWoDhState);
+	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": Before PairTots: " + numOfPairs[l.getNdx()] + ", " +
+																								numOfEffectivePairs[l.getNdx()] + ", " +
+																								numOfPairsWoDh[l.getNdx()] + ", " +
+																								numOfEffectivePairsWoDh[l.getNdx()]);
+}
 
 					numOfPairs[l.getNdx()]++;
 					if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties)
@@ -182,13 +182,13 @@ public class SolutionState {
 							numOfEffectivePairsWoDh[l.getNdx()]++;
 					}
 
-//if (beforeEffectivenessState && (!effectivenessState)
-//		&& l.getNdx() == 114) {
-//	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": After PairTots: " + numOfPairs[l.getNdx()] + ", " +
-//																								numOfEffectivePairs[l.getNdx()] + ", " +
-//																								numOfPairsWoDh[l.getNdx()] + ", " +
-//																								numOfEffectivePairsWoDh[l.getNdx()]);
-//}
+if (beforeEffectivenessState && (!effectivenessState)
+		&& l.getNdx() == 97) {
+	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": After PairTots: " + numOfPairs[l.getNdx()] + ", " +
+																								numOfEffectivePairs[l.getNdx()] + ", " +
+																								numOfPairsWoDh[l.getNdx()] + ", " +
+																								numOfEffectivePairsWoDh[l.getNdx()]);
+}
 
 				}
 			}
@@ -279,8 +279,8 @@ public class SolutionState {
 					&& d.hasPairing(this.hbNdx)) {
 				if (d.isHbDep(this.hbNdx)) {
 
-if (d.getNdx() == 1054)
-System.out.println();
+//if (d.getNdx() == 1054)
+//System.out.println();
 
 					DutyState beforeDst = activeDutyStates[d.getNdx()];
 					int beforeNumOfDhs = (d.getNumOfLegsPassive() + beforeDst.numOfCoveringsActive + beforeDst.numOfCoveringsPassiveInt + beforeDst.numOfCoveringsPassiveExt);
@@ -311,8 +311,8 @@ System.out.println();
 								if (nd.isHbArr(this.hbNdx)
 										&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))) {
 
-if (d.getNdx() == 12142)
-System.out.println();
+//if (d.getNdx() == 12142)
+//System.out.println();
 
 									DutyState beforeNdst = activeDutyStates[nd.getNdx()];
 									beforeNumOfDhs += (nd.getNumOfLegsPassive() + beforeNdst.numOfCoveringsActive + beforeNdst.numOfCoveringsPassiveInt + beforeNdst.numOfCoveringsPassiveExt);

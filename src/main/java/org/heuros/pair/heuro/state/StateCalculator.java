@@ -96,7 +96,7 @@ public class StateCalculator implements Callable<Double> {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-//if (l.getNdx() == 114) {
+//if (l.getNdx() == 97) {
 //	logger.info("--------------------");
 //	if (numOfDuties == 1)
 //		logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[0].getNdx());
@@ -127,7 +127,7 @@ public class StateCalculator implements Callable<Double> {
 						}
 					}
 
-//if (l.getNdx() == 114) {
+//if (l.getNdx() == 97) {
 //	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": After PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
 //																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
 //																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
@@ -165,8 +165,8 @@ public class StateCalculator implements Callable<Double> {
 		for (int i = 0; i < pwq.pair.getNumOfDuties(); i++) {
 			Duty duty = pwq.pair.getDuties().get(i);
 
-if (duty.getNdx() == 825)
-System.out.println();
+//if (duty.getNdx() == 20464)
+//System.out.println();
 
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
 				Leg leg = duty.getLegs().get(j);
@@ -348,6 +348,7 @@ System.out.println();
 								Duty[] pds = this.dutyIndexByArrLegNdx.getArray(pl.getNdx());
 								for (Duty pd : pds) {
 									if (pd.isHbDep(this.hbNdx)
+											&& (!pd.getNextBriefTime(hbNdx).isAfter(dutyOfLeg.getBriefTime(hbNdx)))	//	This line is put because of no rule validation code is invoked here!
 											&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 													|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))) {
 										numOfDhs = pd.getNumOfLegsPassive()
