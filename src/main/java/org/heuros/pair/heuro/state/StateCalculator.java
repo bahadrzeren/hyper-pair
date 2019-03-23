@@ -1,6 +1,7 @@
 package org.heuros.pair.heuro.state;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,7 +97,7 @@ public class StateCalculator implements Callable<Double> {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-//if (l.getNdx() == 97) {
+//if (l.getNdx() == 356) {
 //	logger.info("--------------------");
 //	if (numOfDuties == 1)
 //		logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[0].getNdx());
@@ -127,7 +128,7 @@ public class StateCalculator implements Callable<Double> {
 						}
 					}
 
-//if (l.getNdx() == 97) {
+//if (l.getNdx() == 356) {
 //	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": After PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
 //																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
 //																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
@@ -165,7 +166,7 @@ public class StateCalculator implements Callable<Double> {
 		for (int i = 0; i < pwq.pair.getNumOfDuties(); i++) {
 			Duty duty = pwq.pair.getDuties().get(i);
 
-//if (duty.getNdx() == 20464)
+//if (duty.getNdx() == 6661)
 //System.out.println();
 
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
@@ -186,7 +187,7 @@ public class StateCalculator implements Callable<Double> {
 				if (dutyOfLeg.hasPairing(pwq.pair.getHbNdx())
 						&& dutyOfLeg.isValid(pwq.pair.getHbNdx())) {
 
-//if (dutyOfLeg.getNdx() == 822)
+//if (dutyOfLeg.getNdx() == 44027)
 //System.out.println();
 
 					DutyState dutyOfLegStat = this.tempDutyStates[dutyOfLeg.getNdx()];
@@ -300,7 +301,12 @@ public class StateCalculator implements Callable<Double> {
 								Duty[] nds = this.dutyIndexByDepLegNdx.getArray(nl.getNdx());
 								for (Duty nd : nds) {
 									if (nd.isHbArr(this.hbNdx)
-											&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))) {
+											&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
+											/*
+											 * This line below are put because of no rule validation code is done here!
+											 * Rule validation is done in just briefing time context.
+											 */
+											&& (ChronoUnit.DAYS.between(dutyOfLeg.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < 3)) {
 
 										numOfDhs = nd.getNumOfLegsPassive()
 													+ this.tempDutyStates[nd.getNdx()].numOfCoveringsActive
@@ -348,7 +354,13 @@ public class StateCalculator implements Callable<Double> {
 								Duty[] pds = this.dutyIndexByArrLegNdx.getArray(pl.getNdx());
 								for (Duty pd : pds) {
 									if (pd.isHbDep(this.hbNdx)
-											&& (!pd.getNextBriefTime(hbNdx).isAfter(dutyOfLeg.getBriefTime(hbNdx)))	//	This line is put because of no rule validation code is invoked here!
+											/*
+											 * These three lines below are put because of no rule validation code is done here!
+											 * Rule validation is done in just briefing time context.
+											 */
+											&& (!pd.getMinNextBriefTime(hbNdx).isAfter(dutyOfLeg.getBriefTime(hbNdx)))
+											&& (pd.getMinNextBriefTime(hbNdx).plusHours(HeurosSystemParam.maxNetDutySearchDeptInHours + 1).isAfter(dutyOfLeg.getBriefTime(hbNdx)))
+											&& (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), dutyOfLeg.getDebriefTime(this.hbNdx).minusSeconds(1)) < 3)
 											&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 													|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))) {
 										numOfDhs = pd.getNumOfLegsPassive()

@@ -1,6 +1,7 @@
 package org.heuros.pair.heuro;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -93,7 +94,12 @@ public class BiDirPairChecker implements Callable<Boolean> {
 							Duty[] nds = this.dutyIndexByDepLegNdx.getArray(nl.getNdx());
 							for (Duty nd : nds) {
 								if (nd.isHbArr(this.hbNdx)
-										&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))) {
+										&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
+										/*
+										 * This line below are put because of no rule validation code is done here!
+										 * Rule validation is done in just briefing time context.
+										 */
+										&& (ChronoUnit.DAYS.between(duty.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < 3)) {
 									pairing[1] = nd;
 									numOfDhs += nd.getNumOfLegsPassive();
 									totalActiveBlockTime += nd.getBlockTimeInMinsActive();
