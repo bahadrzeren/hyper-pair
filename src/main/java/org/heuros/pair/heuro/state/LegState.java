@@ -14,7 +14,8 @@ public class LegState implements Cloneable {
 	public static int maxNumOfIncludingEffectivePairs = 0;
 	public static int maxNumOfIncludingEffectivePairsWoDh = 0;
 
-	public static double maxHeuristicModifierValue = 0.0;
+	public static double maxHeurModDh = 0.0;
+	public static double maxHeurModEf = 0.0;
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
@@ -69,7 +70,8 @@ public class LegState implements Cloneable {
 	 * Cumulative values that do not reset during optimization.
 	 */
 	public int numOfIterations = 0;
-	public double heuristicModifierValue = 0.0;
+	public double heurModDh= 0.0;
+	public double heurModEf= 0.0;
 
 	/*
 	 * Difficulty Score calculations.
@@ -80,11 +82,12 @@ public class LegState implements Cloneable {
 	public static double weightDutyEffectiveInclusionScoreWoDh = 0.0;
 
 	public static double weightPairInclusionScore = 0.0;
-	public static double weightPairInclusionScoreWoDh = 0.0;
+	public static double weightPairInclusionScoreWoDh = 0.95;
 	public static double weightPairEffectiveInclusionScore = 0.0;
-	public static double weightPairEffectiveInclusionScoreWoDh = 1.0;
+	public static double weightPairEffectiveInclusionScoreWoDh = 0.0;
 
-	public static double weightHeuristicModifier = 0.0;
+	public static double weightHeurModDh = 0.05;
+	public static double weightHeurModEf = 0.0;
 
 	private double getDutyInclusionScore() {
 		return (weightDutyInclusionScore * (1.0 - (1.0 * this.numOfIncludingDuties / LegState.maxNumOfIncludingDuties)));
@@ -118,9 +121,17 @@ public class LegState implements Cloneable {
 		return (weightPairEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectivePairsWoDh / LegState.maxNumOfIncludingEffectivePairsWoDh)));
 	}
 
-	private double getHeuristicModifierScore() {
-		if (LegState.maxHeuristicModifierValue > 0.0) {
-			return (weightHeuristicModifier * this.heuristicModifierValue) / LegState.maxHeuristicModifierValue;
+	private double getHeurModDhScore() {
+		if (LegState.maxHeurModDh > 0.0) {
+			return (weightHeurModDh * this.heurModDh) / LegState.maxHeurModDh;
+		} else {
+			return 0.0;
+		}
+	}
+
+	private double getHeurModEfScore() {
+		if (LegState.maxHeurModEf > 0.0) {
+			return (weightHeurModEf * this.heurModEf) / LegState.maxHeurModEf;
 		} else {
 			return 0.0;
 		}
@@ -129,17 +140,16 @@ public class LegState implements Cloneable {
 	public double getDifficultyScoreOfTheLeg() {
 		if (this.associatedLeg.isCover()
 				&& (this.numOfCoverings == 0)) {
-			double v1 = this.getDutyInclusionScore();
-			double v2 = this.getDutyInclusionScoreWoDh();
-			double v3 = this.getDutyEffectiveInclusionScore();
-			double v4 = this.getDutyEffectiveInclusionScoreWoDh();
-			double v5 = this.getPairInclusionScore();
-			double v6 = this.getPairInclusionScoreWoDh();
-			double v7 = this.getPairEffectiveInclusionScore();
-			double v8 = this.getPairEffectiveInclusionScoreWoDh();
-			double v9 = this.getHeuristicModifierScore();
-////if (v1 + v2 + v3 + v4 + v5 > 1.0)
-////System.out.println();
+//			double v1 = this.getDutyInclusionScore();
+//			double v2 = this.getDutyInclusionScoreWoDh();
+//			double v3 = this.getDutyEffectiveInclusionScore();
+//			double v4 = this.getDutyEffectiveInclusionScoreWoDh();
+//			double v5 = this.getPairInclusionScore();
+//			double v6 = this.getPairInclusionScoreWoDh();
+//			double v7 = this.getPairEffectiveInclusionScore();
+//			double v8 = this.getPairEffectiveInclusionScoreWoDh();
+//			double v9 = this.getHeurModDhScore();
+//			double v10 = this.getHeurModEfScore();
 			return this.getDutyInclusionScore()
 					+ this.getDutyInclusionScoreWoDh()
 					+ this.getDutyEffectiveInclusionScore()
@@ -148,7 +158,8 @@ public class LegState implements Cloneable {
 					+ this.getPairInclusionScoreWoDh()
 					+ this.getPairEffectiveInclusionScore()
 					+ this.getPairEffectiveInclusionScoreWoDh()
-					+ this.getHeuristicModifierScore();
+					+ this.getHeurModDhScore()
+					+ this.getHeurModEfScore();
 		} else {
 			return 0.0;
 		}
@@ -189,7 +200,8 @@ public class LegState implements Cloneable {
 				", numOfIncludingEffectivePairs: " + numOfIncludingEffectivePairs + 
 				", numOfIncludingEffectivePairsWoDh: " + numOfIncludingEffectivePairsWoDh + 
 				", numOfIterations: " + numOfIterations + 
-				", heuristicModifierValue: " + heuristicModifierValue;
+				", heurModDh: " + heurModDh +
+				", heurModEf: " + heurModEf;
 		
 	}
 }

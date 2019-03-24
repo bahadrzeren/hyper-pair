@@ -96,6 +96,7 @@ public class BiDirPairChecker implements Callable<Boolean> {
 								if (nd.isHbArr(this.hbNdx)
 										&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
 										/*
+										 * TODO
 										 * This line below are put because of no rule validation code is done here!
 										 * Rule validation is done in just briefing time context.
 										 */

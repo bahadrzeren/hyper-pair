@@ -3,11 +3,9 @@ package org.heuros.pair.heuro.state;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
 import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
@@ -17,7 +15,7 @@ import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.sp.PairWithQuality;
 
 public class StateCalculator implements Callable<Double> {
-	private static Logger logger = Logger.getLogger(StateCalculator.class);
+//	private static Logger logger = Logger.getLogger(StateCalculator.class);
 
 	/*
 	 * TODO Single base assumption!!!
@@ -303,6 +301,7 @@ public class StateCalculator implements Callable<Double> {
 									if (nd.isHbArr(this.hbNdx)
 											&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
 											/*
+											 * TODO
 											 * This line below are put because of no rule validation code is done here!
 											 * Rule validation is done in just briefing time context.
 											 */
@@ -355,6 +354,7 @@ public class StateCalculator implements Callable<Double> {
 								for (Duty pd : pds) {
 									if (pd.isHbDep(this.hbNdx)
 											/*
+											 * TODO
 											 * These three lines below are put because of no rule validation code is done here!
 											 * Rule validation is done in just briefing time context.
 											 */
