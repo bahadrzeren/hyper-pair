@@ -199,9 +199,9 @@ public class SolutionState {
 //	}
 
 
-	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxNumOfPairingEvals);
+	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.maxNumOfPairingSetsToEval);
 
-	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[] pqs) throws InterruptedException, ExecutionException {
+	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[][] pqs) throws InterruptedException, ExecutionException {
 
 //if (legToCover.getNdx() == 5204)
 //System.out.println();
@@ -213,7 +213,8 @@ public class SolutionState {
 		List<StateCalculator> stateCalculators = new ArrayList<StateCalculator>(pqs.length);
 		List<Future<Double>> stateProcessL = new ArrayList<Future<Double>>(pqs.length);
 		for (int i = 0; i < pqs.length; i++) {
-			PairWithQuality pwq = pqs[i];
+			for (int j = 0; j < pqs[i].length; j++) {
+			PairWithQuality pwq = pqs[i][j];
 			if (pwq.pair != null) {
 				if (pwq.pair.getFirstDuty().getBriefTime(pwq.pair.getHbNdx()).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
 					StateCalculator stateCalculator = new StateCalculator(this.legs,
@@ -240,6 +241,7 @@ public class SolutionState {
 //						worstDifficutlyScore = maxLegDifficultyScore;
 //					}
 				}
+			}
 			}
 		}
 
@@ -423,7 +425,34 @@ public class SolutionState {
 		return bestStateCalculator.getPwq().pair;
 	}
 
+	private int[][] numOfLegsThatCoveredDutyHas = null;
+	private int[][] numOfLegsThatCoveredPairHas = null;
+	private int[][] numOfDutiesThatCoveredPairHas = null;
+	private int[][] numOfDh = null;
+	private int[][] numOfDhThatCoveredDutyHas = null;
+	private int[][] numOfDhThatCoveredPairHas = null;
+	private int[][] nextLeg = null;
+	private int[][] prevLeg = null;
+	private int[][] dutyCovers = null;
+	private int[][] nextDuty = null;
+	private int[][] prevDuty = null;
+
 	public double finalizeIteration(int iterationNumber, List<Pair> solution, int uncoveredLegs) {
+
+//		if (numOfLegsThatCoveredDutyHas == null) {
+//			numOfLegsThatCoveredDutyHas = new int[this.legs.size()][100];
+//			numOfLegsThatCoveredPairHas = new int[this.legs.size()][100];
+//			numOfDutiesThatCoveredPairHas = new int[this.legs.size()][100];
+//			numOfDh = new int[this.legs.size()][100];
+//			numOfDhThatCoveredDutyHas = new int[this.legs.size()][100];
+//			numOfDhThatCoveredPairHas = new int[this.legs.size()][100];
+//			nextLeg = new int[this.legs.size()][100];
+//			prevLeg = new int[this.legs.size()][100];
+//			dutyCovers = new int[this.legs.size()][100];
+//			nextDuty = new int[this.legs.size()][100];
+//			prevDuty = new int[this.legs.size()][100];
+//		}
+
 //		double fitness = 0.0;
 		int numOfDuties = 0;
 		int numOfPairDays = 0;
@@ -484,12 +513,12 @@ public class SolutionState {
 						/*
 						 * Set dh related heuristicModifier.
 						 */
-						activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh / 2.0 + modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+						activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
 						totalHeurModDh += modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
 						/*
 						 * Set ef related heuristicModifier.
 						 */
-						activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf / 2.0 + modValueEf;
+						activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf + modValueEf;
 						totalHeurModEf += modValueEf;
 					}
 				}
@@ -533,7 +562,7 @@ public class SolutionState {
 					", totalHeurModDh: " + totalHeurModDh +
 					", totalHeurModEf: " + totalHeurModEf);
 
-		return totalHeurModDh * LegState.weightHeurModDh + totalHeurModEf * LegState.weightHeurModEf;
+		return totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf;
 	}
 
 //	/*

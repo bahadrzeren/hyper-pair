@@ -1,6 +1,7 @@
 package org.heuros.pair.heuro.state;
 
 import org.heuros.data.model.Leg;
+import org.heuros.pair.conf.HeurosSystemParam;
 
 public class LegState implements Cloneable {
 
@@ -73,57 +74,41 @@ public class LegState implements Cloneable {
 	public double heurModDh= 0.0;
 	public double heurModEf= 0.0;
 
-	/*
-	 * Difficulty Score calculations.
-	 */
-	public static double weightDutyInclusionScore = 0.0;
-	public static double weightDutyInclusionScoreWoDh = 0.0;
-	public static double weightDutyEffectiveInclusionScore = 0.0;
-	public static double weightDutyEffectiveInclusionScoreWoDh = 0.0;
-
-	public static double weightPairInclusionScore = 0.0;
-	public static double weightPairInclusionScoreWoDh = 0.95;
-	public static double weightPairEffectiveInclusionScore = 0.0;
-	public static double weightPairEffectiveInclusionScoreWoDh = 0.0;
-
-	public static double weightHeurModDh = 0.05;
-	public static double weightHeurModEf = 0.0;
-
 	private double getDutyInclusionScore() {
-		return (weightDutyInclusionScore * (1.0 - (1.0 * this.numOfIncludingDuties / LegState.maxNumOfIncludingDuties)));
+		return (HeurosSystemParam.weightDutyInclusionScore * (1.0 - (1.0 * this.numOfIncludingDuties / LegState.maxNumOfIncludingDuties)));
 	}
 
 	private double getDutyInclusionScoreWoDh() {
-		return (weightDutyInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingDutiesWoDh / LegState.maxNumOfIncludingDutiesWoDh)));
+		return (HeurosSystemParam.weightDutyInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingDutiesWoDh / LegState.maxNumOfIncludingDutiesWoDh)));
 	}
 
 	private double getDutyEffectiveInclusionScore() {
-		return (weightDutyEffectiveInclusionScore * (1.0 - (1.0 * this.numOfIncludingEffectiveDuties / LegState.maxNumOfIncludingEffectiveDuties)));
+		return (HeurosSystemParam.weightDutyEffectiveInclusionScore * (1.0 - (1.0 * this.numOfIncludingEffectiveDuties / LegState.maxNumOfIncludingEffectiveDuties)));
 	}
 
 	private double getDutyEffectiveInclusionScoreWoDh() {
-		return (weightDutyEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectiveDutiesWoDh / LegState.maxNumOfIncludingEffectiveDutiesWoDh)));
+		return (HeurosSystemParam.weightDutyEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectiveDutiesWoDh / LegState.maxNumOfIncludingEffectiveDutiesWoDh)));
 	}
 
 	private double getPairInclusionScore() {
-		return (weightPairInclusionScore * (1.0 - (1.0 * this.numOfIncludingPairs / LegState.maxNumOfIncludingPairs)));
+		return (HeurosSystemParam.weightPairInclusionScore * (1.0 - (1.0 * this.numOfIncludingPairs / LegState.maxNumOfIncludingPairs)));
 	}
 
 	private double getPairInclusionScoreWoDh() {
-		return (weightPairInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingPairsWoDh / LegState.maxNumOfIncludingPairsWoDh)));
+		return (HeurosSystemParam.weightPairInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingPairsWoDh / LegState.maxNumOfIncludingPairsWoDh)));
 	}
 
 	private double getPairEffectiveInclusionScore() {
-		return (weightPairEffectiveInclusionScore * (1.0 - (1.0 * this.numOfIncludingEffectivePairs / LegState.maxNumOfIncludingEffectivePairs)));
+		return (HeurosSystemParam.weightPairEffectiveInclusionScore * (1.0 - (1.0 * this.numOfIncludingEffectivePairs / LegState.maxNumOfIncludingEffectivePairs)));
 	}
 
 	private double getPairEffectiveInclusionScoreWoDh() {
-		return (weightPairEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectivePairsWoDh / LegState.maxNumOfIncludingEffectivePairsWoDh)));
+		return (HeurosSystemParam.weightPairEffectiveInclusionScoreWoDh * (1.0 - (1.0 * this.numOfIncludingEffectivePairsWoDh / LegState.maxNumOfIncludingEffectivePairsWoDh)));
 	}
 
 	private double getHeurModDhScore() {
 		if (LegState.maxHeurModDh > 0.0) {
-			return (weightHeurModDh * this.heurModDh) / LegState.maxHeurModDh;
+			return (HeurosSystemParam.weightHeurModDh * this.heurModDh) / LegState.maxHeurModDh;
 		} else {
 			return 0.0;
 		}
@@ -131,7 +116,7 @@ public class LegState implements Cloneable {
 
 	private double getHeurModEfScore() {
 		if (LegState.maxHeurModEf > 0.0) {
-			return (weightHeurModEf * this.heurModEf) / LegState.maxHeurModEf;
+			return (HeurosSystemParam.weightHeurModEf * this.heurModEf) / LegState.maxHeurModEf;
 		} else {
 			return 0.0;
 		}

@@ -39,7 +39,7 @@ public class PairingGenerator {
 		this.duties = dutyRepository.getModels();
 	}
 
-	public PairWithQuality[] generatePairing(Leg legToCover,
+	public PairWithQuality[][] generatePairing(Leg legToCover,
 								int heuristicNo,
 								DutyState[] dutyStates) throws CloneNotSupportedException {
 
@@ -49,11 +49,13 @@ public class PairingGenerator {
 		currentPair.pair = Pair.newInstance(this.hbNdx);
 		currentPair.pairQ = new QualityMetric();
 
-		PairWithQuality[] bestPairs = new PairWithQuality[HeurosSystemParam.maxNumOfPairingEvals];
+		PairWithQuality[][] bestPairs = new PairWithQuality[HeurosSystemParam.maxNumOfPairingSetsToEval][HeurosSystemParam.maxPairingLengthInDays];
 		for (int i = 0; i < bestPairs.length; i++) {
-			PairWithQuality pairWithQuality = new PairWithQuality();
-			pairWithQuality.pairQ = new QualityMetric();
-			bestPairs[i] = pairWithQuality;
+			for (int j = 0; j < bestPairs[i].length; j++) {
+				PairWithQuality pairWithQuality = new PairWithQuality();
+				pairWithQuality.pairQ = new QualityMetric();
+				bestPairs[i][j] = pairWithQuality;
+			}
 		}
 
 		if ((coveringDuties != null)
@@ -253,12 +255,19 @@ public class PairingGenerator {
 			 */
 			int pairingGenerationNodeNdx = 0;
 			for (int i = 0; i < sourceDutyNodes.length; i++) {
-				int j = i;
 
-				NodeQualityMetric nqm = sourceDutyNodes[j];
-				int numOfDutiesNdx = nqm.getQual().getNumOfDuties() - 1;
+				NodeQualityMetric nqm = sourceDutyNodes[i];
+				int ndxOfSet = -1;
+				int ndxOfCand = nqm.getQual().getNumOfDuties() - 1;
 
-				if (nqm.getQual().isBetterThan(heuristicNo, bestPairs[numOfDutiesNdx].pairQ)) {
+				for (int j = 0; j < HeurosSystemParam.maxNumOfPairingSetsToEval; j++) {
+					if (nqm.getQual().isBetterThan(heuristicNo, bestPairs[j][ndxOfCand].pairQ)) {
+						ndxOfSet = j;
+						break;
+					}
+				}
+
+				if (ndxOfSet >= 0) {
 
 					Duty d = nqm.getParent().getNodeOwner();
 
@@ -273,10 +282,15 @@ public class PairingGenerator {
 						if (d.isHbArr(this.hbNdx)) {
 			    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
 			    				if (currentPair.pair.isComplete(this.hbNdx)) {
-			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[numOfDutiesNdx].pairQ)) {
-			    						bestPairs[numOfDutiesNdx].pair = (Pair) currentPair.pair.clone();
-			    						bestPairs[numOfDutiesNdx].pairQ.injectValues(currentPair.pairQ);
-			    						bestPairs[numOfDutiesNdx].pairNq = sourceDutyNodes[j];
+			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[ndxOfSet][ndxOfCand].pairQ)) {
+			    						for (int j = HeurosSystemParam.maxNumOfPairingSetsToEval - 1; j > ndxOfSet; j--) {
+				    						bestPairs[j][ndxOfCand].pair = bestPairs[j - 1][ndxOfCand].pair;
+				    						bestPairs[j][ndxOfCand].pairQ.injectValues(bestPairs[j - 1][ndxOfCand].pairQ);
+				    						bestPairs[j][ndxOfCand].pairNq = bestPairs[j - 1][ndxOfCand].pairNq;
+			    						}
+			    						bestPairs[ndxOfSet][ndxOfCand].pair = (Pair) currentPair.pair.clone();
+			    						bestPairs[ndxOfSet][ndxOfCand].pairQ.injectValues(currentPair.pairQ);
+			    						bestPairs[ndxOfSet][ndxOfCand].pairNq = sourceDutyNodes[i];
 			    						pairingGenerationNodeNdx = i;
 			    					}
 			    				} else
@@ -299,10 +313,15 @@ public class PairingGenerator {
 										if (nd.isHbArr(this.hbNdx)) {
 											if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
 							    				if (currentPair.pair.isComplete(this.hbNdx)) {
-							    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[numOfDutiesNdx].pairQ)) {
-							    						bestPairs[numOfDutiesNdx].pair = (Pair) currentPair.pair.clone();
-							    						bestPairs[numOfDutiesNdx].pairQ.injectValues(currentPair.pairQ);
-							    						bestPairs[numOfDutiesNdx].pairNq = sourceDutyNodes[j];
+							    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[ndxOfSet][ndxOfCand].pairQ)) {
+							    						for (int j = HeurosSystemParam.maxNumOfPairingSetsToEval - 1; j > ndxOfSet; j--) {
+								    						bestPairs[j][ndxOfCand].pair = bestPairs[j - 1][ndxOfCand].pair;
+								    						bestPairs[j][ndxOfCand].pairQ.injectValues(bestPairs[j - 1][ndxOfCand].pairQ);
+								    						bestPairs[j][ndxOfCand].pairNq = bestPairs[j - 1][ndxOfCand].pairNq;
+							    						}
+							    						bestPairs[ndxOfSet][ndxOfCand].pair = (Pair) currentPair.pair.clone();
+							    						bestPairs[ndxOfSet][ndxOfCand].pairQ.injectValues(currentPair.pairQ);
+							    						bestPairs[ndxOfSet][ndxOfCand].pairNq = sourceDutyNodes[i];
 							    						pairingGenerationNodeNdx = i;
 							    						break;
 							    					}
