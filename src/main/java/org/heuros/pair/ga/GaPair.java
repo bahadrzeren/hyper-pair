@@ -25,9 +25,6 @@ import org.heuros.data.model.Leg;
 import org.heuros.data.processor.BiDirDutyPairingChecker;
 import org.heuros.data.processor.BiDirLegPairingChecker;
 import org.heuros.data.processor.DutyGenerator;
-import org.heuros.data.repo.AirportRepository;
-import org.heuros.data.repo.DutyRepository;
-import org.heuros.data.repo.LegRepository;
 import org.heuros.exception.RuleAnnotationIsMissing;
 import org.heuros.exception.RuleRegistrationMatchingException;
 import org.heuros.loader.legs.LegsLoader;
@@ -70,10 +67,6 @@ import org.heuros.pair.rule.PairLayoverCheck;
 import org.heuros.pair.rule.PairNumOfPassiveLegsLimit;
 import org.heuros.pair.rule.PairPeriodLength;
 import org.heuros.pair.sp.PairingGenerator;
-import org.heuros.rule.AirportRuleContext;
-import org.heuros.rule.DutyRuleContext;
-import org.heuros.rule.LegRuleContext;
-import org.heuros.rule.PairRuleContext;
 
 /**
  * The main class that is used to start process.
@@ -162,13 +155,7 @@ public class GaPair {
 			/*
 			 * Generate context.
 			 */
-			PairOptimizationContext pairOptimizationContext = new PairOptimizationContext(new AirportRepository(),
-																							new AirportRuleContext(),
-																							new LegRepository(),
-																							new LegRuleContext(HeurosSystemParam.homebases.length),
-																							new DutyRepository(),
-																							new DutyRuleContext(HeurosSystemParam.homebases.length),
-																							new PairRuleContext(HeurosSystemParam.homebases.length));
+			PairOptimizationContext pairOptimizationContext = new PairOptimizationContext(HeurosSystemParam.homebases.length);
 
 			/*
 			 * Register rules.
@@ -222,24 +209,14 @@ public class GaPair {
 																						HeurosSystemParam.effectiveDutyBlockHourLimit,
 																						HeurosSystemParam.maxPreDutySearchDeptInHours,
 																						HeurosSystemParam.maxPairingLengthInDays * 24,
-																						pairOptimizationContext.getDutyRepository(),
-																						pairOptimizationContext.getDutyRuleContext(),
-																						pairOptimizationContext.getPairRuleContext(),
-																						pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime(),
-																						pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+																						pairOptimizationContext);
 				pairInitCalls.add(executorService.submit(dutyPairChecker));
 
 				BiDirLegPairingChecker legPairChecker = new BiDirLegPairingChecker(hbNdx,
 																					HeurosDatasetParam.legCoverPeriodEndExc,
 																					HeurosSystemParam.maxPreDutySearchDeptInHours,
 																					HeurosSystemParam.maxPairingLengthInDays * 24,
-																					pairOptimizationContext.getLegRepository(),
-																					pairOptimizationContext.getDutyRepository(),
-																					pairOptimizationContext.getDutyRuleContext(),
-																					pairOptimizationContext.getPairRuleContext(),
-																					pairOptimizationContext.getDutyIndexByLegNdx(),
-																					pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime(),
-																					pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+																					pairOptimizationContext);
 				pairInitCalls.add(executorService.submit(legPairChecker));
 			}
 
@@ -258,10 +235,7 @@ public class GaPair {
 			DutyLegOvernightConnNetwork pricingNetwork = new DutyLegOvernightConnNetwork(HeurosDatasetParam.dutyProcessPeriodEndExc, 
 																							HeurosSystemParam.maxNetDutySearchDeptInHours, 
 																							HeurosSystemParam.maxPairingLengthInDays,
-																							pairOptimizationContext.getDutyRuleContext(),
-																							pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime(),
-																							pairOptimizationContext.getLegRepository(),
-																							pairOptimizationContext.getDutyRepository());
+																							pairOptimizationContext);
 			pricingNetwork.buildNetwork();
 
 			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext.getPairRuleContext(),

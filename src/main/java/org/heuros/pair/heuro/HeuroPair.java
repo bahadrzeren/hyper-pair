@@ -22,9 +22,6 @@ import org.heuros.data.model.Leg;
 import org.heuros.data.processor.BiDirDutyPairingChecker;
 import org.heuros.data.processor.BiDirLegPairingChecker;
 import org.heuros.data.processor.DutyGenerator;
-import org.heuros.data.repo.AirportRepository;
-import org.heuros.data.repo.DutyRepository;
-import org.heuros.data.repo.LegRepository;
 import org.heuros.exception.RuleAnnotationIsMissing;
 import org.heuros.exception.RuleRegistrationMatchingException;
 import org.heuros.loader.legs.LegsLoader;
@@ -62,10 +59,6 @@ import org.heuros.pair.rule.PairLayoverCheck;
 import org.heuros.pair.rule.PairNumOfPassiveLegsLimit;
 import org.heuros.pair.rule.PairPeriodLength;
 import org.heuros.pair.sp.PairingGenerator;
-import org.heuros.rule.AirportRuleContext;
-import org.heuros.rule.DutyRuleContext;
-import org.heuros.rule.LegRuleContext;
-import org.heuros.rule.PairRuleContext;
 
 /**
  * The main class that is used to start process.
@@ -154,13 +147,7 @@ public class HeuroPair {
 			/*
 			 * Generate context.
 			 */
-			PairOptimizationContext pairOptimizationContext = new PairOptimizationContext(new AirportRepository(),
-																							new AirportRuleContext(),
-																							new LegRepository(),
-																							new LegRuleContext(HeurosSystemParam.homebases.length),
-																							new DutyRepository(),
-																							new DutyRuleContext(HeurosSystemParam.homebases.length),
-																							new PairRuleContext(HeurosSystemParam.homebases.length));
+			PairOptimizationContext pairOptimizationContext = new PairOptimizationContext(HeurosSystemParam.homebases.length);
 
 			/*
 			 * Register rules.
@@ -201,23 +188,12 @@ public class HeuroPair {
 
 			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
 
-//			UniDirDutyPairingChecker pairChecker = new UniDirDutyPairingChecker(hbNdx).setMaxPairingLengthInHours(HeurosSystemParam.maxPairingLengthInDays * 24)
-//																	.setMaxIdleTimeInAPairInHours(HeurosSystemParam.maxIdleTimeInAPairInHours)
-//																	.setDutyRepository(pairOptimizationContext.getDutyRepository())
-//																	.setDutyRuleContext(pairOptimizationContext.getDutyRuleContext())
-//																	.setPairRuleContext(pairOptimizationContext.getPairRuleContext())
-//																	.setDutyIndexByDepAirportNdxBrieftime(pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime());
-
 				BiDirDutyPairingChecker dutyPairChecker = new BiDirDutyPairingChecker(hbNdx,
 																						HeurosDatasetParam.dutyProcessPeriodEndExc,
 																						HeurosSystemParam.effectiveDutyBlockHourLimit,
 																						HeurosSystemParam.maxPreDutySearchDeptInHours,
 																						HeurosSystemParam.maxPairingLengthInDays * 24,
-																						pairOptimizationContext.getDutyRepository(),
-																						pairOptimizationContext.getDutyRuleContext(),
-																						pairOptimizationContext.getPairRuleContext(),
-																						pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime(),
-																						pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+																						pairOptimizationContext);
 
 //				pairInitCalls.add(executorService.submit(dutyPairChecker));
 				Future<Boolean> dutyPairCheckCall = executorService.submit(dutyPairChecker);
@@ -228,13 +204,7 @@ public class HeuroPair {
 																					HeurosDatasetParam.legCoverPeriodEndExc,
 																					HeurosSystemParam.maxPreDutySearchDeptInHours,
 																					HeurosSystemParam.maxPairingLengthInDays * 24,
-																					pairOptimizationContext.getLegRepository(),
-																					pairOptimizationContext.getDutyRepository(),
-																					pairOptimizationContext.getDutyRuleContext(),
-																					pairOptimizationContext.getPairRuleContext(),
-																					pairOptimizationContext.getDutyIndexByLegNdx(),
-																					pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime(),
-																					pairOptimizationContext.getDutyIndexByArrAirportNdxNextBrieftime());
+																					pairOptimizationContext);
 
 //				pairInitCalls.add(executorService.submit(legPairChecker));
 				Future<Boolean> legPairCheckCall = executorService.submit(legPairChecker);
@@ -256,17 +226,10 @@ public class HeuroPair {
 			DutyLegOvernightConnNetwork pricingNetwork = new DutyLegOvernightConnNetwork(HeurosDatasetParam.dutyProcessPeriodEndExc, 
 																							HeurosSystemParam.maxNetDutySearchDeptInHours, 
 																							HeurosSystemParam.maxPairingLengthInDays,
-																							pairOptimizationContext.getDutyRuleContext(),
-																							pairOptimizationContext.getDutyIndexByDepAirportNdxBrieftime(),
-																							pairOptimizationContext.getLegRepository(),
-																							pairOptimizationContext.getDutyRepository());
+																							pairOptimizationContext);
 			pricingNetwork.buildNetwork();
 
-			BiDirPairChecker pairChecker = new BiDirPairChecker(
-//																pairOptimizationContext.getLegRepository(),
-																pairOptimizationContext.getDutyRepository(),
-//																pairOptimizationContext.getDutyIndexByLegNdx(),
-																pricingNetwork);
+			BiDirPairChecker pairChecker = new BiDirPairChecker(pairOptimizationContext, pricingNetwork);
 			Future<Boolean> pairCheckCall = executorService.submit(pairChecker);
 			if (pairCheckCall.get())
 				logger.info("pairCheck job is completed!");

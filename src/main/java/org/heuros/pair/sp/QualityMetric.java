@@ -420,7 +420,8 @@ public class QualityMetric {
 	}
 
 	public boolean isBetterInTermsOfDh(QualityMetric qm, double diffScore, double diffScoreQm) {
-		if ((qm.numOfLegs == 0) || (this.numOfDh < qm.numOfDh)
+		if ((qm.numOfLegs == 0)
+				|| (this.numOfDh < qm.numOfDh)
 				|| ((this.numOfDh == qm.numOfDh) && (diffScore < diffScoreQm))) {
 			return true;
 		} else

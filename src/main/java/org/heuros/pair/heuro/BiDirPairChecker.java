@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
+import org.heuros.context.PairOptimizationContext;
 import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
-import org.heuros.core.data.repo.DataRepository;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
@@ -32,14 +32,11 @@ public class BiDirPairChecker implements Callable<Boolean> {
 	private List<Duty> duties = null;
 //	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 
-	public BiDirPairChecker(
-//							DataRepository<Leg> legRepository,
-							DataRepository<Duty> dutyRepository,
-//							OneDimIndexInt<Duty> dutyIndexByLegNdx,
+	public BiDirPairChecker(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork pricingNetwork) {
-//		this.legs = legRepository.getModels();
-		this.duties = dutyRepository.getModels();
-//		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
+//		this.legs = pairOptimizationContext.getLegRepository().getModels();
+		this.duties = pairOptimizationContext.getDutyRepository().getModels();
+//		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
 		this.dutyIndexByDepLegNdx = pricingNetwork.getDutyIndexByDepLegNdx();
 //		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
 		this.nextBriefLegIndexByDutyNdx = pricingNetwork.getNextBriefLegIndexByDutyNdx();

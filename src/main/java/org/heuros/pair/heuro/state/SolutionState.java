@@ -1,6 +1,7 @@
 package org.heuros.pair.heuro.state;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -33,6 +34,8 @@ public class SolutionState {
 	private LegState[] activeLegStates = null;
 	private DutyState[] activeDutyStates = null;
 
+//	private List<Leg> orderedLegs = null;
+
 	public SolutionState(List<Leg> legs,
 							List<Duty> duties,
 							OneDimIndexInt<Duty> dutyIndexByLegNdx,
@@ -50,6 +53,27 @@ public class SolutionState {
 		for (int j = 0; j < this.activeDutyStates.length; j++)
 			this.activeDutyStates[j] = new DutyState(this.duties.get(j));
 
+//		this.orderedLegs = new ArrayList<Leg>();
+//		for (int j = 0; j < this.legs.size(); j++) {
+//			this.orderedLegs.add(this.legs.get(j));
+//		}
+//		this.orderedLegs.sort(new Comparator<Leg>() {
+//			@Override
+//			public int compare(Leg o1, Leg o2) {
+//				if (o1.getNumOfIncludingPairsWoDh() < o2.getNumOfIncludingPairsWoDh())
+//					return -1;
+//				else
+//					if (o1.getNumOfIncludingPairsWoDh() > o2.getNumOfIncludingPairsWoDh())
+//						return 1;
+//					else
+//						if (o1.getNumOfIncludingEffectivePairsWoDh() < o2.getNumOfIncludingEffectivePairsWoDh())
+//							return -1;
+//						else
+//							if (o1.getNumOfIncludingEffectivePairsWoDh() > o2.getNumOfIncludingEffectivePairsWoDh())
+//								return 1;
+//				return 0;
+//			}
+//		});
 	}
 
 	public LegState[] getActiveLegStates() {
@@ -116,8 +140,8 @@ public class SolutionState {
 					&& this.legs.get(i).hasPair(hbNdx)
 					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
 					&& (activeLegStates[i].numOfCoverings == 0)) {
-				if (highestScore < activeLegStates[i].getDifficultyScoreOfTheLeg()) {
-					highestScore = activeLegStates[i].getDifficultyScoreOfTheLeg();
+				if (highestScore < activeLegStates[i].getWeightedDifficultyScore()) {
+					highestScore = activeLegStates[i].getWeightedDifficultyScore();
 					res = i;
 				}
 			}
@@ -237,9 +261,9 @@ public class SolutionState {
 //						bestDifficutlyScore = maxLegDifficultyScore;
 //						bestStateCalculator = stateCalculator;
 //					}
-//					if (worstDifficutlyScore < maxLegDifficultyScore) {
-//						worstDifficutlyScore = maxLegDifficultyScore;
-//					}
+////					if (worstDifficutlyScore < maxLegDifficultyScore) {
+////						worstDifficutlyScore = maxLegDifficultyScore;
+////					}
 				}
 			}
 			}
@@ -410,14 +434,14 @@ public class SolutionState {
 //		this.activeDutyStates = lessStateCalculator.getTempDutyStates();
 
 //logger.info("--- " + legToCover);
-//logger.info("bestScore: " + bestDifficutlyScore + ", lessScore: " + lessDifficutlyScore + ", worstScore: " + worstDifficutlyScore);
-////if (worstDifficutlyScore > lessDifficutlyScore)
-////	logger.info("worstScore: " + worstDifficutlyScore + " >>>>>>> lessScore: " + lessDifficutlyScore);
-//if (lessDifficutlyScore > bestDifficutlyScore)
-//	logger.info("lessScore: " + lessDifficutlyScore + " >>>>>>> bestScore: " + bestDifficutlyScore);
-//if (lessStateCalculator.getPwq().pair.getNumOfDuties() > bestStateCalculator.getPwq().pair.getNumOfDuties())
-//	logger.info("lessNum: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " >>>>>>> bestNum: " + bestStateCalculator.getPwq().pair.getNumOfDuties());
-//logger.info("LessDifficulty: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " - " + lessDifficutlyScore);
+////logger.info("bestScore: " + bestDifficutlyScore + ", lessScore: " + lessDifficutlyScore + ", worstScore: " + worstDifficutlyScore);
+//////if (worstDifficutlyScore > lessDifficutlyScore)
+//////	logger.info("worstScore: " + worstDifficutlyScore + " >>>>>>> lessScore: " + lessDifficutlyScore);
+////if (lessDifficutlyScore > bestDifficutlyScore)
+////	logger.info("lessScore: " + lessDifficutlyScore + " >>>>>>> bestScore: " + bestDifficutlyScore);
+////if (lessStateCalculator.getPwq().pair.getNumOfDuties() > bestStateCalculator.getPwq().pair.getNumOfDuties())
+////	logger.info("lessNum: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " >>>>>>> bestNum: " + bestStateCalculator.getPwq().pair.getNumOfDuties());
+////logger.info("LessDifficulty: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " - " + lessDifficutlyScore);
 //logger.info("BestDifficulty: " + bestStateCalculator.getPwq().pair.getNumOfDuties() + " - " + bestDifficutlyScore);
 
 		this.calculateAndSetMaxValuesOfHeuristicsParameters();

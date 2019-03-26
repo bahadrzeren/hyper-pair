@@ -133,9 +133,12 @@ public class StateCalculator implements Callable<Double> {
 //																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
 //}
 
-					double newDifficultyScore = this.tempLegStates[l.getNdx()].getDifficultyScoreOfTheLeg();
-					if (newDifficultyScore > res)
-						res = newDifficultyScore;
+					if (this.tempLegStates[l.getNdx()].numOfCoverings == 0) {
+						double newDifficultyScore = this.tempLegStates[l.getNdx()].getWeightedDifficultyScore();
+//						double newDifficultyScore = (1.0 * (LegState.maxNumOfIncludingPairsWoDh - this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh)) / LegState.maxNumOfIncludingPairsWoDh;
+						if (newDifficultyScore > res)
+							res = newDifficultyScore;
+					}
 				}
 			}
 		}
