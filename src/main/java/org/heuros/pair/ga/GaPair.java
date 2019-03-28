@@ -238,10 +238,7 @@ public class GaPair {
 																							pairOptimizationContext);
 			pricingNetwork.buildNetwork();
 
-			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext.getPairRuleContext(),
-																		pairOptimizationContext.getDutyIndexByLegNdx(),
-																		pricingNetwork,
-																		pairOptimizationContext.getDutyRepository());
+			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork);
 
 			PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())

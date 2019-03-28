@@ -236,14 +236,9 @@ public class HeuroPair {
 
 			executorService.shutdown();
 
-			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext.getPairRuleContext(),
-																		pairOptimizationContext.getDutyIndexByLegNdx(),
-																		pricingNetwork,
-																		pairOptimizationContext.getDutyRepository());
+			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork);
 
-			HeuroOptimizer pairOptimizer = new HeuroOptimizer(pairOptimizationContext.getLegRepository(),
-																pairOptimizationContext.getDutyRepository(),
-																pairOptimizationContext.getDutyIndexByLegNdx(),
+			HeuroOptimizer pairOptimizer = new HeuroOptimizer(pairOptimizationContext,
 																pricingNetwork,
 																pairingGenerator);
 

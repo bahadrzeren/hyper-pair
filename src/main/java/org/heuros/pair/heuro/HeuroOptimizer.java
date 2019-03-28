@@ -5,13 +5,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
-import org.heuros.core.data.ndx.OneDimIndexInt;
+import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.DutyLegOvernightConnNetwork;
-import org.heuros.data.model.Duty;
-import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
-import org.heuros.data.repo.DutyRepository;
-import org.heuros.data.repo.LegRepository;
 import org.heuros.pair.conf.HeurosGaParameters;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairingGenerator;
@@ -30,22 +26,23 @@ public class HeuroOptimizer {
 //	 */
 //	private int hbNdx = 0;
 
-	private List<Leg> legs = null;
-	private List<Duty> duties = null;
-	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+	private PairOptimizationContext pairOptimizationContext = null;
+//	private List<Leg> legs = null;
+//	private List<Duty> duties = null;
+//	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+
 	private DutyLegOvernightConnNetwork pricingNetwork = null;
 	private PairingGenerator pairingGenerator = null;
 
 	private SolutionState solutionState = null;
 
-	public HeuroOptimizer(LegRepository legRepository,
-							DutyRepository dutyRepository,
-							OneDimIndexInt<Duty> dutyIndexByLegNdx,
+	public HeuroOptimizer(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork pricingNetwork,
 							PairingGenerator pairingGenerator) {
-		this.legs = legRepository.getModels();
-		this.duties = dutyRepository.getModels();
-		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
+		this.pairOptimizationContext = pairOptimizationContext;
+//		this.legs = pairOptimizationContext.getLegRepository().getModels();
+//		this.duties = pairOptimizationContext.getDutyRepository().getModels();
+//		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
 		this.pricingNetwork = pricingNetwork;
 		this.pairingGenerator = pairingGenerator;
 	}
@@ -59,9 +56,7 @@ public class HeuroOptimizer {
 		int numOfIterationsWOProgress = 0;
 		long optStartTime = System.nanoTime();
 
-		this.solutionState = new SolutionState(this.legs,
-												this.duties,
-												this.dutyIndexByLegNdx,
+		this.solutionState = new SolutionState(this.pairOptimizationContext,
 												this.pricingNetwork);
 
 		for (int i = 0; i < HeurosGaParameters.maxNumOfIterations; i++) {
@@ -70,7 +65,7 @@ public class HeuroOptimizer {
 
 			this.solutionState.initializeForNewIteration();
 
-			SolutionGenerator solGen = new SolutionGenerator(this.legs, this.duties, this.dutyIndexByLegNdx, this.pairingGenerator);
+			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pairingGenerator);
 			int uncoveredLegs = solGen.generateSolution(solution, this.solutionState);
 
 			/**

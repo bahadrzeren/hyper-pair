@@ -3,12 +3,12 @@ package org.heuros.pair.sp;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.heuros.context.PairOptimizationContext;
 import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
-import org.heuros.data.repo.DutyRepository;
 import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.DutyState;
 import org.heuros.rule.PairRuleContext;
@@ -24,19 +24,18 @@ public class PairingGenerator {
 
 	private PairRuleContext pairRuleContext = null;
 
+	private List<Duty> duties = null;
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+
 	private DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork = null;
 
-	private List<Duty> duties = null;
+	public PairingGenerator(PairOptimizationContext pairOptimizationContext,
+							DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork) {
+		this.pairRuleContext = pairOptimizationContext.getPairRuleContext();
+		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
+		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 
-	public PairingGenerator(PairRuleContext pairRuleContext,
-							OneDimIndexInt<Duty> dutyIndexByLegNdx,
-							DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork,
-							DutyRepository dutyRepository) {
-		this.pairRuleContext = pairRuleContext;
-		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
 		this.dutyLegOvernightConnNetwork = dutyLegOvernightConnNetwork;
-		this.duties = dutyRepository.getModels();
 	}
 
 	public PairWithQuality[][] generatePairing(Leg legToCover,

@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
-import org.heuros.core.data.ndx.OneDimIndexInt;
-import org.heuros.data.model.Duty;
+import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.heuro.state.SolutionState;
@@ -22,17 +21,15 @@ public class SolutionGenerator {
 	private int hbNdx = 0;
 
 	private List<Leg> legs = null;
-	private List<Duty> duties = null;
-	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+//	private List<Duty> duties = null;
+//	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 	private PairingGenerator pairingGenerator = null;
 
-	public SolutionGenerator(List<Leg> legs,
-								List<Duty> duties,
-								OneDimIndexInt<Duty> dutyIndexByLegNdx,
+	public SolutionGenerator(PairOptimizationContext pairOptimizationContext,
 								PairingGenerator pairingGenerator) {
-		this.legs = legs;
-		this.duties = duties;
-		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
+		this.legs = pairOptimizationContext.getLegRepository().getModels();
+//		this.duties = pairOptimizationContext.getDutyRepository().getModels();
+//		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
 		this.pairingGenerator = pairingGenerator;
 	}
 

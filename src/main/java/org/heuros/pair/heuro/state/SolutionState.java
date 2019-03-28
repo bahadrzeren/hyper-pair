@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
+import org.heuros.context.PairOptimizationContext;
 import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
@@ -27,6 +28,7 @@ public class SolutionState {
 //	 */
 //	private int hbNdx = 0;
 
+	private PairOptimizationContext pairOptimizationContext = null;
 	private List<Leg> legs = null;
 	private List<Duty> duties = null;
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
@@ -36,13 +38,12 @@ public class SolutionState {
 
 //	private List<Leg> orderedLegs = null;
 
-	public SolutionState(List<Leg> legs,
-							List<Duty> duties,
-							OneDimIndexInt<Duty> dutyIndexByLegNdx,
+	public SolutionState(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork pricingNetwork) {
-		this.legs = legs;
-		this.duties = duties;
-		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
+		this.pairOptimizationContext = pairOptimizationContext;
+		this.legs = pairOptimizationContext.getLegRepository().getModels();
+		this.duties = pairOptimizationContext.getDutyRepository().getModels();
+		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
 		this.pricingNetwork = pricingNetwork;
 
 		this.activeLegStates = new LegState[this.legs.size()];
@@ -241,8 +242,7 @@ public class SolutionState {
 			PairWithQuality pwq = pqs[i][j];
 			if (pwq.pair != null) {
 				if (pwq.pair.getFirstDuty().getBriefTime(pwq.pair.getHbNdx()).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
-					StateCalculator stateCalculator = new StateCalculator(this.legs,
-																			dutyIndexByLegNdx,
+					StateCalculator stateCalculator = new StateCalculator(pairOptimizationContext,
 																			pricingNetwork,
 																			legToCover,
 																			activeLegStates,

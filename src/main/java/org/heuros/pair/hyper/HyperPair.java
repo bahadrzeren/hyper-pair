@@ -238,10 +238,7 @@ public class HyperPair {
 																							pairOptimizationContext);
 			pricingNetwork.buildNetwork();
 
-			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext.getPairRuleContext(),
-																		pairOptimizationContext.getDutyIndexByLegNdx(),
-																		pricingNetwork,
-																		pairOptimizationContext.getDutyRepository());
+			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork);
 
 			HyperChromoDecoder pairChromosomeDecoder = new HyperChromoDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
 																						.setDutyRepository(pairOptimizationContext.getDutyRepository())
