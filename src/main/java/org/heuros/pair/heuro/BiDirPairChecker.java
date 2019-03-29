@@ -34,7 +34,7 @@ public class BiDirPairChecker implements Callable<Boolean>, PairListener {
 	private List<Duty> duties = null;
 //	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 
-//	private PairEnumeratorWoRuleCheck pairEnumerator = null;
+	private PairEnumeratorWoRuleCheck pairEnumerator = null;
 
 	public BiDirPairChecker(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork pricingNetwork) {
@@ -46,11 +46,9 @@ public class BiDirPairChecker implements Callable<Boolean>, PairListener {
 		this.nextBriefLegIndexByDutyNdx = pricingNetwork.getNextBriefLegIndexByDutyNdx();
 //		this.prevDebriefLegIndexByDutyNdx = pricingNetwork.getPrevDebriefLegIndexByDutyNdx();
 
-//		pairEnumerator = new PairEnumeratorWoRuleCheck(pairOptimizationContext,
-//														pricingNetwork,
-//														this,
-//														HeurosSystemParam.maxPairingLengthInDays,
-//														HeurosSystemParam.maxSearchDeptForScoreCalculations);
+		pairEnumerator = new PairEnumeratorWoRuleCheck(pairOptimizationContext,
+														pricingNetwork,
+														this);
 	}
 
 	private void setIncludingPairings(Duty[] pairing, int numOfDuties, int numOfDhs, int totalActiveBlockTime) {
@@ -97,63 +95,63 @@ public class BiDirPairChecker implements Callable<Boolean>, PairListener {
 	@Override
 	public Boolean call() {
 
-//		this.pairEnumerator.enumerateAllPairings();
+		this.pairEnumerator.enumerateAllPairings(null);
 
-		logger.info("Pairings check is started!");
-
-		Duty[] pairing = new Duty[HeurosSystemParam.maxPairingLengthInDays];
-
-		int[] numOfProbablePairings = new int[HeurosSystemParam.maxPairingLengthInDays];
-
-		for (Duty duty : this.duties) {
-			if (duty.isValid(this.hbNdx)
-				&& duty.hasPairing(this.hbNdx)
-//				&& (duty.getNumOfLegsPassive() == 0)
-				) {
-
-				pairing[0] = duty;
-				int numOfDhs = duty.getNumOfLegsPassive();
-				int totalActiveBlockTime = duty.getBlockTimeInMinsActive();
-
-				if (duty.isHbDep(this.hbNdx)) {
-					if (duty.isHbArr(this.hbNdx)) {
-						setIncludingPairings(pairing, 1, numOfDhs, totalActiveBlockTime);
-						numOfProbablePairings[0]++;
-					} else {
-						LocalDate maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
-						this.fwSearch(numOfProbablePairings, pairing, duty, duty, numOfDhs, totalActiveBlockTime, 1, 1, maxMinDateDept);
-
-//						Leg[] nls = this.nextBriefLegIndexByDutyNdx.getArray(duty.getNdx());
-//						for (Leg nl : nls) {
-//							Duty[] nds = this.dutyIndexByDepLegNdx.getArray(nl.getNdx());
-//							for (Duty nd : nds) {
-//								if (nd.isHbArr(this.hbNdx)
-//										&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
-//										/*
-//										 * TODO
-//										 * This line below are put because of no rule validation code is done here!
-//										 * Rule validation is done in just briefing time context.
-//										 */
-//										&& (ChronoUnit.DAYS.between(duty.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < 3)) {
-//									pairing[1] = nd;
-//									numOfDhs += nd.getNumOfLegsPassive();
-//									totalActiveBlockTime += nd.getBlockTimeInMinsActive();
-//									setIncludingPairings(pairing, 2, numOfDhs, totalActiveBlockTime);
-//									numOfDhs -= nd.getNumOfLegsPassive();
-//									totalActiveBlockTime -= nd.getBlockTimeInMinsActive();
-//									pairing[1] = null;
-//									numOfProbablePairings++;
-//								}
-//							}
-//						}
-					}
-				}
-			}
-		}
-
-		for (int i = 0; i < numOfProbablePairings.length; i++) {
-			logger.info(numOfProbablePairings[i] + " num of probable " + (i + 1) + "th day pairings are found!");
-		}
+//		logger.info("Pairings check is started!");
+//
+//		Duty[] pairing = new Duty[HeurosSystemParam.maxPairingLengthInDays];
+//
+//		int[] numOfProbablePairings = new int[HeurosSystemParam.maxPairingLengthInDays];
+//
+//		for (Duty duty : this.duties) {
+//			if (duty.isValid(this.hbNdx)
+//				&& duty.hasPairing(this.hbNdx)
+////				&& (duty.getNumOfLegsPassive() == 0)
+//				) {
+//
+//				pairing[0] = duty;
+//				int numOfDhs = duty.getNumOfLegsPassive();
+//				int totalActiveBlockTime = duty.getBlockTimeInMinsActive();
+//
+//				if (duty.isHbDep(this.hbNdx)) {
+//					if (duty.isHbArr(this.hbNdx)) {
+//						setIncludingPairings(pairing, 1, numOfDhs, totalActiveBlockTime);
+//						numOfProbablePairings[0]++;
+//					} else {
+//						LocalDate maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
+//						this.fwSearch(numOfProbablePairings, pairing, duty, duty, numOfDhs, totalActiveBlockTime, 1, 1, maxMinDateDept);
+//
+////						Leg[] nls = this.nextBriefLegIndexByDutyNdx.getArray(duty.getNdx());
+////						for (Leg nl : nls) {
+////							Duty[] nds = this.dutyIndexByDepLegNdx.getArray(nl.getNdx());
+////							for (Duty nd : nds) {
+////								if (nd.isHbArr(this.hbNdx)
+////										&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
+////										/*
+////										 * TODO
+////										 * This line below are put because of no rule validation code is done here!
+////										 * Rule validation is done in just briefing time context.
+////										 */
+////										&& (ChronoUnit.DAYS.between(duty.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < 3)) {
+////									pairing[1] = nd;
+////									numOfDhs += nd.getNumOfLegsPassive();
+////									totalActiveBlockTime += nd.getBlockTimeInMinsActive();
+////									setIncludingPairings(pairing, 2, numOfDhs, totalActiveBlockTime);
+////									numOfDhs -= nd.getNumOfLegsPassive();
+////									totalActiveBlockTime -= nd.getBlockTimeInMinsActive();
+////									pairing[1] = null;
+////									numOfProbablePairings++;
+////								}
+////							}
+////						}
+//					}
+//				}
+//			}
+//		}
+//
+//		for (int i = 0; i < numOfProbablePairings.length; i++) {
+//			logger.info(numOfProbablePairings[i] + " num of probable " + (i + 1) + "th day pairings are found!");
+//		}
 
 		return true;
 	}

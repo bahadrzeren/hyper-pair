@@ -199,9 +199,10 @@ public class LegState implements Cloneable {
 										int numOfIncludingEffectivePairs,
 										int numOfIncludingPairsWoDh,
 										int numOfIncludingEffectivePairsWoDh) {
-		return (this.numOfIncludingPairs == numOfIncludingPairs)
-				&& (this.numOfIncludingEffectivePairs == numOfIncludingEffectivePairs)
-				&& (this.numOfIncludingPairsWoDh == numOfIncludingPairsWoDh)
+		return 
+//				(this.numOfIncludingPairs == numOfIncludingPairs) && 
+//				(this.numOfIncludingEffectivePairs == numOfIncludingEffectivePairs) && 
+				(this.numOfIncludingPairsWoDh == numOfIncludingPairsWoDh)
 				&& (this.numOfIncludingEffectivePairsWoDh == numOfIncludingEffectivePairsWoDh);
 	}
 
