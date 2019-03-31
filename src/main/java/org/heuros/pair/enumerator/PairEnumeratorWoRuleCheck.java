@@ -177,14 +177,18 @@ public class PairEnumeratorWoRuleCheck {
 							&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 									|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))) {
 						if (hbArr) {
-							if (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1)) {
+							if (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1)
+									&& (((toNdxExc - fromNdxInc) < 3)
+											|| ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), fd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))
+									) {
 								pairing[fromNdxInc] = pd;
 								this.pairListener.onPairingFound(pairing, fromNdxInc, toNdxExc, newNumOfDhs, totalActiveBlockTime + pd.getBlockTimeInMinsActive());
 								numOfProbablePairings[toNdxExc - fromNdxInc - 1]++;
 								pairing[fromNdxInc] = null;
 							}
 						} else
-							if (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)) {
+							if ((toNdxExc - fromNdxInc < HeurosSystemParam.maxSearchDeptForScoreCalculations)
+									&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)) {
 								pairing[fromNdxInc] = pd;
 								this.fwSearch(true,
 												dutyStates,
@@ -197,13 +201,15 @@ public class PairEnumeratorWoRuleCheck {
 					} else
 						if (pd.isNonHbArr(this.hbNdx)
 								&& (toNdxExc - fromNdxInc < HeurosSystemParam.maxSearchDeptForScoreCalculations)
-								&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
-										|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
 								/*
 								 * TODO
 								 * This line below are put because of no rule validation code is done here!
 								 * Rule validation is done in just briefing time context.
 								 */
+								&& (!pd.getMinNextBriefTime(hbNdx).isAfter(fd.getBriefTime(hbNdx)))
+								&& (pd.getMinNextBriefTime(hbNdx).plusHours(HeurosSystemParam.maxNetDutySearchDeptInHours + 1).isAfter(fd.getBriefTime(hbNdx)))
+								&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
+										|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
 								&& (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))) {
 							pairing[fromNdxInc] = pd;
 							this.bwSearch(hbArr,
@@ -221,17 +227,17 @@ public class PairEnumeratorWoRuleCheck {
 
 	public void enumerateAllPairings(Duty duty, DutyState[] dutyStates) {
 
-		DutyState dutyState = dutyStates[duty.getNdx()];
-
-		pairing[HeurosSystemParam.maxPairingLengthInDays - 1] = duty;
-
-		int numOfDhs = duty.getNumOfLegsPassive() + dutyState.numOfCoverings;
-		/*
-		 * We need ActiveBlockTime in the beginning to be able to decide whether the first state of the duty is efficient.
-		 */
-		int totalActiveBlockTime = duty.getBlockTimeInMinsActive();	//	 - dutyState.blockTimeOfCoveringsActive;
+		int numOfDhs = duty.getNumOfLegsPassive() + dutyStates[duty.getNdx()].numOfCoverings;
 
 		if (numOfDhs == 1) {
+
+			/*
+			 * We need ActiveBlockTime in the beginning to be able to decide whether the first state of the duty is efficient.
+			 */
+			int totalActiveBlockTime = duty.getBlockTimeInMinsActive();	//	 - dutyState.blockTimeOfCoveringsActive;
+
+			pairing[HeurosSystemParam.maxPairingLengthInDays - 1] = duty;
+
 			if (duty.isHbDep(this.hbNdx)) {
 				if (duty.isHbArr(this.hbNdx)) {
 					this.pairListener.onPairingFound(pairing,
@@ -264,5 +270,80 @@ public class PairEnumeratorWoRuleCheck {
 										numOfDhs, totalActiveBlockTime, duty.getDebriefDay(this.hbNdx).minusDays(HeurosSystemParam.maxPairingLengthInDays - 2));
 					}
 		}
+	}
+
+	public boolean validatePair(Duty[] testPair, DutyState[] dutyStates) {
+
+		int numOfDhs = dutyStates[testPair[0].getNdx()].numOfCoverings;
+
+		if ((testPair[0].getNumOfLegsPassive() == 0)
+				&& (numOfDhs <= 1)) {
+
+			/*
+			 * We need ActiveBlockTime in the beginning to be able to decide whether the first state of the duty is efficient.
+			 */
+			int totalActiveBlockTime = testPair[0].getBlockTimeInMinsActive();	//	 - dutyState.blockTimeOfCoveringsActive;
+
+			if (testPair[0].isHbDep(this.hbNdx)) {
+				if (testPair[0].isHbArr(this.hbNdx)) {
+					return true;
+				} else
+					if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 1) {
+						return this.validateFwSearch(testPair,
+														dutyStates,
+														1,
+														numOfDhs,
+														totalActiveBlockTime,
+														testPair[0].getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays));
+					}
+			} else
+				System.out.println("Must be an unreachable line!");
+		}
+
+		return false;
+	}
+
+	private boolean validateFwSearch(Duty[] testPair,
+										DutyState[] dutyStates,
+										int nextNdx,
+										int numOfDhs,
+										int totalActiveBlockTime,
+										LocalDate maxMinDateDept) {
+		Duty nd = testPair[nextNdx];
+		if ((nd.getNumOfLegsPassive() == 0)
+				&& ((dutyStates[nd.getNdx()].numOfCoverings + numOfDhs) <= 1)) {
+	
+			int newNumOfDhs = numOfDhs + nd.getNumOfLegsPassive();
+			if (dutyStates != null)
+				newNumOfDhs += dutyStates[nd.getNdx()].numOfCoverings;
+	
+			if (nd.isHbArr(this.hbNdx)
+					&& maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx))
+					/*
+					 * TODO
+					 * This line below are put because of no rule validation code is done here!
+					 * Rule validation is done in just briefing time context.
+					 */
+					&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1))) {
+				return true;
+			} else
+				if (nd.isNonHbArr(this.hbNdx)
+						&& (nextNdx + 1 < HeurosSystemParam.maxSearchDeptForScoreCalculations)
+						&& maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx))
+						/*
+						 * TODO
+						 * This line below are put because of no rule validation code is done here!
+						 * Rule validation is done in just briefing time context.
+						 */
+						&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))) {
+					return this.validateFwSearch(testPair,
+													dutyStates,
+													nextNdx + 1,
+													newNumOfDhs,
+													totalActiveBlockTime + nd.getBlockTimeInMinsActive(),
+													maxMinDateDept);
+				}
+		}
+		return false;
 	}
 }

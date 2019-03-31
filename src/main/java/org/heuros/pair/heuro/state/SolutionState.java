@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.DutyLegOvernightConnNetwork;
@@ -206,6 +207,9 @@ public class SolutionState implements PairListener {
 //		}
 //	}
 
+	public int[][] pairControlArray1 = null;
+	public int[][] pairControlArray2 = null;
+
 	private int[] numOfPairsWoDh = null;
 	private int[] numOfEffectivePairsWoDh = null;
 
@@ -217,7 +221,17 @@ public class SolutionState implements PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-if (l.getNdx() == 69) {
+if (l.getNdx() == 498) {
+
+	pairControlArray2 = ArrayUtils.add(pairControlArray2, new int[toNdxExc - fromNdxInc]);
+	int h = 0;
+	for (int k = fromNdxInc; k < toNdxExc; k++) {
+		pairControlArray2[pairControlArray2.length - 1][h] = pairing[k].getNdx();
+		h++;
+	}
+
+
+
 	logger.info("XXXXXXXXXXXXXXXXXXXX");
 	if (toNdxExc - fromNdxInc == 1)
 		logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx());
@@ -230,10 +244,40 @@ if (l.getNdx() == 69) {
 				logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
 																pairing[fromNdxInc + 1].getNdx() + ", " + 
 																pairing[fromNdxInc + 2].getNdx());
-			
+			else
+				if (toNdxExc - fromNdxInc == 4)
+					logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+																	pairing[fromNdxInc + 1].getNdx() + ", " +
+																	pairing[fromNdxInc + 2].getNdx() + ", " +
+																	pairing[fromNdxInc + 3].getNdx());
+
+	if (bestStateCalculator.pairControlArray != null) {
+		for (int[] dutyNdxs: bestStateCalculator.pairControlArray) {
+			if (dutyNdxs.length == (toNdxExc - fromNdxInc)) {
+				boolean f = true;
+				for (int k = 0; k < dutyNdxs.length; k++) {
+					if ((dutyNdxs[k] == 0)
+							|| (pairing[fromNdxInc - 1] != null)
+							|| (pairing[toNdxExc] != null))
+						System.out.println("Must be an unreachable line!");
+					if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
+						f = false;
+						break;
+					}
+				}
+				if (f)
+					System.out.println("Must be an unreachable line!");
+			} else
+				if ((pairing[fromNdxInc - 1] != null)
+						|| (pairing[toNdxExc] != null))
+					System.out.println("Must be an unreachable line!");
+		}
+	}
+
 	for (int k = fromNdxInc; k < toNdxExc; k++) {
 		logger.info(pairing[k]);
 	}
+
 	logger.info((toNdxExc - fromNdxInc) + ": wasEffective: " + (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
 }
 
@@ -251,6 +295,8 @@ if (l.getNdx() == 69) {
 
 	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.maxNumOfPairingSetsToEval);
 
+	private StateCalculator bestStateCalculator = null;
+
 	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[][] pqs) throws InterruptedException, ExecutionException {
 
 //if (legToCover.getNdx() == 5204)
@@ -258,7 +304,8 @@ if (l.getNdx() == 69) {
 
 //		double worstDifficutlyScore = 0.0;
 		double bestDifficutlyScore = Integer.MAX_VALUE;
-		StateCalculator bestStateCalculator = null;
+//		StateCalculator bestStateCalculator = null;
+		bestStateCalculator = null;
 
 		List<StateCalculator> stateCalculators = new ArrayList<StateCalculator>(pqs.length);
 		List<Future<Double>> stateProcessL = new ArrayList<Future<Double>>(pqs.length);
@@ -315,7 +362,6 @@ if (l.getNdx() == 69) {
 //			}
 //		}
 
-
 		/**
 		 * TEST BLOCK BEGIN
 		 * 
@@ -325,8 +371,55 @@ if (l.getNdx() == 69) {
 		numOfPairsWoDh = new int[this.legs.size()];
 		numOfEffectivePairsWoDh = new int[this.legs.size()];
 
+		pairControlArray1 = pairControlArray2;
+		pairControlArray2 = new int[0][0];
+
 		this.pairEnumerator.enumerateAllPairings(bestStateCalculator.getTempDutyStates());
 
+		if (pairControlArray1 != null) {
+			for (int i = 0; i < pairControlArray1.length; i++) {
+				int[] pair1 = pairControlArray1[i];
+				boolean found = false;
+				for (int j = 0; j < pairControlArray2.length; j++) {
+					int[] pair2 = pairControlArray2[j];
+					if (pair1.length == pair2.length) {
+						boolean f = true; 
+						for (int k = 0; k < pair1.length; k++) {
+							if (pair1[k] != pair2[k]) {
+								f = false;
+								break;
+							}
+						}
+						if (f) {
+							found = true;
+							break;
+						}
+					}
+				}
+				if (!found) {
+					for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
+						int[] pairT = bestStateCalculator.pairControlArray[0];
+						if (pair1.length == pairT.length) {
+							boolean f = true; 
+							for (int k = 0; k < pair1.length; k++) {
+								if (pair1[k] != pairT[k]) {
+									f = false;
+									break;
+								}
+							}
+							if (f) {
+								found = true;
+								break;
+							}
+						}
+					}
+					if (!found) {
+						System.out.println("Pairing could not be reproduced!");
+						System.out.println("Pair1 :" + ArrayUtils.toString(pair1));
+					}
+				}
+			}
+		}
 		for (int i = 0; i < this.legs.size(); i++) {
 			Leg l = this.legs.get(i);
 			if (l.isCover()
