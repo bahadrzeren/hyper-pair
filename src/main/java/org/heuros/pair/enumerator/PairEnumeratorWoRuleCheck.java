@@ -55,6 +55,10 @@ public class PairEnumeratorWoRuleCheck {
 
 		logger.info("Pairings enumeration is started!");
 
+		for (int i = 0; i < this.numOfProbablePairings.length; i++) {
+			this.numOfProbablePairings[i] = 0;
+		}
+
 		for (Duty duty : this.duties) {
 			if (duty.isValid(this.hbNdx)
 				&& duty.hasPairing(this.hbNdx)
@@ -79,8 +83,7 @@ public class PairEnumeratorWoRuleCheck {
 						numOfProbablePairings[0]++;
 					} else
 						if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 1) {
-							this.fwSearch(true,
-											dutyStates,
+							this.fwSearch(dutyStates,
 											numOfProbablePairings,
 											duty, duty, HeurosSystemParam.maxPairingLengthInDays - 1, HeurosSystemParam.maxPairingLengthInDays + 1,
 											numOfDhs, totalActiveBlockTime, duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays));
@@ -94,8 +97,7 @@ public class PairEnumeratorWoRuleCheck {
 		}
 	}
 
-	private void fwSearch(boolean hbDep,
-							DutyState[] dutyStates,
+	private void fwSearch(DutyState[] dutyStates,
 							int[] numOfProbablePairings,
 							Duty fd, Duty ld, int fromNdxInc, int toNdxExc,
 							int numOfDhs, int totalActiveBlockTime,
@@ -119,7 +121,9 @@ public class PairEnumeratorWoRuleCheck {
 							 * This line below are put because of no rule validation code is done here!
 							 * Rule validation is done in just briefing time context.
 							 */
-							&& (ChronoUnit.DAYS.between(fd.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1))) {
+							&& (ChronoUnit.DAYS.between(fd.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1))
+							&& (((toNdxExc - fromNdxInc) < 3)
+									|| (ChronoUnit.DAYS.between(ld.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)))) {
 						pairing[toNdxExc - 1] = nd;
 						this.pairListener.onPairingFound(pairing, fromNdxInc, toNdxExc, newNumOfDhs, totalActiveBlockTime + nd.getBlockTimeInMinsActive());
 						numOfProbablePairings[toNdxExc - fromNdxInc - 1]++;
@@ -135,8 +139,7 @@ public class PairEnumeratorWoRuleCheck {
 								 */
 								&& (ChronoUnit.DAYS.between(fd.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))) {
 							pairing[toNdxExc - 1] = nd;
-							this.fwSearch(hbDep,
-											dutyStates,
+							this.fwSearch(dutyStates,
 											numOfProbablePairings,
 											fd, nd, fromNdxInc, toNdxExc + 1,
 											newNumOfDhs, totalActiveBlockTime + nd.getBlockTimeInMinsActive(),
@@ -158,6 +161,14 @@ public class PairEnumeratorWoRuleCheck {
 		for (Leg pl : pls) {
 			Duty[] pds = this.dutyIndexByArrLegNdx.getArray(pl.getNdx());
 			for (Duty pd : pds) {
+
+if ((fd.getNdx() == 29056) && (ld.getNdx() == 29056) && (pd.getNdx() == 15360))
+System.out.println();
+if ((fd.getNdx() == 15360) && (ld.getNdx() == 29056) && (pd.getNdx() == 9658))
+System.out.println();
+if ((fd.getNdx() == 9658) && (ld.getNdx() == 29056) && (pd.getNdx() == 5344))
+System.out.println();
+
 				if ((pd.getNumOfLegsPassive() == 0)
 						&& ((dutyStates == null)
 								|| (dutyStates[pd.getNdx()].numOfCoverings == 0))) {
@@ -179,7 +190,7 @@ public class PairEnumeratorWoRuleCheck {
 						if (hbArr) {
 							if (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1)
 									&& (((toNdxExc - fromNdxInc) < 3)
-											|| ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), fd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))
+											|| (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), fd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)))
 									) {
 								pairing[fromNdxInc] = pd;
 								this.pairListener.onPairingFound(pairing, fromNdxInc, toNdxExc, newNumOfDhs, totalActiveBlockTime + pd.getBlockTimeInMinsActive());
@@ -190,8 +201,7 @@ public class PairEnumeratorWoRuleCheck {
 							if ((toNdxExc - fromNdxInc < HeurosSystemParam.maxSearchDeptForScoreCalculations)
 									&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)) {
 								pairing[fromNdxInc] = pd;
-								this.fwSearch(true,
-												dutyStates,
+								this.fwSearch(dutyStates,
 												numOfProbablePairings,
 												pd, ld, fromNdxInc, toNdxExc + 1,
 												newNumOfDhs, totalActiveBlockTime + pd.getBlockTimeInMinsActive(),
@@ -199,7 +209,7 @@ public class PairEnumeratorWoRuleCheck {
 								pairing[fromNdxInc] = null;
 							}
 					} else
-						if (pd.isNonHbArr(this.hbNdx)
+						if (pd.isNonHbDep(this.hbNdx)
 								&& (toNdxExc - fromNdxInc < HeurosSystemParam.maxSearchDeptForScoreCalculations)
 								/*
 								 * TODO
@@ -210,7 +220,10 @@ public class PairEnumeratorWoRuleCheck {
 								&& (pd.getMinNextBriefTime(hbNdx).plusHours(HeurosSystemParam.maxNetDutySearchDeptInHours + 1).isAfter(fd.getBriefTime(hbNdx)))
 								&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 										|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
-								&& (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))) {
+								&& ((hbArr 
+										&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))
+										|| ((!hbArr) 
+												&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 3)))) {
 							pairing[fromNdxInc] = pd;
 							this.bwSearch(hbArr,
 											dutyStates,
@@ -246,8 +259,7 @@ public class PairEnumeratorWoRuleCheck {
 					numOfProbablePairings[0]++;
 				} else
 					if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 1) {
-						this.fwSearch(true,
-										dutyStates,
+						this.fwSearch(dutyStates,
 										numOfProbablePairings,
 										duty, duty, HeurosSystemParam.maxPairingLengthInDays - 1, HeurosSystemParam.maxPairingLengthInDays + 1,
 										numOfDhs, totalActiveBlockTime, duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays));
@@ -272,78 +284,78 @@ public class PairEnumeratorWoRuleCheck {
 		}
 	}
 
-	public boolean validatePair(Duty[] testPair, DutyState[] dutyStates) {
-
-		int numOfDhs = dutyStates[testPair[0].getNdx()].numOfCoverings;
-
-		if ((testPair[0].getNumOfLegsPassive() == 0)
-				&& (numOfDhs <= 1)) {
-
-			/*
-			 * We need ActiveBlockTime in the beginning to be able to decide whether the first state of the duty is efficient.
-			 */
-			int totalActiveBlockTime = testPair[0].getBlockTimeInMinsActive();	//	 - dutyState.blockTimeOfCoveringsActive;
-
-			if (testPair[0].isHbDep(this.hbNdx)) {
-				if (testPair[0].isHbArr(this.hbNdx)) {
-					return true;
-				} else
-					if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 1) {
-						return this.validateFwSearch(testPair,
-														dutyStates,
-														1,
-														numOfDhs,
-														totalActiveBlockTime,
-														testPair[0].getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays));
-					}
-			} else
-				System.out.println("Must be an unreachable line!");
-		}
-
-		return false;
-	}
-
-	private boolean validateFwSearch(Duty[] testPair,
-										DutyState[] dutyStates,
-										int nextNdx,
-										int numOfDhs,
-										int totalActiveBlockTime,
-										LocalDate maxMinDateDept) {
-		Duty nd = testPair[nextNdx];
-		if ((nd.getNumOfLegsPassive() == 0)
-				&& ((dutyStates[nd.getNdx()].numOfCoverings + numOfDhs) <= 1)) {
-	
-			int newNumOfDhs = numOfDhs + nd.getNumOfLegsPassive();
-			if (dutyStates != null)
-				newNumOfDhs += dutyStates[nd.getNdx()].numOfCoverings;
-	
-			if (nd.isHbArr(this.hbNdx)
-					&& maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx))
-					/*
-					 * TODO
-					 * This line below are put because of no rule validation code is done here!
-					 * Rule validation is done in just briefing time context.
-					 */
-					&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1))) {
-				return true;
-			} else
-				if (nd.isNonHbArr(this.hbNdx)
-						&& (nextNdx + 1 < HeurosSystemParam.maxSearchDeptForScoreCalculations)
-						&& maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx))
-						/*
-						 * TODO
-						 * This line below are put because of no rule validation code is done here!
-						 * Rule validation is done in just briefing time context.
-						 */
-						&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))) {
-					return this.validateFwSearch(testPair,
-													dutyStates,
-													nextNdx + 1,
-													newNumOfDhs,
-													totalActiveBlockTime + nd.getBlockTimeInMinsActive(),
-													maxMinDateDept);
-				}
-		}
-		return false;
-	}
+//	public boolean validatePair(Duty[] testPair, DutyState[] dutyStates) {
+//
+//		int numOfDhs = dutyStates[testPair[0].getNdx()].numOfCoverings;
+//
+//		if ((testPair[0].getNumOfLegsPassive() == 0)
+//				&& (numOfDhs <= 1)) {
+//
+//			/*
+//			 * We need ActiveBlockTime in the beginning to be able to decide whether the first state of the duty is efficient.
+//			 */
+//			int totalActiveBlockTime = testPair[0].getBlockTimeInMinsActive();	//	 - dutyState.blockTimeOfCoveringsActive;
+//
+//			if (testPair[0].isHbDep(this.hbNdx)) {
+//				if (testPair[0].isHbArr(this.hbNdx)) {
+//					return true;
+//				} else
+//					if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 1) {
+//						return this.validateFwSearch(testPair,
+//														dutyStates,
+//														1,
+//														numOfDhs,
+//														totalActiveBlockTime,
+//														testPair[0].getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays));
+//					}
+//			} else
+//				System.out.println("Must be an unreachable line!");
+//		}
+//
+//		return false;
+//	}
+//
+//	private boolean validateFwSearch(Duty[] testPair,
+//										DutyState[] dutyStates,
+//										int nextNdx,
+//										int numOfDhs,
+//										int totalActiveBlockTime,
+//										LocalDate maxMinDateDept) {
+//		Duty nd = testPair[nextNdx];
+//		if ((nd.getNumOfLegsPassive() == 0)
+//				&& ((dutyStates[nd.getNdx()].numOfCoverings + numOfDhs) <= 1)) {
+//	
+//			int newNumOfDhs = numOfDhs + nd.getNumOfLegsPassive();
+//			if (dutyStates != null)
+//				newNumOfDhs += dutyStates[nd.getNdx()].numOfCoverings;
+//	
+//			if (nd.isHbArr(this.hbNdx)
+//					&& maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx))
+//					/*
+//					 * TODO
+//					 * This line below are put because of no rule validation code is done here!
+//					 * Rule validation is done in just briefing time context.
+//					 */
+//					&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1))) {
+//				return true;
+//			} else
+//				if (nd.isNonHbArr(this.hbNdx)
+//						&& (nextNdx + 1 < HeurosSystemParam.maxSearchDeptForScoreCalculations)
+//						&& maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx))
+//						/*
+//						 * TODO
+//						 * This line below are put because of no rule validation code is done here!
+//						 * Rule validation is done in just briefing time context.
+//						 */
+//						&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))) {
+//					return this.validateFwSearch(testPair,
+//													dutyStates,
+//													nextNdx + 1,
+//													newNumOfDhs,
+//													totalActiveBlockTime + nd.getBlockTimeInMinsActive(),
+//													maxMinDateDept);
+//				}
+//		}
+//		return false;
+//	}
 }

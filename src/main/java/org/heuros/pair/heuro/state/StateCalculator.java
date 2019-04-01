@@ -103,7 +103,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-if ((l.getNdx() == 498)
+if ((l.getNdx() == 486)
 		&& (pairControlArray != null)) {
 	logger.info("--------------------");
 
@@ -117,18 +117,19 @@ if ((l.getNdx() == 498)
 			}
 		}
 	}
-	if (!pairEnumerator.validatePair(hPair, tempDutyStates)) {
-		System.out.println();
-		pairEnumerator.validatePair(hPair, tempDutyStates);
-	}
+//	if (!pairEnumerator.validatePair(hPair, tempDutyStates)) {
+//		System.out.println();
+//		pairEnumerator.validatePair(hPair, tempDutyStates);
+//	}
 
 	for (int[] dutyNdxs: pairControlArray) {
 		if (dutyNdxs.length == toNdxExc - fromNdxInc) {
 			boolean f = true;
 			for (int k = 0; k < dutyNdxs.length; k++) {
-				if ((dutyNdxs[k] == 0)
-						|| (pairing[fromNdxInc - 1] != null)
-						|| (pairing[toNdxExc] != null))
+				if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+						&& ((dutyNdxs[k] == 0)
+							|| (pairing[fromNdxInc - 1] != null)
+							|| (pairing[toNdxExc] != null)))
 					System.out.println("Must be an unreachable line!");
 				if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
 					f = false;
@@ -138,8 +139,9 @@ if ((l.getNdx() == 498)
 			if (f)
 				System.out.println("Must be an unreachable line!");
 		} else
-			if ((pairing[fromNdxInc - 1] != null)
-					|| (pairing[toNdxExc] != null))
+			if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+					&& ((pairing[fromNdxInc - 1] != null)
+					|| (pairing[toNdxExc] != null)))
 				System.out.println("Must be an unreachable line!");
 	}
 	pairControlArray = ArrayUtils.add(pairControlArray, new int[hPair.length]);
@@ -185,7 +187,7 @@ if ((l.getNdx() == 498)
 					} else
 						System.out.println("Must be an unreachable line!");
 
-if ((l.getNdx() == 498)
+if ((l.getNdx() == 486)
 		&& (pairControlArray != null)) {
 	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
 																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
@@ -203,70 +205,6 @@ if ((l.getNdx() == 498)
 			}
 		}
 	}
-
-//	private double decreasePairingTotalizers(double maxDifficultyScoreObtained,
-//												Leg leg,
-//												Duty[] pairing,
-//												int numOfDuties,
-//												boolean isEffectivenessChanged,
-//												boolean isDhStateChanged,
-//												boolean isEffectivenessWoDhChanged) {
-//		double res = maxDifficultyScoreObtained;
-//		for (int i = 0; i < numOfDuties; i++) {
-//			for (int j = 0; j < pairing[i].getNumOfLegs(); j++) {
-//				Leg l = pairing[i].getLegs().get(j);
-//				if (l.isCover()
-//						&& l.hasPair(hbNdx)) {
-//
-////if (l.getNdx() == 356) {
-////	logger.info("--------------------");
-////	if (numOfDuties == 1)
-////		logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[0].getNdx());
-////	else
-////		logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[0].getNdx() + ", " + pairing[1].getNdx());
-////	logger.info("Leg covered: " + leg);
-////	if (numOfDuties == 1)
-////		logger.info(pairing[0]);
-////	else {
-////		logger.info(pairing[0]);
-////		logger.info(pairing[1]);
-////	}
-////	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": isEffectivenessChanged: " + isEffectivenessChanged +
-////																				", isDhStateChanged: " + isDhStateChanged +
-////																				", isEffectivenessWoDhChanged: " + isEffectivenessWoDhChanged);
-////	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
-////																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
-////																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
-////																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
-////}
-//
-//					if (isEffectivenessChanged)
-//						this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs--;
-//					if (isDhStateChanged) {
-//						this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh--;
-//						if (isEffectivenessWoDhChanged) {
-//							this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh--;
-//						}
-//					}
-//
-////if (l.getNdx() == 356) {
-////	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": After PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
-////																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
-////																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
-////																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
-////}
-//
-//					if (this.tempLegStates[l.getNdx()].numOfCoverings == 0) {
-//						double newDifficultyScore = this.tempLegStates[l.getNdx()].getWeightedDifficultyScore();
-////						double newDifficultyScore = (1.0 * (LegState.maxNumOfIncludingPairsWoDh - this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh)) / LegState.maxNumOfIncludingPairsWoDh;
-//						if (newDifficultyScore > res)
-//							res = newDifficultyScore;
-//					}
-//				}
-//			}
-//		}
-//		return res;
-//	}
 
 	private double maxDifficultyScoreObtained = 0.0;
 
@@ -317,18 +255,10 @@ pairControlArray = new int[0][0];
 					if (dutyOfLeg.hasPairing(pwq.pair.getHbNdx())
 							&& dutyOfLeg.isValid(pwq.pair.getHbNdx())) {
 
-//if (dutyOfLeg.getNdx() == 44027)
-//System.out.println();
+if (dutyOfLeg.getNdx() == 29056)
+System.out.println();
 
 						DutyState dutyOfLegStat = this.tempDutyStates[dutyOfLeg.getNdx()];
-
-//						int prevNumOfDhs = dutyOfLeg.getNumOfLegsPassive()
-//											+ dutyOfLegStat.numOfCoveringsActive
-//											+ dutyOfLegStat.numOfCoveringsPassiveInt
-//											+ dutyOfLegStat.numOfCoveringsPassiveExt;
-//						int prevActiveBlockTime = dutyOfLeg.getBlockTimeInMinsActive() - dutyOfLegStat.blockTimeOfCoveringsActive;
-//						int prevTotalNumOfDhs = prevNumOfDhs;
-//						int prevTotalActiveBlockTime = prevActiveBlockTime;
 
 						dutyOfLegStat.numOfCoverings++;
 						dutyOfLegStat.blockTimeOfCoverings += leg.getBlockTimeInMins();
@@ -370,139 +300,7 @@ pairControlArray = new int[0][0];
 						 * Calculate decrease in pairing totalizers.
 						 */
 
-//						Duty[] pairing = new Duty[HeurosSystemParam.maxPairingLengthInDays];
-//						pairing[0] = dutyOfLeg;
-
 						this.pairEnumerator.enumerateAllPairings(dutyOfLeg, tempDutyStates);
-
-//						LocalDate maxMinDateDept = null;
-//						int numOfDhs = dutyOfLeg.getNumOfLegsPassive()
-//										+ dutyOfLegStat.numOfCoveringsActive
-//										+ dutyOfLegStat.numOfCoveringsPassiveInt
-//										+ dutyOfLegStat.numOfCoveringsPassiveExt;
-//						int activeBlockTime = dutyOfLeg.getBlockTimeInMinsActive() - dutyOfLegStat.blockTimeOfCoveringsActive;
-//						int totalNumOfDhs = numOfDhs;
-//						int totalActiveBlockTime = activeBlockTime;
-//
-//						if (dutyOfLeg.isHbDep(this.hbNdx)) {
-//							if (dutyOfLeg.isHbArr(this.hbNdx)) {
-//								maxDifficultyScoreObtained = this.decreasePairingTotalizers(maxDifficultyScoreObtained,
-//																							leg, pairing, 1,
-//																							isEffectivenessChanged,
-//																							isDhStateChanged,
-//																							isEffectivenessWoDhChanged);
-//							} else {
-//								maxMinDateDept = dutyOfLeg.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
-//								Leg[] nls = this.nextBriefLegIndexByDutyNdx.getArray(dutyOfLeg.getNdx());
-//								for (Leg nl : nls) {
-//									Duty[] nds = this.dutyIndexByDepLegNdx.getArray(nl.getNdx());
-//									for (Duty nd : nds) {
-//										if (nd.isHbArr(this.hbNdx)
-//												&& (maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx)))
-//												/*
-//												 * TODO
-//												 * This line below are put because of no rule validation code is done here!
-//												 * Rule validation is done in just briefing time context.
-//												 */
-//												&& (ChronoUnit.DAYS.between(dutyOfLeg.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < 3)) {
-//
-//											numOfDhs = nd.getNumOfLegsPassive()
-//														+ this.tempDutyStates[nd.getNdx()].numOfCoveringsActive
-//														+ this.tempDutyStates[nd.getNdx()].numOfCoveringsPassiveInt
-//														+ this.tempDutyStates[nd.getNdx()].numOfCoveringsPassiveExt;
-//											activeBlockTime = nd.getBlockTimeInMinsActive() - this.tempDutyStates[nd.getNdx()].blockTimeOfCoveringsActive;
-//											prevTotalNumOfDhs += numOfDhs;
-//											prevTotalActiveBlockTime += activeBlockTime;
-//											totalNumOfDhs += numOfDhs;
-//											totalActiveBlockTime += activeBlockTime;
-//											pairing[1] = nd;
-//
-//											boolean isEffectivenessOfThePairChanged = leg.isCover()
-//																						&& (this.tempLegStates[leg.getNdx()].numOfCoverings == 1)
-//																						&& (prevTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0)
-//																						&& (totalActiveBlockTime < HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0);
-//											boolean isDhStateOfThePairChanged = isDhStateChanged && (numOfDhs == 0);
-//											boolean isEffectivenessWoDhOfThePairChanged = isDhStateOfThePairChanged
-//																							&& (prevTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0);
-//
-//											if (isEffectivenessOfThePairChanged
-//													|| isDhStateOfThePairChanged
-//													|| isEffectivenessWoDhOfThePairChanged) {
-//												maxDifficultyScoreObtained = this.decreasePairingTotalizers(maxDifficultyScoreObtained,
-//																											leg, pairing, 2,
-//																											isEffectivenessOfThePairChanged,
-//																											isDhStateOfThePairChanged,
-//																											isEffectivenessWoDhOfThePairChanged);
-//											}
-//
-//											prevTotalNumOfDhs -= numOfDhs;
-//											prevTotalActiveBlockTime -= activeBlockTime;
-//											totalNumOfDhs -= numOfDhs;
-//											totalActiveBlockTime -= activeBlockTime;
-//											pairing[1] = null;
-//										}
-//									}
-//								}
-//							}
-//						} else {
-//							if (dutyOfLeg.isHbArr(this.hbNdx)) {
-//								maxMinDateDept = dutyOfLeg.getDebriefDay(this.hbNdx).minusDays(HeurosSystemParam.maxPairingLengthInDays - 1);
-//								Leg[] pls = this.prevDebriefLegIndexByDutyNdx.getArray(dutyOfLeg.getNdx());
-//								for (Leg pl : pls) {
-//									Duty[] pds = this.dutyIndexByArrLegNdx.getArray(pl.getNdx());
-//									for (Duty pd : pds) {
-//										if (pd.isHbDep(this.hbNdx)
-//												/*
-//												 * TODO
-//												 * These three lines below are put because of no rule validation code is done here!
-//												 * Rule validation is done in just briefing time context.
-//												 */
-//												&& (!pd.getMinNextBriefTime(hbNdx).isAfter(dutyOfLeg.getBriefTime(hbNdx)))
-//												&& (pd.getMinNextBriefTime(hbNdx).plusHours(HeurosSystemParam.maxNetDutySearchDeptInHours + 1).isAfter(dutyOfLeg.getBriefTime(hbNdx)))
-//												&& (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), dutyOfLeg.getDebriefTime(this.hbNdx).minusSeconds(1)) < 3)
-//												&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
-//														|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))) {
-//											numOfDhs = pd.getNumOfLegsPassive()
-//														+ this.tempDutyStates[pd.getNdx()].numOfCoveringsActive
-//														+ this.tempDutyStates[pd.getNdx()].numOfCoveringsPassiveInt
-//														+ this.tempDutyStates[pd.getNdx()].numOfCoveringsPassiveExt;
-//											activeBlockTime = pd.getBlockTimeInMinsActive() - this.tempDutyStates[pd.getNdx()].blockTimeOfCoveringsActive;
-//											prevTotalNumOfDhs += numOfDhs;
-//											prevTotalActiveBlockTime += activeBlockTime;
-//											totalNumOfDhs += numOfDhs;
-//											totalActiveBlockTime += activeBlockTime;
-//											pairing[1] = pd;
-//
-//											boolean isEffectivenessOfThePairChanged = leg.isCover()
-//																						&& (this.tempLegStates[leg.getNdx()].numOfCoverings == 1)
-//																						&& (prevTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0)
-//																						&& (totalActiveBlockTime < HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0);
-//											boolean isDhStateOfThePairChanged = isDhStateChanged && (numOfDhs == 0);
-//											boolean isEffectivenessWoDhOfThePairChanged = isDhStateOfThePairChanged
-//																							&& (prevTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * 2.0);
-//
-//											if (isEffectivenessOfThePairChanged
-//													|| isDhStateOfThePairChanged
-//													|| isEffectivenessWoDhOfThePairChanged) {
-//												maxDifficultyScoreObtained = this.decreasePairingTotalizers(maxDifficultyScoreObtained,
-//																											leg, pairing, 2,
-//																											isEffectivenessOfThePairChanged,
-//																											isDhStateOfThePairChanged,
-//																											isEffectivenessWoDhOfThePairChanged);
-//											}
-//
-//											prevTotalNumOfDhs -= numOfDhs;
-//											prevTotalActiveBlockTime -= activeBlockTime;
-//											totalNumOfDhs -= numOfDhs;
-//											totalActiveBlockTime -= activeBlockTime;
-//											pairing[1] = null;
-//										}
-//									}
-//								}
-////							} else {
-////								Not implemented!
-//							}
-//						}
 
 						boolean isEffectivenessChanged = leg.isCover()
 															&& (this.tempLegStates[leg.getNdx()].numOfCoverings == 1)
@@ -520,11 +318,6 @@ pairControlArray = new int[0][0];
 							for (int li = 0; li < dutyOfLeg.getLegs().size(); li++) {
 								Leg indLeg = dutyOfLeg.getLegs().get(li);
 
-//								if (indLeg.isCover()
-//										&& (this.tempLegStates[indLeg.getNdx()].numOfCoverings == 0)
-//										&& indLeg.hasPair(p.getHbNdx())
-//										&& (indLeg.getNdx() != leg.getNdx()))
-//									indLegNdxs.add(indLeg.getNdx());
 								if (indLeg.isCover()) {
 									if (isEffectivenessChanged) {
 										this.tempLegStates[indLeg.getNdx()].numOfIncludingEffectiveDuties--;

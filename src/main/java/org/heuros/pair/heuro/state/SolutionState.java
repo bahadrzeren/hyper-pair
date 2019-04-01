@@ -207,8 +207,8 @@ public class SolutionState implements PairListener {
 //		}
 //	}
 
-	public int[][] pairControlArray1 = null;
-	public int[][] pairControlArray2 = null;
+	private int[][] pairControlArray1 = null;
+	private int[][] pairControlArray2 = null;
 
 	private int[] numOfPairsWoDh = null;
 	private int[] numOfEffectivePairsWoDh = null;
@@ -221,7 +221,7 @@ public class SolutionState implements PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-if (l.getNdx() == 498) {
+if (l.getNdx() == 486) {
 
 	pairControlArray2 = ArrayUtils.add(pairControlArray2, new int[toNdxExc - fromNdxInc]);
 	int h = 0;
@@ -256,9 +256,10 @@ if (l.getNdx() == 498) {
 			if (dutyNdxs.length == (toNdxExc - fromNdxInc)) {
 				boolean f = true;
 				for (int k = 0; k < dutyNdxs.length; k++) {
-					if ((dutyNdxs[k] == 0)
-							|| (pairing[fromNdxInc - 1] != null)
-							|| (pairing[toNdxExc] != null))
+					if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+							&& ((dutyNdxs[k] == 0)
+								|| (pairing[fromNdxInc - 1] != null)
+								|| (pairing[toNdxExc] != null)))
 						System.out.println("Must be an unreachable line!");
 					if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
 						f = false;
@@ -268,8 +269,9 @@ if (l.getNdx() == 498) {
 				if (f)
 					System.out.println("Must be an unreachable line!");
 			} else
-				if ((pairing[fromNdxInc - 1] != null)
-						|| (pairing[toNdxExc] != null))
+				if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+						&& ((pairing[fromNdxInc - 1] != null)
+								|| (pairing[toNdxExc] != null)))
 					System.out.println("Must be an unreachable line!");
 		}
 	}
@@ -298,9 +300,6 @@ if (l.getNdx() == 498) {
 	private StateCalculator bestStateCalculator = null;
 
 	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[][] pqs) throws InterruptedException, ExecutionException {
-
-//if (legToCover.getNdx() == 5204)
-//System.out.println();
 
 //		double worstDifficutlyScore = 0.0;
 		double bestDifficutlyScore = Integer.MAX_VALUE;
@@ -374,7 +373,13 @@ if (l.getNdx() == 498) {
 		pairControlArray1 = pairControlArray2;
 		pairControlArray2 = new int[0][0];
 
+		logger.info("------------------------------------------------------------------");
+		logger.info(legToCover);
+		logger.info(bestStateCalculator.getMaxDifficultyScoreObtained());
+		logger.info(legToCover.getNumOfIncludingPairsWoDh() + "/" + legToCover.getNumOfIncludingEffectivePairsWoDh());
+		logger.info(bestStateCalculator.getPwq().pair);
 		this.pairEnumerator.enumerateAllPairings(bestStateCalculator.getTempDutyStates());
+		logger.info("------------------------------------------------------------------");
 
 		if (pairControlArray1 != null) {
 			for (int i = 0; i < pairControlArray1.length; i++) {
@@ -398,7 +403,7 @@ if (l.getNdx() == 498) {
 				}
 				if (!found) {
 					for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
-						int[] pairT = bestStateCalculator.pairControlArray[0];
+						int[] pairT = bestStateCalculator.pairControlArray[j];
 						if (pair1.length == pairT.length) {
 							boolean f = true; 
 							for (int k = 0; k < pair1.length; k++) {
@@ -416,6 +421,9 @@ if (l.getNdx() == 498) {
 					if (!found) {
 						System.out.println("Pairing could not be reproduced!");
 						System.out.println("Pair1 :" + ArrayUtils.toString(pair1));
+						for (int j : pair1) {
+							System.out.println(this.duties.get(j));
+						}
 					}
 				}
 			}
