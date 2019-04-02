@@ -534,6 +534,8 @@ public class NetworkExplorer {
 
 					if (pd.isValid(this.hbNdx)
 							&& pd.hasPairing(this.hbNdx)
+							&& (!pd.getMinNextBriefTime(hbNdx).isAfter(ndInfo.duty.getBriefTime(hbNdx)))
+							&& (pd.getMinNextBriefTime(hbNdx).plusHours(HeurosSystemParam.maxNetDutySearchDeptInHours + 1).isAfter(ndInfo.duty.getBriefTime(hbNdx)))
 							&& (pd.isHbDep(this.hbNdx) || (dept > 1))
 							&& ((sourceNodeQmArray.length == 0)
 									|| (pd.getNumOfLegs() > dps[pd.getNdx()].numOfDistinctCoverings)

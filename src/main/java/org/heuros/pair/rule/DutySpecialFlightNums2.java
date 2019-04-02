@@ -28,10 +28,13 @@ public class DutySpecialFlightNums2 implements ConnectionChecker<DutyView> {
          * 
 		 * isAnyHb check is used for backward compatibility.
 		 */
-        if (pd.getFirstDepAirport().isAnyNonHb()
-        		&& pd.getFirstDepAirport().isDomestic()
-        		&& nd.getFirstLeg().isSpecialFlight())
-        	return false;
+		/*
+		 * Cancelled due to Totalizer calculation error fix.
+		 */
+//        if (pd.getFirstDepAirport().isAnyNonHb()
+//        		&& pd.getFirstDepAirport().isDomestic()
+//        		&& nd.getFirstLeg().isSpecialFlight())
+//        	return false;
         return true;
 	}
 }

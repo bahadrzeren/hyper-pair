@@ -34,6 +34,9 @@ public class PairEarlyDuty implements ConnectionChecker<DutyView> {
 		/*
 		 * isAnyNonHb check is used for backward compatibility.
 		 */
+		/*
+		 * Cancelled due to Totalizer calculation error fix.
+		 */
 //		if (pd.isEarly(hbNdx) && nd.isEarly(hbNdx)
 //				&& (pd.getFirstDepAirport().isAnyNonHb() || nd.getLastArrAirport().isAnyNonHb()))
 //			return false;

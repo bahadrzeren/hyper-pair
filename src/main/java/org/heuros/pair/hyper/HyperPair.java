@@ -234,7 +234,6 @@ public class HyperPair {
 
 			DutyLegOvernightConnNetwork pricingNetwork = new DutyLegOvernightConnNetwork(HeurosDatasetParam.dutyProcessPeriodEndExc, 
 																							HeurosSystemParam.maxNetDutySearchDeptInHours, 
-																							HeurosSystemParam.maxPairingLengthInDays,
 																							pairOptimizationContext);
 			pricingNetwork.buildNetwork();
 

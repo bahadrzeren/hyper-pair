@@ -93,7 +93,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 		return res;
 	}
 
-	public int[][] pairControlArray = null;
+//	public int[][] pairControlArray = null;
 
 	@Override
 	public void onPairingFound(Duty[] pairing, int fromNdxInc, int toNdxExc, int numOfDhs, int totalActiveBlockTime) {
@@ -103,81 +103,81 @@ public class StateCalculator implements Callable<Double>, PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-if ((l.getNdx() == 486)
-		&& (pairControlArray != null)) {
-	logger.info("--------------------");
-
-	Duty[] hPair = ArrayUtils.subarray(pairing, fromNdxInc, toNdxExc);
-	for (int k = 0; k < hPair.length; k++) {
-		for (int m = hPair.length - 1; m > k; m--) {
-			if (hPair[m].getBriefTime(hbNdx).isBefore(hPair[m - 1].getBriefTime(hbNdx))) {
-				Duty hd = hPair[m];
-				hPair[m] = hPair[m - 1];
-				hPair[m - 1] = hd;
-			}
-		}
-	}
-//	if (!pairEnumerator.validatePair(hPair, tempDutyStates)) {
-//		System.out.println();
-//		pairEnumerator.validatePair(hPair, tempDutyStates);
+//if ((l.getNdx() == 2070)
+//		&& (pairControlArray != null)) {
+//	logger.info("--------------------");
+//
+//	Duty[] hPair = ArrayUtils.subarray(pairing, fromNdxInc, toNdxExc);
+//	for (int k = 0; k < hPair.length; k++) {
+//		for (int m = hPair.length - 1; m > k; m--) {
+//			if (hPair[m].getBriefTime(hbNdx).isBefore(hPair[m - 1].getBriefTime(hbNdx))) {
+//				Duty hd = hPair[m];
+//				hPair[m] = hPair[m - 1];
+//				hPair[m - 1] = hd;
+//			}
+//		}
 //	}
-
-	for (int[] dutyNdxs: pairControlArray) {
-		if (dutyNdxs.length == toNdxExc - fromNdxInc) {
-			boolean f = true;
-			for (int k = 0; k < dutyNdxs.length; k++) {
-				if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
-						&& ((dutyNdxs[k] == 0)
-							|| (pairing[fromNdxInc - 1] != null)
-							|| (pairing[toNdxExc] != null)))
-					System.out.println("Must be an unreachable line!");
-				if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
-					f = false;
-					break;
-				}
-			}
-			if (f)
-				System.out.println("Must be an unreachable line!");
-		} else
-			if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
-					&& ((pairing[fromNdxInc - 1] != null)
-					|| (pairing[toNdxExc] != null)))
-				System.out.println("Must be an unreachable line!");
-	}
-	pairControlArray = ArrayUtils.add(pairControlArray, new int[hPair.length]);
-	for (int k = 0; k < hPair.length; k++) {
-		pairControlArray[pairControlArray.length - 1][k] = hPair[k].getNdx();
-	}
-	if (toNdxExc - fromNdxInc == 1) {
-		logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[fromNdxInc].getNdx());
-	} else
-		if (toNdxExc - fromNdxInc == 2) {
-			logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-																							pairing[fromNdxInc + 1].getNdx());
-		} else
-			if (toNdxExc - fromNdxInc == 3) {
-				logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-																								pairing[fromNdxInc + 1].getNdx() + ", " + 
-																								pairing[fromNdxInc + 2].getNdx());
-			} else
-				if (toNdxExc - fromNdxInc == 4) {
-					logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-																									pairing[fromNdxInc + 1].getNdx() + ", " +
-																									pairing[fromNdxInc + 2].getNdx() + ", " +
-																									pairing[fromNdxInc + 3].getNdx());
-				} else
-					System.out.println("Must be an unreachable line!");
-
-	for (int k = fromNdxInc; k < toNdxExc; k++) {
-		logger.info(pairing[k]);
-	}
-	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": wasEffective: " + (totalActiveBlockTime >= 
-																									HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
-	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
-																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
-																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
-																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
-}
+////	if (!pairEnumerator.validatePair(hPair, tempDutyStates)) {
+////		System.out.println();
+////		pairEnumerator.validatePair(hPair, tempDutyStates);
+////	}
+//
+//	for (int[] dutyNdxs: pairControlArray) {
+//		if (dutyNdxs.length == toNdxExc - fromNdxInc) {
+//			boolean f = true;
+//			for (int k = 0; k < dutyNdxs.length; k++) {
+//				if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+//						&& ((dutyNdxs[k] == 0)
+//							|| (pairing[fromNdxInc - 1] != null)
+//							|| (pairing[toNdxExc] != null)))
+//					System.out.println("Must be an unreachable line!");
+//				if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
+//					f = false;
+//					break;
+//				}
+//			}
+//			if (f)
+//				System.out.println("Must be an unreachable line!");
+//		} else
+//			if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+//					&& ((pairing[fromNdxInc - 1] != null)
+//					|| (pairing[toNdxExc] != null)))
+//				System.out.println("Must be an unreachable line!");
+//	}
+//	pairControlArray = ArrayUtils.add(pairControlArray, new int[hPair.length]);
+//	for (int k = 0; k < hPair.length; k++) {
+//		pairControlArray[pairControlArray.length - 1][k] = hPair[k].getNdx();
+//	}
+//	if (toNdxExc - fromNdxInc == 1) {
+//		logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[fromNdxInc].getNdx());
+//	} else
+//		if (toNdxExc - fromNdxInc == 2) {
+//			logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//																							pairing[fromNdxInc + 1].getNdx());
+//		} else
+//			if (toNdxExc - fromNdxInc == 3) {
+//				logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//																								pairing[fromNdxInc + 1].getNdx() + ", " + 
+//																								pairing[fromNdxInc + 2].getNdx());
+//			} else
+//				if (toNdxExc - fromNdxInc == 4) {
+//					logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//																									pairing[fromNdxInc + 1].getNdx() + ", " +
+//																									pairing[fromNdxInc + 2].getNdx() + ", " +
+//																									pairing[fromNdxInc + 3].getNdx());
+//				} else
+//					System.out.println("Must be an unreachable line!");
+//
+//	for (int k = fromNdxInc; k < toNdxExc; k++) {
+//		logger.info(pairing[k]);
+//	}
+//	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": wasEffective: " + (totalActiveBlockTime >= 
+//																									HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
+//	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
+//																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
+//																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
+//																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
+//}
 
 					if (numOfDhs == 1) {
 						this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh--;
@@ -187,13 +187,13 @@ if ((l.getNdx() == 486)
 					} else
 						System.out.println("Must be an unreachable line!");
 
-if ((l.getNdx() == 486)
-		&& (pairControlArray != null)) {
-	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
-																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
-																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
-																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
-}
+//if ((l.getNdx() == 2070)
+//		&& (pairControlArray != null)) {
+//	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
+//																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
+//																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
+//																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairsWoDh);
+//}
 
 					if (this.tempLegStates[l.getNdx()].numOfCoverings == 0) {
 						double newDifficultyScore = this.tempLegStates[l.getNdx()].getWeightedDifficultyScore();
@@ -219,9 +219,9 @@ if ((l.getNdx() == 486)
 		this.tempLegStates = this.cloneLegStates();
 		this.tempDutyStates = this.cloneDutyStates();
 
-//		double maxDifficultyScoreObtained = 0.0;
+		double maxDifficultyScoreObtained = 0.0;
 
-pairControlArray = null;
+//pairControlArray = null;
 
 		/*
 		 * First update COVERING states of the legs and duties that constitute new pairing.
@@ -229,11 +229,11 @@ pairControlArray = null;
 		for (int i = 0; i < pwq.pair.getNumOfDuties(); i++) {
 			Duty duty = pwq.pair.getDuties().get(i);
 
-if ((duty.getNdx() == 823)
-		&& (pwq.pair.getNumOfDuties() == 4)) {
-System.out.println();
-pairControlArray = new int[0][0];
-}
+//if ((duty.getNdx() == 43978)
+//		&& (pwq.pair.getNumOfDuties() == 1)) {
+//System.out.println();
+//pairControlArray = new int[0][0];
+//}
 
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
 				Leg leg = duty.getLegs().get(j);
@@ -255,8 +255,8 @@ pairControlArray = new int[0][0];
 					if (dutyOfLeg.hasPairing(pwq.pair.getHbNdx())
 							&& dutyOfLeg.isValid(pwq.pair.getHbNdx())) {
 
-if (dutyOfLeg.getNdx() == 29056)
-System.out.println();
+//if (dutyOfLeg.getNdx() == 44027)
+//System.out.println();
 
 						DutyState dutyOfLegStat = this.tempDutyStates[dutyOfLeg.getNdx()];
 

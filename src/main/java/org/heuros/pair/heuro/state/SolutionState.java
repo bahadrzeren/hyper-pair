@@ -135,80 +135,9 @@ public class SolutionState implements PairListener {
 		return res;
 	}
 
-//	private void setIncludingPairingsForTest(Leg legToCover,
-//												int numOfDutiesOfChosenPair,
-//												Duty[] pairing,
-//												int numOfDuties,
-//												int beforeNumOfDhs,
-//												int beforeTotalActiveBlockTime,
-//												int numOfDhs,
-//												int totalActiveBlockTime,
-//												int[] numOfPairs,
-//												int[] numOfEffectivePairs,
-//												int[] numOfPairsWoDh,
-//												int[] numOfEffectivePairsWoDh) {
-//		for (int i = 0; i < numOfDuties; i++) {
-//			for (int j = 0; j < pairing[i].getNumOfLegs(); j++) {
-//				Leg l = pairing[i].getLegs().get(j);
-//				if (l.isCover()
-//						&& l.hasPair(hbNdx)) {
-//
-////boolean beforeEffectivenessState = (beforeTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
-////boolean beforeDhState = (beforeNumOfDhs == 0);
-////boolean beforeEffectivenessWoDhState = beforeDhState && (beforeTotalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
-////
-////boolean effectivenessState = (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
-////boolean dhState = (numOfDhs == 0);
-////boolean effectivenessWoDhState = dhState && (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties);
-////
-////if (beforeEffectivenessState && (!effectivenessState) && 
-//////		beforeDhState && (!dhState) && 
-////		l.getNdx() == 356) {
-////	logger.info("xxxxxxxxxxxxxxxxxxxxxxx");
-////	if (numOfDuties == 1)
-////		logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": " + pairing[0].getNdx());
-////	else
-////		logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": " + pairing[0].getNdx() + ", " + pairing[1].getNdx());
-////	if (numOfDuties == 1)
-////		logger.info(pairing[0]);
-////	else {
-////		logger.info(pairing[0]);
-////		logger.info(pairing[1]);
-////	}
-////	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": effectivenessState: " + effectivenessState +
-////																		", dhState: " + dhState +
-////																		", effectivenessWoDhState: " + effectivenessWoDhState);
-////	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": Before PairTots: " + numOfPairs[l.getNdx()] + ", " +
-////																								numOfEffectivePairs[l.getNdx()] + ", " +
-////																								numOfPairsWoDh[l.getNdx()] + ", " +
-////																								numOfEffectivePairsWoDh[l.getNdx()]);
-////}
-//
-//					numOfPairs[l.getNdx()]++;
-//					if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties)
-//						numOfEffectivePairs[l.getNdx()]++;
-//					if (numOfDhs == 0) {
-//						numOfPairsWoDh[l.getNdx()]++;
-//						if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * numOfDuties)
-//							numOfEffectivePairsWoDh[l.getNdx()]++;
-//					}
-//
-////if (beforeEffectivenessState && (!effectivenessState) && 
-//////		beforeDhState && (!dhState) && 
-////		l.getNdx() == 356) {
-////	logger.info(legToCover.getNdx() + "-" + numOfDutiesOfChosenPair + ": After PairTots: " + numOfPairs[l.getNdx()] + ", " +
-////																								numOfEffectivePairs[l.getNdx()] + ", " +
-////																								numOfPairsWoDh[l.getNdx()] + ", " +
-////																								numOfEffectivePairsWoDh[l.getNdx()]);
-////}
-//
-//				}
-//			}
-//		}
-//	}
-
-	private int[][] pairControlArray1 = null;
-	private int[][] pairControlArray2 = null;
+	private Leg prevLegToCover = null;
+//	private int[][] pairControlArray1 = null;
+//	private int[][] pairControlArray2 = null;
 
 	private int[] numOfPairsWoDh = null;
 	private int[] numOfEffectivePairsWoDh = null;
@@ -221,67 +150,65 @@ public class SolutionState implements PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-if (l.getNdx() == 486) {
-
-	pairControlArray2 = ArrayUtils.add(pairControlArray2, new int[toNdxExc - fromNdxInc]);
-	int h = 0;
-	for (int k = fromNdxInc; k < toNdxExc; k++) {
-		pairControlArray2[pairControlArray2.length - 1][h] = pairing[k].getNdx();
-		h++;
-	}
-
-
-
-	logger.info("XXXXXXXXXXXXXXXXXXXX");
-	if (toNdxExc - fromNdxInc == 1)
-		logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx());
-	else
-		if (toNdxExc - fromNdxInc == 2)
-			logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-															pairing[fromNdxInc + 1].getNdx());
-		else
-			if (toNdxExc - fromNdxInc == 3)
-				logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-																pairing[fromNdxInc + 1].getNdx() + ", " + 
-																pairing[fromNdxInc + 2].getNdx());
-			else
-				if (toNdxExc - fromNdxInc == 4)
-					logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-																	pairing[fromNdxInc + 1].getNdx() + ", " +
-																	pairing[fromNdxInc + 2].getNdx() + ", " +
-																	pairing[fromNdxInc + 3].getNdx());
-
-	if (bestStateCalculator.pairControlArray != null) {
-		for (int[] dutyNdxs: bestStateCalculator.pairControlArray) {
-			if (dutyNdxs.length == (toNdxExc - fromNdxInc)) {
-				boolean f = true;
-				for (int k = 0; k < dutyNdxs.length; k++) {
-					if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
-							&& ((dutyNdxs[k] == 0)
-								|| (pairing[fromNdxInc - 1] != null)
-								|| (pairing[toNdxExc] != null)))
-						System.out.println("Must be an unreachable line!");
-					if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
-						f = false;
-						break;
-					}
-				}
-				if (f)
-					System.out.println("Must be an unreachable line!");
-			} else
-				if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
-						&& ((pairing[fromNdxInc - 1] != null)
-								|| (pairing[toNdxExc] != null)))
-					System.out.println("Must be an unreachable line!");
-		}
-	}
-
-	for (int k = fromNdxInc; k < toNdxExc; k++) {
-		logger.info(pairing[k]);
-	}
-
-	logger.info((toNdxExc - fromNdxInc) + ": wasEffective: " + (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
-}
+//if (l.getNdx() == 2070) {
+//
+//	pairControlArray2 = ArrayUtils.add(pairControlArray2, new int[toNdxExc - fromNdxInc]);
+//	int h = 0;
+//	for (int k = fromNdxInc; k < toNdxExc; k++) {
+//		pairControlArray2[pairControlArray2.length - 1][h] = pairing[k].getNdx();
+//		h++;
+//	}
+//
+//	logger.info("XXXXXXXXXXXXXXXXXXXX");
+//	if (toNdxExc - fromNdxInc == 1)
+//		logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx());
+//	else
+//		if (toNdxExc - fromNdxInc == 2)
+//			logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//															pairing[fromNdxInc + 1].getNdx());
+//		else
+//			if (toNdxExc - fromNdxInc == 3)
+//				logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//																pairing[fromNdxInc + 1].getNdx() + ", " + 
+//																pairing[fromNdxInc + 2].getNdx());
+//			else
+//				if (toNdxExc - fromNdxInc == 4)
+//					logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//																	pairing[fromNdxInc + 1].getNdx() + ", " +
+//																	pairing[fromNdxInc + 2].getNdx() + ", " +
+//																	pairing[fromNdxInc + 3].getNdx());
+//
+//	if (bestStateCalculator.pairControlArray != null) {
+//		for (int[] dutyNdxs: bestStateCalculator.pairControlArray) {
+//			if (dutyNdxs.length == (toNdxExc - fromNdxInc)) {
+//				boolean f = true;
+//				for (int k = 0; k < dutyNdxs.length; k++) {
+//					if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+//							&& ((dutyNdxs[k] == 0)
+//								|| (pairing[fromNdxInc - 1] != null)
+//								|| (pairing[toNdxExc] != null)))
+//						System.out.println("Must be an unreachable line!");
+//					if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
+//						f = false;
+//						break;
+//					}
+//				}
+//				if (f)
+//					System.out.println("Must be an unreachable line!");
+//			} else
+//				if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+//						&& ((pairing[fromNdxInc - 1] != null)
+//								|| (pairing[toNdxExc] != null)))
+//					System.out.println("Must be an unreachable line!");
+//		}
+//	}
+//
+//	for (int k = fromNdxInc; k < toNdxExc; k++) {
+//		logger.info(pairing[k]);
+//	}
+//
+//	logger.info((toNdxExc - fromNdxInc) + ": wasEffective: " + (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
+//}
 
 					if (numOfDhs == 0) {
 						numOfPairsWoDh[l.getNdx()]++;
@@ -326,31 +253,31 @@ if (l.getNdx() == 486) {
 					/*
 					 * Temoporary
 					 */
-					double maxLegDifficultyScore = doubleFuture.get();
-					if ((bestStateCalculator == null)
-							|| (stateCalculator.getPwq().pairQ.isBetterInTermsOfDh(bestStateCalculator.getPwq().pairQ, maxLegDifficultyScore, bestDifficutlyScore))) {
-						bestDifficutlyScore = maxLegDifficultyScore;
-						bestStateCalculator = stateCalculator;
-					}
-//					if (worstDifficutlyScore < maxLegDifficultyScore) {
-//						worstDifficutlyScore = maxLegDifficultyScore;
+//					double maxLegDifficultyScore = doubleFuture.get();
+//					if ((bestStateCalculator == null)
+//							|| (stateCalculator.getPwq().pairQ.isBetterInTermsOfDh(bestStateCalculator.getPwq().pairQ, maxLegDifficultyScore, bestDifficutlyScore))) {
+//						bestDifficutlyScore = maxLegDifficultyScore;
+//						bestStateCalculator = stateCalculator;
 //					}
+////					if (worstDifficutlyScore < maxLegDifficultyScore) {
+////						worstDifficutlyScore = maxLegDifficultyScore;
+////					}
 				}
 			}
 			}
 		}
 
-//		for (int i = 0; i < stateProcessL.size(); i++) {
-//			double maxLegDifficultyScore = stateProcessL.get(i).get();
-//			if ((bestStateCalculator == null)
-//					|| (stateCalculators.get(i).getPwq().pairQ.isBetterInTermsOfDh(bestStateCalculator.getPwq().pairQ, maxLegDifficultyScore, bestDifficutlyScore))) {
-//				bestDifficutlyScore = maxLegDifficultyScore;
-//				bestStateCalculator = stateCalculators.get(i);
+		for (int i = 0; i < stateProcessL.size(); i++) {
+			double maxLegDifficultyScore = stateProcessL.get(i).get();
+			if ((bestStateCalculator == null)
+					|| (stateCalculators.get(i).getPwq().pairQ.isBetterInTermsOfDh(bestStateCalculator.getPwq().pairQ, maxLegDifficultyScore, bestDifficutlyScore))) {
+				bestDifficutlyScore = maxLegDifficultyScore;
+				bestStateCalculator = stateCalculators.get(i);
+			}
+//			if (worstDifficutlyScore < maxLegDifficultyScore) {
+//				worstDifficutlyScore = maxLegDifficultyScore;
 //			}
-////			if (worstDifficutlyScore < maxLegDifficultyScore) {
-////				worstDifficutlyScore = maxLegDifficultyScore;
-////			}
-//		}
+		}
 
 //		StateCalculator lessStateCalculator = stateCalculators.get(0);
 //		double lessDifficutlyScore = lessStateCalculator.getMaxDifficultyScoreObtained();
@@ -367,82 +294,120 @@ if (l.getNdx() == 486) {
 		 * Checks probable pairing numbers of Legs.
 		 * 
 		 */
-		numOfPairsWoDh = new int[this.legs.size()];
-		numOfEffectivePairsWoDh = new int[this.legs.size()];
 
-		pairControlArray1 = pairControlArray2;
-		pairControlArray2 = new int[0][0];
+//		if (
+//				(legToCover.getNdx() == 5239) || 
+//				(legToCover.getNdx() == 5204)) {
+		if (true) {
 
-		logger.info("------------------------------------------------------------------");
-		logger.info(legToCover);
-		logger.info(bestStateCalculator.getMaxDifficultyScoreObtained());
-		logger.info(legToCover.getNumOfIncludingPairsWoDh() + "/" + legToCover.getNumOfIncludingEffectivePairsWoDh());
-		logger.info(bestStateCalculator.getPwq().pair);
-		this.pairEnumerator.enumerateAllPairings(bestStateCalculator.getTempDutyStates());
-		logger.info("------------------------------------------------------------------");
+			numOfPairsWoDh = new int[this.legs.size()];
+			numOfEffectivePairsWoDh = new int[this.legs.size()];
 
-		if (pairControlArray1 != null) {
-			for (int i = 0; i < pairControlArray1.length; i++) {
-				int[] pair1 = pairControlArray1[i];
-				boolean found = false;
-				for (int j = 0; j < pairControlArray2.length; j++) {
-					int[] pair2 = pairControlArray2[j];
-					if (pair1.length == pair2.length) {
-						boolean f = true; 
-						for (int k = 0; k < pair1.length; k++) {
-							if (pair1[k] != pair2[k]) {
-								f = false;
-								break;
-							}
-						}
-						if (f) {
-							found = true;
-							break;
-						}
+//			pairControlArray1 = pairControlArray2;
+//			pairControlArray2 = new int[0][0];
+
+			logger.info("------------------------------------------------------------------");
+			logger.info(legToCover);
+			logger.info(bestStateCalculator.getMaxDifficultyScoreObtained());
+			logger.info(legToCover.getNumOfIncludingPairsWoDh() + "/" + legToCover.getNumOfIncludingEffectivePairsWoDh());
+			logger.info(bestStateCalculator.getPwq().pair);
+			this.pairEnumerator.enumerateAllPairings(bestStateCalculator.getTempDutyStates());
+			logger.info("------------------------------------------------------------------");
+
+//			if (pairControlArray1 != null) {
+//				for (int i = 0; i < pairControlArray1.length; i++) {
+//					int[] pair1 = pairControlArray1[i];
+//					boolean found = false;
+//					for (int j = 0; j < pairControlArray2.length; j++) {
+//						int[] pair2 = pairControlArray2[j];
+//						if (pair1.length == pair2.length) {
+//							boolean f = true; 
+//							for (int k = 0; k < pair1.length; k++) {
+//								if (pair1[k] != pair2[k]) {
+//									f = false;
+//									break;
+//								}
+//							}
+//							if (f) {
+//								found = true;
+//								break;
+//							}
+//						}
+//					}
+//					if (!found) {
+//						for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
+//							int[] pairT = bestStateCalculator.pairControlArray[j];
+//							if (pair1.length == pairT.length) {
+//								boolean f = true; 
+//								for (int k = 0; k < pair1.length; k++) {
+//									if (pair1[k] != pairT[k]) {
+//										f = false;
+//										break;
+//									}
+//								}
+//								if (f) {
+//									found = true;
+//									break;
+//								}
+//							}
+//						}
+//						if (!found) {
+//							System.out.println("Pairing could not be reproduced!");
+//							System.out.println("Pair1 :" + ArrayUtils.toString(pair1));
+//							for (int j : pair1) {
+//								System.out.println(this.duties.get(j));
+//							}
+//						}
+//					}
+//				}
+//			}
+
+//		if (pairControlArray1 != null) {
+//			for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
+//				int[] pairT = bestStateCalculator.pairControlArray[j];
+//				boolean found = false;
+//				for (int i = 0; i < pairControlArray1.length; i++) {
+//					int[] pair1 = pairControlArray1[i];
+//					if (pair1.length == pairT.length) {
+//						boolean f = true; 
+//						for (int k = 0; k < pair1.length; k++) {
+//							if (pair1[k] != pairT[k]) {
+//								f = false;
+//								break;
+//							}
+//						}
+//						if (f) {
+//							found = true;
+//							break;
+//						}
+//					}
+//				}
+//				if (!found) {
+//					System.out.println("Pairing could not be reproduced!");
+//					System.out.println("Pair2 :" + ArrayUtils.toString(pairT));
+//					for (int i : pairT) {
+//						System.out.println(this.duties.get(i));
+//					}
+//				}
+//			}
+//		}
+
+			for (int i = 0; i < this.legs.size(); i++) {
+				Leg l = this.legs.get(i);
+				if (l.isCover()
+					&& l.hasPair(hbNdx)) {
+					LegState ls = bestStateCalculator.getTempLegStates()[l.getNdx()];
+					if (!ls.arePairTotalizersOk(0,
+												0,
+												numOfPairsWoDh[l.getNdx()],
+												numOfEffectivePairsWoDh[l.getNdx()])) {
+						logger.error("LegToCover: " + legToCover);
+						logger.error("Leg pair totalizers are not set correctly! " + l);
+						ls.arePairTotalizersOk(0,
+												0,
+												numOfPairsWoDh[l.getNdx()],
+												numOfEffectivePairsWoDh[l.getNdx()]);
 					}
-				}
-				if (!found) {
-					for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
-						int[] pairT = bestStateCalculator.pairControlArray[j];
-						if (pair1.length == pairT.length) {
-							boolean f = true; 
-							for (int k = 0; k < pair1.length; k++) {
-								if (pair1[k] != pairT[k]) {
-									f = false;
-									break;
-								}
-							}
-							if (f) {
-								found = true;
-								break;
-							}
-						}
-					}
-					if (!found) {
-						System.out.println("Pairing could not be reproduced!");
-						System.out.println("Pair1 :" + ArrayUtils.toString(pair1));
-						for (int j : pair1) {
-							System.out.println(this.duties.get(j));
-						}
-					}
-				}
-			}
-		}
-		for (int i = 0; i < this.legs.size(); i++) {
-			Leg l = this.legs.get(i);
-			if (l.isCover()
-				&& l.hasPair(hbNdx)) {
-				LegState ls = bestStateCalculator.getTempLegStates()[l.getNdx()];
-				if (!ls.arePairTotalizersOk(0,
-											0,
-											numOfPairsWoDh[l.getNdx()],
-											numOfEffectivePairsWoDh[l.getNdx()])) {
-					logger.error("LegToCover: " + legToCover);
-					logger.error("Leg pair totalizers are not set correctly! " + l);
-					ls.arePairTotalizersOk(0,
-											0,
-											numOfPairsWoDh[l.getNdx()],
-											numOfEffectivePairsWoDh[l.getNdx()]);
 				}
 			}
 		}
@@ -451,6 +416,7 @@ if (l.getNdx() == 486) {
 		 * 
 		 */
 
+		this.prevLegToCover = legToCover;
 		this.activeLegStates = bestStateCalculator.getTempLegStates();
 		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
 

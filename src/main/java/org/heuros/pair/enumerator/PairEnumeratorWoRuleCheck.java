@@ -106,6 +106,14 @@ public class PairEnumeratorWoRuleCheck {
 		for (Leg nl : nls) {
 			Duty[] nds = this.dutyIndexByDepLegNdx.getArray(nl.getNdx());
 			for (Duty nd : nds) {
+
+//if ((fd.getNdx() == 15830) && (ld.getNdx() == 15830) && (nd.getNdx() == 31427))
+//System.out.println();
+//if ((fd.getNdx() == 15830) && (ld.getNdx() == 31427) && (nd.getNdx() == 44027))
+//System.out.println();
+//if ((fd.getNdx() == 9658) && (ld.getNdx() == 29056) && (pd.getNdx() == 5344))
+//System.out.println();
+
 				if ((nd.getNumOfLegsPassive() == 0)
 						&& ((dutyStates == null)
 								|| (dutyStates[nd.getNdx()].numOfCoverings == 0))) {
@@ -121,9 +129,10 @@ public class PairEnumeratorWoRuleCheck {
 							 * This line below are put because of no rule validation code is done here!
 							 * Rule validation is done in just briefing time context.
 							 */
-							&& (ChronoUnit.DAYS.between(fd.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1))
-							&& (((toNdxExc - fromNdxInc) < 3)
-									|| (ChronoUnit.DAYS.between(ld.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)))) {
+							&& (ChronoUnit.DAYS.between(fd.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + 1))
+//							&& (((toNdxExc - fromNdxInc) < 3)
+//									|| (ChronoUnit.DAYS.between(ld.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)))
+							) {
 						pairing[toNdxExc - 1] = nd;
 						this.pairListener.onPairingFound(pairing, fromNdxInc, toNdxExc, newNumOfDhs, totalActiveBlockTime + nd.getBlockTimeInMinsActive());
 						numOfProbablePairings[toNdxExc - fromNdxInc - 1]++;
@@ -137,7 +146,8 @@ public class PairEnumeratorWoRuleCheck {
 								 * This line below are put because of no rule validation code is done here!
 								 * Rule validation is done in just briefing time context.
 								 */
-								&& (ChronoUnit.DAYS.between(fd.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))) {
+								&& (ChronoUnit.DAYS.between(fd.getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + 1))
+								) {
 							pairing[toNdxExc - 1] = nd;
 							this.fwSearch(dutyStates,
 											numOfProbablePairings,
@@ -162,12 +172,12 @@ public class PairEnumeratorWoRuleCheck {
 			Duty[] pds = this.dutyIndexByArrLegNdx.getArray(pl.getNdx());
 			for (Duty pd : pds) {
 
-if ((fd.getNdx() == 29056) && (ld.getNdx() == 29056) && (pd.getNdx() == 15360))
-System.out.println();
-if ((fd.getNdx() == 15360) && (ld.getNdx() == 29056) && (pd.getNdx() == 9658))
-System.out.println();
-if ((fd.getNdx() == 9658) && (ld.getNdx() == 29056) && (pd.getNdx() == 5344))
-System.out.println();
+//if ((fd.getNdx() == 32904) && (ld.getNdx() == 32904) && (pd.getNdx() == 26216))
+//System.out.println();
+//if ((fd.getNdx() == 26216) && (ld.getNdx() == 32904) && (pd.getNdx() == 7397))
+//System.out.println();
+//if ((fd.getNdx() == 9658) && (ld.getNdx() == 29056) && (pd.getNdx() == 5344))
+//System.out.println();
 
 				if ((pd.getNumOfLegsPassive() == 0)
 						&& ((dutyStates == null)
@@ -188,9 +198,9 @@ System.out.println();
 							&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 									|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))) {
 						if (hbArr) {
-							if (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1)
-									&& (((toNdxExc - fromNdxInc) < 3)
-											|| (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), fd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)))
+							if (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + 1)
+//									&& (((toNdxExc - fromNdxInc) < 3)
+//											|| (ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), fd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)))
 									) {
 								pairing[fromNdxInc] = pd;
 								this.pairListener.onPairingFound(pairing, fromNdxInc, toNdxExc, newNumOfDhs, totalActiveBlockTime + pd.getBlockTimeInMinsActive());
@@ -199,7 +209,8 @@ System.out.println();
 							}
 						} else
 							if ((toNdxExc - fromNdxInc < HeurosSystemParam.maxSearchDeptForScoreCalculations)
-									&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2)) {
+									&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + 1)
+									) {
 								pairing[fromNdxInc] = pd;
 								this.fwSearch(dutyStates,
 												numOfProbablePairings,
@@ -220,10 +231,12 @@ System.out.println();
 								&& (pd.getMinNextBriefTime(hbNdx).plusHours(HeurosSystemParam.maxNetDutySearchDeptInHours + 1).isAfter(fd.getBriefTime(hbNdx)))
 								&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 										|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
-								&& ((hbArr 
-										&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))
-										|| ((!hbArr) 
-												&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 3)))) {
+								&& (
+//										(hbArr && 
+												ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + 1)
+//										) || ((!hbArr) 
+//												&& ChronoUnit.DAYS.between(pd.getBriefTime(this.hbNdx), ld.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 3))
+								)) {
 							pairing[fromNdxInc] = pd;
 							this.bwSearch(hbArr,
 											dutyStates,
@@ -336,7 +349,7 @@ System.out.println();
 //					 * This line below are put because of no rule validation code is done here!
 //					 * Rule validation is done in just briefing time context.
 //					 */
-//					&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 1))) {
+//					&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (nextNdx + 2))) {
 //				return true;
 //			} else
 //				if (nd.isNonHbArr(this.hbNdx)
@@ -347,7 +360,7 @@ System.out.println();
 //						 * This line below are put because of no rule validation code is done here!
 //						 * Rule validation is done in just briefing time context.
 //						 */
-//						&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (HeurosSystemParam.maxPairingLengthInDays - 2))) {
+//						&& (ChronoUnit.DAYS.between(testPair[0].getBriefTime(this.hbNdx), nd.getDebriefTime(this.hbNdx).minusSeconds(1)) < (nextNdx + 2))) {
 //					return this.validateFwSearch(testPair,
 //													dutyStates,
 //													nextNdx + 1,
