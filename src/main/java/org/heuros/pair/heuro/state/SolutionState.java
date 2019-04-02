@@ -150,7 +150,7 @@ public class SolutionState implements PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-//if (l.getNdx() == 2070) {
+//if (l.getNdx() == 4222) {
 //
 //	pairControlArray2 = ArrayUtils.add(pairControlArray2, new int[toNdxExc - fromNdxInc]);
 //	int h = 0;
@@ -296,8 +296,8 @@ public class SolutionState implements PairListener {
 		 */
 
 //		if (
-//				(legToCover.getNdx() == 5239) || 
-//				(legToCover.getNdx() == 5204)) {
+//				(legToCover.getNdx() == 7019) || 
+//				(legToCover.getNdx() == 7810)) {
 		if (true) {
 
 			numOfPairsWoDh = new int[this.legs.size()];

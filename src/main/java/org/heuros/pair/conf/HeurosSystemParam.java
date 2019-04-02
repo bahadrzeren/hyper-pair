@@ -41,7 +41,7 @@ public class HeurosSystemParam {
 	/*
 	 * must not exceed maxPairingLengthInDays!
 	 */
-	public static int maxSearchDeptForScoreCalculations = maxPairingLengthInDays - 1;
+	public static int maxSearchDeptForScoreCalculations = maxPairingLengthInDays;	//	- 1;
 
 	/*
 	 * Difficulty Score calculations.

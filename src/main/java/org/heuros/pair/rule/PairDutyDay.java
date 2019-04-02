@@ -41,7 +41,7 @@ public class PairDutyDay implements ConnectionChecker<DutyView> {
 		/*
 		 *	Max one duty can start per calendar day. 
 		 */
-		if (pd.getBriefDay(hbNdx) == nd.getBriefDay(hbNdx))
+		if (pd.getBriefDay(hbNdx).isEqual(nd.getBriefDay(hbNdx)))
 			return false;
 
 		return true;

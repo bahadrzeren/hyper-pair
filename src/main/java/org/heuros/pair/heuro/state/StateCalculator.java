@@ -103,7 +103,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-//if ((l.getNdx() == 2070)
+//if ((l.getNdx() == 4222)
 //		&& (pairControlArray != null)) {
 //	logger.info("--------------------");
 //
@@ -187,7 +187,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 					} else
 						System.out.println("Must be an unreachable line!");
 
-//if ((l.getNdx() == 2070)
+//if ((l.getNdx() == 4222)
 //		&& (pairControlArray != null)) {
 //	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
 //																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
@@ -229,8 +229,8 @@ public class StateCalculator implements Callable<Double>, PairListener {
 		for (int i = 0; i < pwq.pair.getNumOfDuties(); i++) {
 			Duty duty = pwq.pair.getDuties().get(i);
 
-//if ((duty.getNdx() == 43978)
-//		&& (pwq.pair.getNumOfDuties() == 1)) {
+//if ((duty.getNdx() == 68973)
+//		&& (pwq.pair.getNumOfDuties() == 2)) {
 //System.out.println();
 //pairControlArray = new int[0][0];
 //}
@@ -255,7 +255,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 					if (dutyOfLeg.hasPairing(pwq.pair.getHbNdx())
 							&& dutyOfLeg.isValid(pwq.pair.getHbNdx())) {
 
-//if (dutyOfLeg.getNdx() == 44027)
+//if (dutyOfLeg.getNdx() == 70087)
 //System.out.println();
 
 						DutyState dutyOfLegStat = this.tempDutyStates[dutyOfLeg.getNdx()];
