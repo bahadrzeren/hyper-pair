@@ -103,8 +103,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-//if ((l.getNdx() == 4222)
-//		&& (pairControlArray != null)) {
+//if ((l.getNdx() == 4798) && (pairControlArray != null)) {
 //	logger.info("--------------------");
 //
 //	Duty[] hPair = ArrayUtils.subarray(pairing, fromNdxInc, toNdxExc);
@@ -187,8 +186,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 					} else
 						System.out.println("Must be an unreachable line!");
 
-//if ((l.getNdx() == 4222)
-//		&& (pairControlArray != null)) {
+//if ((l.getNdx() == 4798) && (pairControlArray != null)) {
 //	logger.info(this.legToCover.getNdx() + "-" + pwq.pair.getNumOfDuties() + ": Before PairTots: " + this.tempLegStates[l.getNdx()].numOfIncludingPairs + ", " +
 //																										this.tempLegStates[l.getNdx()].numOfIncludingEffectivePairs + ", " +
 //																										this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh + ", " +
@@ -232,7 +230,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 //if ((duty.getNdx() == 68973)
 //		&& (pwq.pair.getNumOfDuties() == 2)) {
 //System.out.println();
-//pairControlArray = new int[0][0];
+////pairControlArray = new int[0][0];
 //}
 
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
@@ -255,7 +253,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 					if (dutyOfLeg.hasPairing(pwq.pair.getHbNdx())
 							&& dutyOfLeg.isValid(pwq.pair.getHbNdx())) {
 
-//if (dutyOfLeg.getNdx() == 70087)
+//if (dutyOfLeg.getNdx() == 63888)
 //System.out.println();
 
 						DutyState dutyOfLegStat = this.tempDutyStates[dutyOfLeg.getNdx()];

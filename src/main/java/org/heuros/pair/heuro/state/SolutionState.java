@@ -150,7 +150,7 @@ public class SolutionState implements PairListener {
 				if (l.isCover()
 						&& l.hasPair(hbNdx)) {
 
-//if (l.getNdx() == 4222) {
+//if (l.getNdx() == 4798) {
 //
 //	pairControlArray2 = ArrayUtils.add(pairControlArray2, new int[toNdxExc - fromNdxInc]);
 //	int h = 0;
@@ -159,24 +159,24 @@ public class SolutionState implements PairListener {
 //		h++;
 //	}
 //
-//	logger.info("XXXXXXXXXXXXXXXXXXXX");
-//	if (toNdxExc - fromNdxInc == 1)
-//		logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx());
-//	else
-//		if (toNdxExc - fromNdxInc == 2)
-//			logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-//															pairing[fromNdxInc + 1].getNdx());
-//		else
-//			if (toNdxExc - fromNdxInc == 3)
-//				logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-//																pairing[fromNdxInc + 1].getNdx() + ", " + 
-//																pairing[fromNdxInc + 2].getNdx());
-//			else
-//				if (toNdxExc - fromNdxInc == 4)
-//					logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-//																	pairing[fromNdxInc + 1].getNdx() + ", " +
-//																	pairing[fromNdxInc + 2].getNdx() + ", " +
-//																	pairing[fromNdxInc + 3].getNdx());
+////	logger.info("XXXXXXXXXXXXXXXXXXXX");
+////	if (toNdxExc - fromNdxInc == 1)
+////		logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx());
+////	else
+////		if (toNdxExc - fromNdxInc == 2)
+////			logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+////															pairing[fromNdxInc + 1].getNdx());
+////		else
+////			if (toNdxExc - fromNdxInc == 3)
+////				logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+////																pairing[fromNdxInc + 1].getNdx() + ", " + 
+////																pairing[fromNdxInc + 2].getNdx());
+////			else
+////				if (toNdxExc - fromNdxInc == 4)
+////					logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+////																	pairing[fromNdxInc + 1].getNdx() + ", " +
+////																	pairing[fromNdxInc + 2].getNdx() + ", " +
+////																	pairing[fromNdxInc + 3].getNdx());
 //
 //	if (bestStateCalculator.pairControlArray != null) {
 //		for (int[] dutyNdxs: bestStateCalculator.pairControlArray) {
@@ -203,11 +203,11 @@ public class SolutionState implements PairListener {
 //		}
 //	}
 //
-//	for (int k = fromNdxInc; k < toNdxExc; k++) {
-//		logger.info(pairing[k]);
-//	}
-//
-//	logger.info((toNdxExc - fromNdxInc) + ": wasEffective: " + (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
+////	for (int k = fromNdxInc; k < toNdxExc; k++) {
+////		logger.info(pairing[k]);
+////	}
+////
+////	logger.info((toNdxExc - fromNdxInc) + ": wasEffective: " + (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
 //}
 
 					if (numOfDhs == 0) {
