@@ -9,11 +9,11 @@ public class DutyState implements Cloneable {
 		return (DutyState) super.clone();
 	}
 
-	private Duty associatedDuty = null;
+//	private Duty associatedDuty = null;
 
-	public DutyState(Duty associatedDuty) {
-		this.associatedDuty = associatedDuty;
-	}
+//	public DutyState(Duty associatedDuty) {
+//		this.associatedDuty = associatedDuty;
+//	}
 
 	public int numOfCoverings = 0;
 	public int numOfCoveringsActive = 0;

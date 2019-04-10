@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.DutyLegOvernightConnNetwork;
@@ -55,7 +54,7 @@ public class SolutionState implements PairListener {
 		for (int j = 0; j < this.activeLegStates.length; j++)
 			this.activeLegStates[j] = new LegState(this.legs.get(j));
 		for (int j = 0; j < this.activeDutyStates.length; j++)
-			this.activeDutyStates[j] = new DutyState(this.duties.get(j));
+			this.activeDutyStates[j] = new DutyState();	//	this.duties.get(j));
 
 		pairEnumerator = new PairEnumeratorWoRuleCheck(pairOptimizationContext,
 														pricingNetwork,
@@ -135,7 +134,7 @@ public class SolutionState implements PairListener {
 		return res;
 	}
 
-	private Leg prevLegToCover = null;
+//	private Leg prevLegToCover = null;
 //	private int[][] pairControlArray1 = null;
 //	private int[][] pairControlArray2 = null;
 
@@ -294,129 +293,128 @@ public class SolutionState implements PairListener {
 		 * Checks probable pairing numbers of Legs.
 		 * 
 		 */
-
-//		if (
-//				(legToCover.getNdx() == 7019) || 
-//				(legToCover.getNdx() == 7810)) {
-		if (true) {
-
-			numOfPairsWoDh = new int[this.legs.size()];
-			numOfEffectivePairsWoDh = new int[this.legs.size()];
-
-//			pairControlArray1 = pairControlArray2;
-//			pairControlArray2 = new int[0][0];
-
-			logger.info("------------------------------------------------------------------");
-			logger.info(legToCover);
-			logger.info(bestStateCalculator.getMaxDifficultyScoreObtained());
-			logger.info(legToCover.getNumOfIncludingPairsWoDh() + "/" + legToCover.getNumOfIncludingEffectivePairsWoDh());
-			logger.info(bestStateCalculator.getPwq().pair);
-			this.pairEnumerator.enumerateAllPairings(bestStateCalculator.getTempDutyStates());
-			logger.info("------------------------------------------------------------------");
-
-//			if (pairControlArray1 != null) {
-//				for (int i = 0; i < pairControlArray1.length; i++) {
-//					int[] pair1 = pairControlArray1[i];
-//					boolean found = false;
-//					for (int j = 0; j < pairControlArray2.length; j++) {
-//						int[] pair2 = pairControlArray2[j];
-//						if (pair1.length == pair2.length) {
-//							boolean f = true; 
-//							for (int k = 0; k < pair1.length; k++) {
-//								if (pair1[k] != pair2[k]) {
-//									f = false;
-//									break;
-//								}
-//							}
-//							if (f) {
-//								found = true;
-//								break;
-//							}
-//						}
-//					}
-//					if (!found) {
-//						for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
-//							int[] pairT = bestStateCalculator.pairControlArray[j];
-//							if (pair1.length == pairT.length) {
-//								boolean f = true; 
-//								for (int k = 0; k < pair1.length; k++) {
-//									if (pair1[k] != pairT[k]) {
-//										f = false;
-//										break;
-//									}
-//								}
-//								if (f) {
-//									found = true;
-//									break;
-//								}
-//							}
-//						}
-//						if (!found) {
-//							System.out.println("Pairing could not be reproduced!");
-//							System.out.println("Pair1 :" + ArrayUtils.toString(pair1));
-//							for (int j : pair1) {
-//								System.out.println(this.duties.get(j));
-//							}
-//						}
-//					}
-//				}
-//			}
-
-//		if (pairControlArray1 != null) {
-//			for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
-//				int[] pairT = bestStateCalculator.pairControlArray[j];
-//				boolean found = false;
-//				for (int i = 0; i < pairControlArray1.length; i++) {
-//					int[] pair1 = pairControlArray1[i];
-//					if (pair1.length == pairT.length) {
-//						boolean f = true; 
-//						for (int k = 0; k < pair1.length; k++) {
-//							if (pair1[k] != pairT[k]) {
-//								f = false;
-//								break;
-//							}
-//						}
-//						if (f) {
-//							found = true;
-//							break;
-//						}
-//					}
-//				}
-//				if (!found) {
-//					System.out.println("Pairing could not be reproduced!");
-//					System.out.println("Pair2 :" + ArrayUtils.toString(pairT));
-//					for (int i : pairT) {
-//						System.out.println(this.duties.get(i));
+////		if (
+////				(legToCover.getNdx() == 7019) || 
+////				(legToCover.getNdx() == 7810)) {
+//		if (true) {
+//
+//			numOfPairsWoDh = new int[this.legs.size()];
+//			numOfEffectivePairsWoDh = new int[this.legs.size()];
+//
+////			pairControlArray1 = pairControlArray2;
+////			pairControlArray2 = new int[0][0];
+//
+//			logger.info("------------------------------------------------------------------");
+//			logger.info(legToCover);
+//			logger.info(bestStateCalculator.getMaxDifficultyScoreObtained());
+//			logger.info(legToCover.getNumOfIncludingPairsWoDh() + "/" + legToCover.getNumOfIncludingEffectivePairsWoDh());
+//			logger.info(bestStateCalculator.getPwq().pair);
+//			this.pairEnumerator.enumerateAllPairings(bestStateCalculator.getTempDutyStates());
+//			logger.info("------------------------------------------------------------------");
+//
+////			if (pairControlArray1 != null) {
+////				for (int i = 0; i < pairControlArray1.length; i++) {
+////					int[] pair1 = pairControlArray1[i];
+////					boolean found = false;
+////					for (int j = 0; j < pairControlArray2.length; j++) {
+////						int[] pair2 = pairControlArray2[j];
+////						if (pair1.length == pair2.length) {
+////							boolean f = true; 
+////							for (int k = 0; k < pair1.length; k++) {
+////								if (pair1[k] != pair2[k]) {
+////									f = false;
+////									break;
+////								}
+////							}
+////							if (f) {
+////								found = true;
+////								break;
+////							}
+////						}
+////					}
+////					if (!found) {
+////						for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
+////							int[] pairT = bestStateCalculator.pairControlArray[j];
+////							if (pair1.length == pairT.length) {
+////								boolean f = true; 
+////								for (int k = 0; k < pair1.length; k++) {
+////									if (pair1[k] != pairT[k]) {
+////										f = false;
+////										break;
+////									}
+////								}
+////								if (f) {
+////									found = true;
+////									break;
+////								}
+////							}
+////						}
+////						if (!found) {
+////							System.out.println("Pairing could not be reproduced!");
+////							System.out.println("Pair1 :" + ArrayUtils.toString(pair1));
+////							for (int j : pair1) {
+////								System.out.println(this.duties.get(j));
+////							}
+////						}
+////					}
+////				}
+////			}
+//
+////		if (pairControlArray1 != null) {
+////			for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
+////				int[] pairT = bestStateCalculator.pairControlArray[j];
+////				boolean found = false;
+////				for (int i = 0; i < pairControlArray1.length; i++) {
+////					int[] pair1 = pairControlArray1[i];
+////					if (pair1.length == pairT.length) {
+////						boolean f = true; 
+////						for (int k = 0; k < pair1.length; k++) {
+////							if (pair1[k] != pairT[k]) {
+////								f = false;
+////								break;
+////							}
+////						}
+////						if (f) {
+////							found = true;
+////							break;
+////						}
+////					}
+////				}
+////				if (!found) {
+////					System.out.println("Pairing could not be reproduced!");
+////					System.out.println("Pair2 :" + ArrayUtils.toString(pairT));
+////					for (int i : pairT) {
+////						System.out.println(this.duties.get(i));
+////					}
+////				}
+////			}
+////		}
+//
+//			for (int i = 0; i < this.legs.size(); i++) {
+//				Leg l = this.legs.get(i);
+//				if (l.isCover()
+//					&& l.hasPair(hbNdx)) {
+//					LegState ls = bestStateCalculator.getTempLegStates()[l.getNdx()];
+//					if (!ls.arePairTotalizersOk(0,
+//												0,
+//												numOfPairsWoDh[l.getNdx()],
+//												numOfEffectivePairsWoDh[l.getNdx()])) {
+//						logger.error("LegToCover: " + legToCover);
+//						logger.error("Leg pair totalizers are not set correctly! " + l);
+//						ls.arePairTotalizersOk(0,
+//												0,
+//												numOfPairsWoDh[l.getNdx()],
+//												numOfEffectivePairsWoDh[l.getNdx()]);
 //					}
 //				}
 //			}
 //		}
-
-			for (int i = 0; i < this.legs.size(); i++) {
-				Leg l = this.legs.get(i);
-				if (l.isCover()
-					&& l.hasPair(hbNdx)) {
-					LegState ls = bestStateCalculator.getTempLegStates()[l.getNdx()];
-					if (!ls.arePairTotalizersOk(0,
-												0,
-												numOfPairsWoDh[l.getNdx()],
-												numOfEffectivePairsWoDh[l.getNdx()])) {
-						logger.error("LegToCover: " + legToCover);
-						logger.error("Leg pair totalizers are not set correctly! " + l);
-						ls.arePairTotalizersOk(0,
-												0,
-												numOfPairsWoDh[l.getNdx()],
-												numOfEffectivePairsWoDh[l.getNdx()]);
-					}
-				}
-			}
-		}
 		/**
 		 * TEST BLOCK END
 		 * 
 		 */
 
-		this.prevLegToCover = legToCover;
+//		this.prevLegToCover = legToCover;
 		this.activeLegStates = bestStateCalculator.getTempLegStates();
 		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
 

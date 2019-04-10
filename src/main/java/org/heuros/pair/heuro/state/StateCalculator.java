@@ -1,16 +1,9 @@
 package org.heuros.pair.heuro.state;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
 import org.heuros.core.data.ndx.OneDimIndexInt;
-import org.heuros.core.data.ndx.OneDimUniqueIndexInt;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
@@ -20,27 +13,27 @@ import org.heuros.pair.enumerator.PairListener;
 import org.heuros.pair.sp.PairWithQuality;
 
 public class StateCalculator implements Callable<Double>, PairListener {
-	private static Logger logger = Logger.getLogger(StateCalculator.class);
+//	private static Logger logger = Logger.getLogger(StateCalculator.class);
 
 	/*
 	 * TODO Single base assumption!!!
 	 */
 	private int hbNdx = 0;
 
-	private List<Leg> legs = null;
-	private List<Duty> duties = null;
+//	private List<Leg> legs = null;
+//	private List<Duty> duties = null;
 	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 	private LegState[] activeLegStates = null;
 	private DutyState[] activeDutyStates = null;
 	private LegState[] tempLegStates = null;
 	private DutyState[] tempDutyStates = null;
 	private PairWithQuality pwq = null;
-	private Leg legToCover = null;
+//	private Leg legToCover = null;
 
-	private OneDimIndexInt<Duty> dutyIndexByDepLegNdx = null;
-	private OneDimIndexInt<Duty> dutyIndexByArrLegNdx = null;
-	private OneDimUniqueIndexInt<Leg> nextBriefLegIndexByDutyNdx = null;
-	private OneDimUniqueIndexInt<Leg> prevDebriefLegIndexByDutyNdx = null;
+//	private OneDimIndexInt<Duty> dutyIndexByDepLegNdx = null;
+//	private OneDimIndexInt<Duty> dutyIndexByArrLegNdx = null;
+//	private OneDimUniqueIndexInt<Leg> nextBriefLegIndexByDutyNdx = null;
+//	private OneDimUniqueIndexInt<Leg> prevDebriefLegIndexByDutyNdx = null;
 
 	private PairEnumeratorWoRuleCheck pairEnumerator = null;
 
@@ -50,15 +43,15 @@ public class StateCalculator implements Callable<Double>, PairListener {
 							LegState[] activeLegStates,
 							DutyState[] activeDutyStates,
 							PairWithQuality pwq) {
-		this.legs = pairOptimizationContext.getLegRepository().getModels();
-		this.duties = pairOptimizationContext.getDutyRepository().getModels();
+//		this.legs = pairOptimizationContext.getLegRepository().getModels();
+//		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
 
-		this.dutyIndexByDepLegNdx = pricingNetwork.getDutyIndexByDepLegNdx();
-		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
-		this.nextBriefLegIndexByDutyNdx = pricingNetwork.getNextBriefLegIndexByDutyNdx();
-		this.prevDebriefLegIndexByDutyNdx = pricingNetwork.getPrevDebriefLegIndexByDutyNdx();
-		this.legToCover = legToCover;
+//		this.dutyIndexByDepLegNdx = pricingNetwork.getDutyIndexByDepLegNdx();
+//		this.dutyIndexByArrLegNdx = pricingNetwork.getDutyIndexByArrLegNdx();
+//		this.nextBriefLegIndexByDutyNdx = pricingNetwork.getNextBriefLegIndexByDutyNdx();
+//		this.prevDebriefLegIndexByDutyNdx = pricingNetwork.getPrevDebriefLegIndexByDutyNdx();
+//		this.legToCover = legToCover;
 		this.activeLegStates = activeLegStates;
 		this.activeDutyStates = activeDutyStates;
 		this.pwq = pwq;
