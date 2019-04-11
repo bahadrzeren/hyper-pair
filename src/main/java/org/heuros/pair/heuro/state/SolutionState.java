@@ -449,7 +449,12 @@ public class SolutionState implements PairListener {
 //	private int[][] nextDuty = null;
 //	private int[][] prevDuty = null;
 
-	public double finalizeIteration(int iterationNumber, List<Pair> solution, int uncoveredLegs) {
+	public double finalizeIteration(int iterationNumber, List<Pair> solution, int uncoveredLegs, 
+									boolean bestFound, int prevItrBestFound, int itrBestFound, 
+									boolean solutionIsImproved, int prevItrSolutionIsImproved, int itrSolutionIsImproved) {
+
+		double bestW = (1.0 * (itrBestFound - prevItrBestFound)) / itrBestFound;	//	+ 0.2;
+		double imprW = (1.0 * (itrSolutionIsImproved - prevItrSolutionIsImproved)) / itrSolutionIsImproved;	//	+ 0.6;
 
 //		if (numOfLegsThatCoveredDutyHas == null) {
 //			numOfLegsThatCoveredDutyHas = new int[this.legs.size()][100];
@@ -466,9 +471,10 @@ public class SolutionState implements PairListener {
 //		}
 
 //		double fitness = 0.0;
-		int numOfDuties = 0;
-		int numOfPairDays = 0;
 		int numOfPairs = 0;
+		int numOfPairDays = 0;
+		int numOfDuties = 0;
+		int numOfDutyDays = 0;
 
 		double totalHeurModDh = 0.0;
 		double totalHeurModEf = 0.0;
@@ -502,6 +508,8 @@ public class SolutionState implements PairListener {
 			for (int j = 0; j < p.getNumOfDuties(); j++) {
 				Duty d = p.getDuties().get(j);
 
+				numOfDutyDays += d.getNumOfDaysTouched(this.hbNdx);
+
 				/*
 				 * Effectiveness!
 				 */
@@ -511,13 +519,19 @@ public class SolutionState implements PairListener {
 				}
 
 //				double modValueDh = activeDutyStates[d.getNdx()].numOfCoveringsPassiveExt + activeDutyStates[d.getNdx()].numOfCoveringsPassiveInt;
-				double modValueDh = activeDutyStates[d.getNdx()].numOfCoveringsPassiveExt;
+				double modValueDhExt = activeDutyStates[d.getNdx()].numOfCoveringsPassiveExt;
+				double modValueDhInt = 0.0;
 				for (int k = 0; k < d.getNumOfLegs(); k++) {
 					Leg l = d.getLegs().get(k);
 					if (l.isCover()) {
-						modValueDh += (activeLegStates[l.getNdx()].numOfCoverings - 1);
+						modValueDhInt += (activeLegStates[l.getNdx()].numOfCoverings - 1);
 					}
 				}
+				double modValueDh = modValueDhExt + modValueDhInt;
+//				modValueDh = modValueDh / (1.0 + d.getNumOfLegsActive());
+//				modValueEf = modValueEf / (1.0 + d.getNumOfLegsActive());
+				totalHeurModDh += modValueDhExt + modValueDhInt / 2.0;
+				totalHeurModEf += modValueEf;
 				for (int k = 0; k < d.getNumOfLegs(); k++) {
 					Leg l = d.getLegs().get(k);
 					if (l.isCover()) {
@@ -525,13 +539,42 @@ public class SolutionState implements PairListener {
 						/*
 						 * Set dh related heuristicModifier.
 						 */
-						activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
-						totalHeurModDh += modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+
+						if (bestFound)
+							activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * bestW + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+						else
+							if (solutionIsImproved)
+								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * imprW + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+							else
+								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+
+//						if (!solutionIsImproved)
+//							activeLegStates[l.getNdx()].heurModDh = modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+//						else
+//							if (!bestFound)
+//								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * 0.5 + modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+//							else
+//								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+
 						/*
 						 * Set ef related heuristicModifier.
 						 */
-						activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf + modValueEf;
-						totalHeurModEf += modValueEf;
+
+						if (bestFound)
+							activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * bestW + modValueEf;
+						else
+							if (solutionIsImproved)
+								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * imprW + modValueEf;
+							else
+								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf + modValueEf;
+
+//						if (!solutionIsImproved)
+//							activeLegStates[l.getNdx()].heurModEf = modValueEf;
+//						else
+//							if (!bestFound)
+//								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * 0.5 + modValueEf;
+//							else
+//								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf + modValueEf;
 					}
 				}
 			}
@@ -563,16 +606,18 @@ public class SolutionState implements PairListener {
 			}
 		}
 
-		logger.info("numOfPairs: " + numOfPairs + 
-					", numOfDuties: " + numOfDuties +
-					", numOfPairDays:" + numOfPairDays +
-					", uncoveredLegs: " + uncoveredLegs + 
-					", numOfDeadheads: " + numOfDeadheads + 
-					", numOfDistinctLegsFromTheFleet: " + numOfDistinctLegsFromTheFleet +
-					", numOfDistinctDeadheadLegsFromTheFleet: " + numOfDistinctDeadheadLegsFromTheFleet +
-					", numOfDistinctLegsOutsideOfTheFleet: " + numOfDistinctLegsOutsideOfTheFleet +
-					", totalHeurModDh: " + totalHeurModDh +
-					", totalHeurModEf: " + totalHeurModEf);
+		logger.info("#Pairs: " + numOfPairs +
+					" #Duties: " + numOfDuties +
+					" #PairDays: " + numOfPairDays +
+					" #DutyDays: " + numOfDutyDays +
+					" #Dh: " + numOfDeadheads +
+					" #LegsInt: " + numOfDistinctLegsFromTheFleet +
+					" #LegsIntDh: " + numOfDistinctDeadheadLegsFromTheFleet +
+					" #LegsFltExt: " + numOfDistinctLegsOutsideOfTheFleet +
+					" #UncvrLegs: " + uncoveredLegs +
+					" TotHM_Dh: " + totalHeurModDh +
+					" TotHM_Ef: " + totalHeurModEf +
+					" FinalCost: " + (totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf));
 
 		return totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf;
 	}

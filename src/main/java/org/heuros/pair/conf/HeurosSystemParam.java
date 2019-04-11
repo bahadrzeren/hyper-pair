@@ -38,12 +38,12 @@ public class HeurosSystemParam {
 //	public static int maxNumOfPairingEvals = maxPairingLengthInDays;
 	public static int maxNumOfPairingSetsToEval = 1;
 
-	public static int pairEnumBuffer = 0;
+	public static int pairEnumBuffer = 1;
 
 	/*
 	 * must not exceed maxPairingLengthInDays!
 	 */
-	public static int maxSearchDeptForScoreCalculations = maxPairingLengthInDays;
+	public static int maxSearchDeptForScoreCalculations = maxPairingLengthInDays - 2;
 
 	/*
 	 * Difficulty Score calculations.

@@ -50,6 +50,7 @@ public class HeuroOptimizer {
 	public List<Pair> doMinimize() throws InterruptedException, ExecutionException {
 		logger.info("Optimization process is started!");
 
+		double prevCost = Double.MAX_VALUE;
 		double bestCost = Double.MAX_VALUE;
 		List<Pair> bestSolution = null;
 
@@ -58,6 +59,13 @@ public class HeuroOptimizer {
 
 		this.solutionState = new SolutionState(this.pairOptimizationContext,
 												this.pricingNetwork);
+
+		boolean bestFound = true;
+		int prevItrBestFound = 0;
+		int itrBestFound = 1;
+		boolean solutionIsImproved = true;
+		int prevItrSolutionIsImproved = 0;
+		int itrSolutionIsImproved = 1;
 
 		for (int i = 0; i < HeurosGaParameters.maxNumOfIterations; i++) {
 
@@ -105,15 +113,31 @@ public class HeuroOptimizer {
 			 * TEST BLOCK END
 			 */
 
-			double cost = solutionState.finalizeIteration(i + 1, solution, uncoveredLegs);
+			double cost = solutionState.finalizeIteration(i + 1, solution, uncoveredLegs, 
+															bestFound, prevItrBestFound, itrBestFound, 
+															solutionIsImproved, prevItrSolutionIsImproved, itrSolutionIsImproved);
 
 			/*
 			 * Improvement test.
 			 */
 			if (cost < bestCost) {
+				prevItrBestFound = itrBestFound;
+				itrBestFound = i + 1;
 				bestCost = cost;
 				bestSolution = solution;
-			}
+				bestFound = true;
+				logger.info("Best found!!!");
+			} else
+				bestFound = false;
+			if (cost < prevCost) {
+				prevItrSolutionIsImproved = itrSolutionIsImproved;
+				itrSolutionIsImproved = i + 1;
+				solutionIsImproved = true;
+				logger.info("Solution is improved!!!");
+			} else
+				solutionIsImproved = false;
+			prevCost = cost;
+
 
 			/*
 			 * DH HEURISTIC SEARCH ORDER
