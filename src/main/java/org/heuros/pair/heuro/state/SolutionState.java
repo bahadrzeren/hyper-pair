@@ -453,8 +453,8 @@ public class SolutionState implements PairListener {
 									boolean bestFound, int prevItrBestFound, int itrBestFound, 
 									boolean solutionIsImproved, int prevItrSolutionIsImproved, int itrSolutionIsImproved) {
 
-		double bestW = (1.0 * (itrBestFound - prevItrBestFound)) / itrBestFound;	//	+ 0.2;
-		double imprW = (1.0 * (itrSolutionIsImproved - prevItrSolutionIsImproved)) / itrSolutionIsImproved;	//	+ 0.6;
+		double bestW = 0.33;	//	(1.0 * (itrBestFound - prevItrBestFound)) / itrBestFound;	//	+ 
+		double imprW = 0.66;	//	(1.0 * (itrSolutionIsImproved - prevItrSolutionIsImproved)) / itrSolutionIsImproved;	//	+ 
 
 //		if (numOfLegsThatCoveredDutyHas == null) {
 //			numOfLegsThatCoveredDutyHas = new int[this.legs.size()][100];
