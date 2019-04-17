@@ -35,7 +35,7 @@ public class HeurosSystemParam {
 	 */
 	public static int effectiveDutyBlockHourLimit = 4 * 60;
 
-	public static int maxNumOfPairingSetsToEval = 1;
+//	public static int maxNumOfPairingSetsToEval = 1;
 
 	/*
 	 * Pair enumeration params.

@@ -43,19 +43,17 @@ public class PairingGenerator {
 		currentPair.pairQ = new QualityMetric();
 	}
 
-	public PairWithQuality[][] generatePairing(Leg legToCover,
+	public PairWithQuality[] generatePairing(Leg legToCover,
 												int heuristicNo,
 												DutyState[] dutyStates) throws CloneNotSupportedException {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
-		PairWithQuality[][] bestPairs = new PairWithQuality[HeurosSystemParam.maxNumOfPairingSetsToEval][HeurosSystemParam.maxPairingLengthInDays];
+		PairWithQuality[] bestPairs = new PairWithQuality[HeurosSystemParam.maxPairingLengthInDays];
 		for (int i = 0; i < bestPairs.length; i++) {
-			for (int j = 0; j < bestPairs[i].length; j++) {
-				PairWithQuality pairWithQuality = new PairWithQuality();
-				pairWithQuality.pairQ = new QualityMetric();
-				bestPairs[i][j] = pairWithQuality;
-			}
+			PairWithQuality pairWithQuality = new PairWithQuality();
+			pairWithQuality.pairQ = new QualityMetric();
+			bestPairs[i] = pairWithQuality;
 		}
 
 		if ((coveringDuties != null)
@@ -257,95 +255,74 @@ public class PairingGenerator {
 			for (int i = 0; i < sourceDutyNodes.length; i++) {
 
 				NodeQualityMetric nqm = sourceDutyNodes[i];
-				int ndxOfSet = -1;
 				int ndxOfCand = nqm.getQual().getNumOfDuties() - 1;
 
-				for (int j = 0; j < HeurosSystemParam.maxNumOfPairingSetsToEval; j++) {
-					if (nqm.getQual().isBetterThan(heuristicNo, bestPairs[j][ndxOfCand].pairQ)) {
-						ndxOfSet = j;
-						break;
-					}
-				}
+				Duty d = nqm.getParent().getNodeOwner();
 
-				if (ndxOfSet >= 0) {
+				if (d.isNonHbDep(this.hbNdx))
+					logger.error("Must be HB departed duty!");
 
-					Duty d = nqm.getParent().getNodeOwner();
+	    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
 
-					if (d.isNonHbDep(this.hbNdx))
-						logger.error("Must be HB departed duty!");
+	    			currentPair.pairQ.addToQualityMetricFw(d, dutyStates[d.getNdx()]);
+	    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
 
-		    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
+					if (d.isHbArr(this.hbNdx)) {
+		    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
+		    				if (currentPair.pair.isComplete(this.hbNdx)) {
+		    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[ndxOfCand].pairQ)) {
+		    						bestPairs[ndxOfCand].pair = (Pair) currentPair.pair.clone();
+		    						bestPairs[ndxOfCand].pairQ.injectValues(currentPair.pairQ);
+		    						bestPairs[ndxOfCand].pairNq = sourceDutyNodes[i];
+		    						pairingGenerationNodeNdx = i;
+		    					}
+		    				} else
+		    					logger.error("Pairing " + d + " must be complete!");
+		    			}
+					} else {
+						/*
+						 * Basic cumulative quality info which is calculated during the sub network generation is checked!
+						 */
+						if (this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair)) {
 
-		    			currentPair.pairQ.addToQualityMetricFw(d, dutyStates[d.getNdx()]);
-		    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
+							int dept = HeurosSystemParam.maxPairingLengthInDays - 1;
+							while (nqm.getNextNodeMetric() != null) {
+								nqm = nqm.getNextNodeMetric();
+								Duty nd = nqm.getParent().getNodeOwner();
 
-						if (d.isHbArr(this.hbNdx)) {
-			    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
-			    				if (currentPair.pair.isComplete(this.hbNdx)) {
-			    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[ndxOfSet][ndxOfCand].pairQ)) {
-			    						for (int j = HeurosSystemParam.maxNumOfPairingSetsToEval - 1; j > ndxOfSet; j--) {
-				    						bestPairs[j][ndxOfCand].pair = bestPairs[j - 1][ndxOfCand].pair;
-				    						bestPairs[j][ndxOfCand].pairQ.injectValues(bestPairs[j - 1][ndxOfCand].pairQ);
-				    						bestPairs[j][ndxOfCand].pairNq = bestPairs[j - 1][ndxOfCand].pairNq;
-			    						}
-			    						bestPairs[ndxOfSet][ndxOfCand].pair = (Pair) currentPair.pair.clone();
-			    						bestPairs[ndxOfSet][ndxOfCand].pairQ.injectValues(currentPair.pairQ);
-			    						bestPairs[ndxOfSet][ndxOfCand].pairNq = sourceDutyNodes[i];
-			    						pairingGenerationNodeNdx = i;
-			    					}
-			    				} else
-			    					logger.error("Pairing " + d + " must be complete!");
-			    			}
-						} else {
-							/*
-							 * Basic cumulative quality info which is calculated during the sub network generation is checked!
-							 */
-							if (this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair)) {
-
-								int dept = HeurosSystemParam.maxPairingLengthInDays - 1;
-								while (nqm.getNextNodeMetric() != null) {
-									nqm = nqm.getNextNodeMetric();
-									Duty nd = nqm.getParent().getNodeOwner();
-
-									if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
-										currentPair.pairQ.addToQualityMetricFw(nd, dutyStates[nd.getNdx()]);
-										pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, nd);
-										if (nd.isHbArr(this.hbNdx)) {
-											if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
-							    				if (currentPair.pair.isComplete(this.hbNdx)) {
-							    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[ndxOfSet][ndxOfCand].pairQ)) {
-							    						for (int j = HeurosSystemParam.maxNumOfPairingSetsToEval - 1; j > ndxOfSet; j--) {
-								    						bestPairs[j][ndxOfCand].pair = bestPairs[j - 1][ndxOfCand].pair;
-								    						bestPairs[j][ndxOfCand].pairQ.injectValues(bestPairs[j - 1][ndxOfCand].pairQ);
-								    						bestPairs[j][ndxOfCand].pairNq = bestPairs[j - 1][ndxOfCand].pairNq;
-							    						}
-							    						bestPairs[ndxOfSet][ndxOfCand].pair = (Pair) currentPair.pair.clone();
-							    						bestPairs[ndxOfSet][ndxOfCand].pairQ.injectValues(currentPair.pairQ);
-							    						bestPairs[ndxOfSet][ndxOfCand].pairNq = sourceDutyNodes[i];
-							    						pairingGenerationNodeNdx = i;
-							    						break;
-							    					}
-							    				} else
-							    					logger.error("Pairing " + currentPair.pair + " must be complete!");
-											}
-										} else
-											if (!(nd.isNonHbArr(this.hbNdx)
-													&& (dept > 1)
-													&& this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair))) {
-												break;
-											}
-									}
+								if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
+									currentPair.pairQ.addToQualityMetricFw(nd, dutyStates[nd.getNdx()]);
+									pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, nd);
+									if (nd.isHbArr(this.hbNdx)) {
+										if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
+						    				if (currentPair.pair.isComplete(this.hbNdx)) {
+						    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[ndxOfCand].pairQ)) {
+						    						bestPairs[ndxOfCand].pair = (Pair) currentPair.pair.clone();
+						    						bestPairs[ndxOfCand].pairQ.injectValues(currentPair.pairQ);
+						    						bestPairs[ndxOfCand].pairNq = sourceDutyNodes[i];
+						    						pairingGenerationNodeNdx = i;
+						    						break;
+						    					}
+						    				} else
+						    					logger.error("Pairing " + currentPair.pair + " must be complete!");
+										}
+									} else
+										if (!(nd.isNonHbArr(this.hbNdx)
+												&& (dept > 1)
+												&& this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair))) {
+											break;
+										}
 								}
 							}
 						}
+					}
 
 //	    				if (!currentPair.pair.isComplete(this.hbNdx))
 //	    					logger.error("Pairing " + currentPair.pair + " must be complete!");
 
-						currentPair.pairQ.reset();
-						this.pairRuleContext.getAggregatorProxy().removeAll(currentPair.pair);
-		    		}
-				}
+					currentPair.pairQ.reset();
+					this.pairRuleContext.getAggregatorProxy().removeAll(currentPair.pair);
+	    		}
 			}
 
 //logger.info(legToCover);

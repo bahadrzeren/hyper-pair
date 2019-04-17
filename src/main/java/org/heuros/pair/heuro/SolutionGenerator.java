@@ -50,7 +50,7 @@ public class SolutionGenerator {
 
 			int heuristicNo = 1;
 
-			PairWithQuality[][] pqs = null;
+			PairWithQuality[] pqs = null;
 			try {
 				pqs = this.pairingGenerator.generatePairing(legToCover, 
 															heuristicNo,

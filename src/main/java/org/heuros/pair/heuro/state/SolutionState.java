@@ -62,8 +62,8 @@ public class SolutionState {
 //														pricingNetwork,
 //														this);
 
-		this.stateCalculators = new StateCalculator[HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.maxNumOfPairingSetsToEval];
-		this.stateProcessL = new ArrayList<Future<Double>>(HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.maxNumOfPairingSetsToEval);
+		this.stateCalculators = new StateCalculator[HeurosSystemParam.maxPairingLengthInDays];
+		this.stateProcessL = new ArrayList<Future<Double>>(HeurosSystemParam.maxPairingLengthInDays);
 		for (int i = 0; i < this.stateCalculators.length; i++) {
 			this.stateCalculators[i] = new StateCalculator(pairOptimizationContext,
 															pricingNetwork,
@@ -272,11 +272,11 @@ public class SolutionState {
 		}
 	}
 
-	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.maxNumOfPairingSetsToEval);
+	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays);
 
 	private StateCalculator bestStateCalculator = null;
 
-	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[][] pqs) throws InterruptedException, ExecutionException, CloneNotSupportedException {
+	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[] pqs) throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 //		double worstDifficutlyScore = 0.0;
 		double bestDifficutlyScore = Integer.MAX_VALUE;
@@ -285,8 +285,7 @@ public class SolutionState {
 
 		int k = 0;
 		for (int i = 0; i < pqs.length; i++) {
-			for (int j = 0; j < pqs[i].length; j++) {
-			PairWithQuality pwq = pqs[i][j];
+			PairWithQuality pwq = pqs[i];
 			if (pwq.pair != null) {
 				if (pwq.pair.getFirstDuty().getBriefTime(pwq.pair.getHbNdx()).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
 
@@ -308,7 +307,6 @@ public class SolutionState {
 ////						worstDifficutlyScore = maxLegDifficultyScore;
 ////					}
 				}
-			}
 			}
 		}
 
