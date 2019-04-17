@@ -107,7 +107,7 @@ public class HeuroPair {
 
 	private static Logger logger = Logger.getLogger(HeuroPair.class);
 
-	public static void main(String[] args) throws IOException, RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException {
+	public static void main(String[] args) throws IOException, RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException {
     	/*
     	 * Load configuration file.
     	 */

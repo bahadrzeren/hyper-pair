@@ -82,7 +82,7 @@ public class PairEnumeratorWoRuleCheck {
 															totalActiveBlockTime);
 						numOfProbablePairings[0]++;
 					} else
-						if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 1) {
+						if (HeurosSystemParam.pairEnumerationDept > 1) {
 							this.fwSearch(dutyStates,
 											numOfProbablePairings,
 											duty, duty, HeurosSystemParam.maxPairingLengthInDays - 1, HeurosSystemParam.maxPairingLengthInDays + 1,
@@ -129,21 +129,21 @@ public class PairEnumeratorWoRuleCheck {
 							 * This line below are put because of no rule validation code is done here!
 							 * Rule validation is done in just briefing time context.
 							 */
-							&& (ChronoUnit.DAYS.between(fd.getBriefDayBeginning(this.hbNdx), nd.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumBuffer))) {
+							&& (ChronoUnit.DAYS.between(fd.getBriefDayBeginning(this.hbNdx), nd.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumerationBuffer))) {
 						pairing[toNdxExc - 1] = nd;
 						this.pairListener.onPairingFound(pairing, fromNdxInc, toNdxExc, newNumOfDhs, totalActiveBlockTime + nd.getBlockTimeInMinsActive());
 						numOfProbablePairings[toNdxExc - fromNdxInc - 1]++;
 						pairing[toNdxExc - 1] = null;
 					} else
 						if (nd.isNonHbArr(this.hbNdx)
-								&& (toNdxExc - fromNdxInc < HeurosSystemParam.maxSearchDeptForScoreCalculations)
+								&& (toNdxExc - fromNdxInc < HeurosSystemParam.pairEnumerationDept)
 								&& maxMinDateDept.isAfter(nd.getDebriefDay(this.hbNdx))
 								/*
 								 * TODO
 								 * This line below are put because of no rule validation code is done here!
 								 * Rule validation is done in just briefing time context.
 								 */
-								&& (ChronoUnit.DAYS.between(fd.getBriefDayBeginning(this.hbNdx), nd.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumBuffer))) {
+								&& (ChronoUnit.DAYS.between(fd.getBriefDayBeginning(this.hbNdx), nd.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumerationBuffer))) {
 							pairing[toNdxExc - 1] = nd;
 							this.fwSearch(dutyStates,
 											numOfProbablePairings,
@@ -194,7 +194,7 @@ public class PairEnumeratorWoRuleCheck {
 							&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 									|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))) {
 						if (hbArr) {
-							if (ChronoUnit.DAYS.between(pd.getBriefDayBeginning(this.hbNdx), ld.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumBuffer)
+							if (ChronoUnit.DAYS.between(pd.getBriefDayBeginning(this.hbNdx), ld.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumerationBuffer)
 									) {
 								pairing[fromNdxInc] = pd;
 								this.pairListener.onPairingFound(pairing, fromNdxInc, toNdxExc, newNumOfDhs, totalActiveBlockTime + pd.getBlockTimeInMinsActive());
@@ -202,8 +202,8 @@ public class PairEnumeratorWoRuleCheck {
 								pairing[fromNdxInc] = null;
 							}
 						} else
-							if ((toNdxExc - fromNdxInc < HeurosSystemParam.maxSearchDeptForScoreCalculations)
-									&& ChronoUnit.DAYS.between(pd.getBriefDayBeginning(this.hbNdx), ld.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumBuffer)
+							if ((toNdxExc - fromNdxInc < HeurosSystemParam.pairEnumerationDept)
+									&& ChronoUnit.DAYS.between(pd.getBriefDayBeginning(this.hbNdx), ld.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumerationBuffer)
 									) {
 								pairing[fromNdxInc] = pd;
 								this.fwSearch(dutyStates,
@@ -215,7 +215,7 @@ public class PairEnumeratorWoRuleCheck {
 							}
 					} else
 						if (pd.isNonHbDep(this.hbNdx)
-								&& (toNdxExc - fromNdxInc < HeurosSystemParam.maxSearchDeptForScoreCalculations)
+								&& (toNdxExc - fromNdxInc < HeurosSystemParam.pairEnumerationDept)
 								/*
 								 * TODO
 								 * This line below are put because of no rule validation code is done here!
@@ -225,7 +225,7 @@ public class PairEnumeratorWoRuleCheck {
 								&& (pd.getMinNextBriefTime(hbNdx).plusHours(HeurosSystemParam.maxNetDutySearchDeptInHours + 1).isAfter(fd.getBriefTime(hbNdx)))
 								&& (maxMinDateDept.isBefore(pd.getBriefDay(this.hbNdx))
 										|| maxMinDateDept.isEqual(pd.getBriefDay(this.hbNdx)))
-								&& (ChronoUnit.DAYS.between(pd.getBriefDayBeginning(this.hbNdx), ld.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumBuffer))) {
+								&& (ChronoUnit.DAYS.between(pd.getBriefDayBeginning(this.hbNdx), ld.getDebriefDayEnding(this.hbNdx).minusSeconds(1)) < (toNdxExc - fromNdxInc + HeurosSystemParam.pairEnumerationBuffer))) {
 							pairing[fromNdxInc] = pd;
 							this.bwSearch(hbArr,
 											dutyStates,
@@ -260,7 +260,7 @@ public class PairEnumeratorWoRuleCheck {
 														numOfDhs, totalActiveBlockTime);
 					numOfProbablePairings[0]++;
 				} else
-					if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 1) {
+					if (HeurosSystemParam.pairEnumerationDept > 1) {
 						this.fwSearch(dutyStates,
 										numOfProbablePairings,
 										duty, duty, HeurosSystemParam.maxPairingLengthInDays - 1, HeurosSystemParam.maxPairingLengthInDays + 1,
@@ -268,7 +268,7 @@ public class PairEnumeratorWoRuleCheck {
 					}
 			} else
 				if (duty.isHbArr(this.hbNdx)) {
-					if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 1) {
+					if (HeurosSystemParam.pairEnumerationDept > 1) {
 						this.bwSearch(true,
 										dutyStates,
 										numOfProbablePairings,
@@ -276,7 +276,7 @@ public class PairEnumeratorWoRuleCheck {
 										numOfDhs, totalActiveBlockTime, duty.getDebriefDay(this.hbNdx).minusDays(HeurosSystemParam.maxPairingLengthInDays - 1));
 					}
 				} else
-					if (HeurosSystemParam.maxSearchDeptForScoreCalculations > 2) {
+					if (HeurosSystemParam.pairEnumerationDept > 2) {
 						this.bwSearch(false,
 										dutyStates,
 										numOfProbablePairings,

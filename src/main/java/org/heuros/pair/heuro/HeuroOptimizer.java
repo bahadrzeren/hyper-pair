@@ -47,7 +47,7 @@ public class HeuroOptimizer {
 		this.pairingGenerator = pairingGenerator;
 	}
 
-	public List<Pair> doMinimize() throws InterruptedException, ExecutionException {
+	public List<Pair> doMinimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
 		logger.info("Optimization process is started!");
 
 		double prevCost = Double.MAX_VALUE;

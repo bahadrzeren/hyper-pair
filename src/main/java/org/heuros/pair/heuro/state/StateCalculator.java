@@ -39,10 +39,11 @@ public class StateCalculator implements Callable<Double>, PairListener {
 
 	public StateCalculator(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork pricingNetwork,
-							Leg legToCover,
+//							Leg legToCover,
 							LegState[] activeLegStates,
-							DutyState[] activeDutyStates,
-							PairWithQuality pwq) {
+							DutyState[] activeDutyStates
+//							PairWithQuality pwq
+							) throws CloneNotSupportedException {
 //		this.legs = pairOptimizationContext.getLegRepository().getModels();
 //		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
@@ -54,10 +55,23 @@ public class StateCalculator implements Callable<Double>, PairListener {
 //		this.legToCover = legToCover;
 		this.activeLegStates = activeLegStates;
 		this.activeDutyStates = activeDutyStates;
-		this.pwq = pwq;
+//		this.pwq = pwq;
 		this.pairEnumerator = new PairEnumeratorWoRuleCheck(pairOptimizationContext,
 															pricingNetwork,
 															this);
+
+		this.tempLegStates = new LegState[this.activeLegStates.length];
+		for (int i = 0; i < this.tempLegStates.length; i++) {
+			this.tempLegStates[i] = (LegState) this.activeLegStates[i].clone();
+		}
+		this.tempDutyStates = new DutyState[this.activeDutyStates.length];
+		for (int i = 0; i < this.tempDutyStates.length; i++) {
+			this.tempDutyStates[i] = (DutyState) this.activeDutyStates[i].clone();
+		}
+	}
+
+	public void setPairForEnumeration(PairWithQuality pwq) {
+		this.pwq = pwq;
 	}
 
 	public LegState[] getTempLegStates() {
@@ -72,18 +86,57 @@ public class StateCalculator implements Callable<Double>, PairListener {
 		return pwq;
 	}
 
-	private LegState[] cloneLegStates() throws CloneNotSupportedException {
-		LegState[] res = this.activeLegStates.clone();
-		for (int i = 0; i < res.length; i++)
-			res[i] = (LegState) res[i].clone();
-		return res;
+//	private LegState[] cloneLegStates() throws CloneNotSupportedException {
+//		LegState[] res = this.activeLegStates.clone();
+//		for (int i = 0; i < res.length; i++)
+//			res[i] = (LegState) res[i].clone();
+//		return res;
+//	}
+//
+//	private DutyState[] cloneDutyStates() throws CloneNotSupportedException {
+//		DutyState[] res = this.activeDutyStates.clone();
+//		for (int i = 0; i < res.length; i++)
+//			res[i] = (DutyState) res[i].clone();
+//		return res;
+//	}
+
+	private void resetTempLegStates() {
+		for (int i = 0; i < this.tempLegStates.length; i++) {
+			this.tempLegStates[i].numOfCoverings = this.activeLegStates[i].numOfCoverings;
+
+			this.tempLegStates[i].numOfIncludingDuties = this.activeLegStates[i].numOfIncludingDuties;
+			this.tempLegStates[i].numOfIncludingDutiesWoDh = this.activeLegStates[i].numOfIncludingDutiesWoDh;
+			this.tempLegStates[i].numOfIncludingEffectiveDuties = this.activeLegStates[i].numOfIncludingEffectiveDuties;
+			this.tempLegStates[i].numOfIncludingEffectiveDutiesWoDh = this.activeLegStates[i].numOfIncludingEffectiveDutiesWoDh;
+
+			this.tempLegStates[i].numOfIncludingPairs = this.activeLegStates[i].numOfIncludingPairs;
+			this.tempLegStates[i].numOfIncludingPairsWoDh = this.activeLegStates[i].numOfIncludingPairsWoDh;
+			this.tempLegStates[i].numOfIncludingEffectivePairs = this.activeLegStates[i].numOfIncludingEffectivePairs;
+			this.tempLegStates[i].numOfIncludingEffectivePairsWoDh = this.activeLegStates[i].numOfIncludingEffectivePairsWoDh;
+
+			this.tempLegStates[i].numOfIterations = this.activeLegStates[i].numOfIterations;
+			this.tempLegStates[i].heurModDh = this.activeLegStates[i].heurModDh;
+			this.tempLegStates[i].heurModEf = this.activeLegStates[i].heurModEf;
+		}
 	}
 
-	private DutyState[] cloneDutyStates() throws CloneNotSupportedException {
-		DutyState[] res = this.activeDutyStates.clone();
-		for (int i = 0; i < res.length; i++)
-			res[i] = (DutyState) res[i].clone();
-		return res;
+	private void resetTempDutyStates() {
+		for (int i = 0; i < this.tempDutyStates.length; i++) {
+			this.tempDutyStates[i].numOfCoverings = this.activeDutyStates[i].numOfCoverings;
+			this.tempDutyStates[i].numOfCoveringsActive = this.activeDutyStates[i].numOfCoveringsActive;
+			this.tempDutyStates[i].numOfCoveringsPassiveInt = this.activeDutyStates[i].numOfCoveringsPassiveInt;
+			this.tempDutyStates[i].numOfCoveringsPassiveExt = this.activeDutyStates[i].numOfCoveringsPassiveExt;
+			this.tempDutyStates[i].numOfDistinctCoverings = this.activeDutyStates[i].numOfDistinctCoverings;
+			this.tempDutyStates[i].numOfDistinctCoveringsActive = this.activeDutyStates[i].numOfDistinctCoveringsActive;
+			this.tempDutyStates[i].numOfDistinctCoveringsPassive = this.activeDutyStates[i].numOfDistinctCoveringsPassive;
+			this.tempDutyStates[i].blockTimeOfCoverings = this.activeDutyStates[i].blockTimeOfCoverings;
+			this.tempDutyStates[i].blockTimeOfCoveringsActive = this.activeDutyStates[i].blockTimeOfCoveringsActive;
+			this.tempDutyStates[i].blockTimeOfCoveringsPassiveInt = this.activeDutyStates[i].blockTimeOfCoveringsPassiveInt;
+			this.tempDutyStates[i].blockTimeOfCoveringsPassiveExt = this.activeDutyStates[i].blockTimeOfCoveringsPassiveExt;
+			this.tempDutyStates[i].blockTimeOfDistinctCoverings = this.activeDutyStates[i].blockTimeOfDistinctCoverings;
+			this.tempDutyStates[i].blockTimeOfDistinctCoveringsActive = this.activeDutyStates[i].blockTimeOfDistinctCoveringsActive;
+			this.tempDutyStates[i].blockTimeOfDistinctCoveringsPassive = this.activeDutyStates[i].blockTimeOfDistinctCoveringsPassive;
+		}
 	}
 
 //	public int[][] pairControlArray = null;
@@ -207,8 +260,8 @@ public class StateCalculator implements Callable<Double>, PairListener {
 	public Double call() throws Exception {
 
 
-		this.tempLegStates = this.cloneLegStates();
-		this.tempDutyStates = this.cloneDutyStates();
+		this.resetTempLegStates();
+		this.resetTempDutyStates();
 
 		double maxDifficultyScoreObtained = 0.0;
 

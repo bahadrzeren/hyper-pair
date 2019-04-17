@@ -15,11 +15,9 @@ import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.conf.HeurosDatasetParam;
 import org.heuros.pair.conf.HeurosSystemParam;
-import org.heuros.pair.enumerator.PairEnumeratorWoRuleCheck;
-import org.heuros.pair.enumerator.PairListener;
 import org.heuros.pair.sp.PairWithQuality;
 
-public class SolutionState implements PairListener {
+public class SolutionState {
 
 	private static Logger logger = Logger.getLogger(SolutionState.class);
 
@@ -28,37 +26,51 @@ public class SolutionState implements PairListener {
 	 */
 	private int hbNdx = 0;
 
-	private PairOptimizationContext pairOptimizationContext = null;
+//	private PairOptimizationContext pairOptimizationContext = null;
 	private List<Leg> legs = null;
 	private List<Duty> duties = null;
 //	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
-	private DutyLegOvernightConnNetwork pricingNetwork = null;
+//	private DutyLegOvernightConnNetwork pricingNetwork = null;
 	private LegState[] activeLegStates = null;
 	private DutyState[] activeDutyStates = null;
 
 //	private List<Leg> orderedLegs = null;
 
-	private PairEnumeratorWoRuleCheck pairEnumerator = null;
+//	private PairEnumeratorWoRuleCheck pairEnumerator = null;
+
+	private StateCalculator[] stateCalculators = null;
+	private List<Future<Double>> stateProcessL = null;
+
 
 	public SolutionState(PairOptimizationContext pairOptimizationContext,
-							DutyLegOvernightConnNetwork pricingNetwork) {
-		this.pairOptimizationContext = pairOptimizationContext;
+							DutyLegOvernightConnNetwork pricingNetwork) throws CloneNotSupportedException {
+//		this.pairOptimizationContext = pairOptimizationContext;
 		this.legs = pairOptimizationContext.getLegRepository().getModels();
 		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 //		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
-		this.pricingNetwork = pricingNetwork;
+//		this.pricingNetwork = pricingNetwork;
 
 		this.activeLegStates = new LegState[this.legs.size()];
 		this.activeDutyStates = new DutyState[this.duties.size()];
 
-		for (int j = 0; j < this.activeLegStates.length; j++)
-			this.activeLegStates[j] = new LegState(this.legs.get(j));
-		for (int j = 0; j < this.activeDutyStates.length; j++)
-			this.activeDutyStates[j] = new DutyState();	//	this.duties.get(j));
+		for (int i = 0; i < this.activeLegStates.length; i++)
+			this.activeLegStates[i] = new LegState(this.legs.get(i));
+		for (int i = 0; i < this.activeDutyStates.length; i++)
+			this.activeDutyStates[i] = new DutyState();	//	this.duties.get(j));
 
-		pairEnumerator = new PairEnumeratorWoRuleCheck(pairOptimizationContext,
-														pricingNetwork,
-														this);
+//		pairEnumerator = new PairEnumeratorWoRuleCheck(pairOptimizationContext,
+//														pricingNetwork,
+//														this);
+
+		this.stateCalculators = new StateCalculator[HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.maxNumOfPairingSetsToEval];
+		this.stateProcessL = new ArrayList<Future<Double>>(HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.maxNumOfPairingSetsToEval);
+		for (int i = 0; i < this.stateCalculators.length; i++) {
+			this.stateCalculators[i] = new StateCalculator(pairOptimizationContext,
+															pricingNetwork,
+															activeLegStates,
+															activeDutyStates);
+			this.stateProcessL.add(null);
+		}
 	}
 
 	public LegState[] getActiveLegStates() {
@@ -138,86 +150,125 @@ public class SolutionState implements PairListener {
 //	private int[][] pairControlArray1 = null;
 //	private int[][] pairControlArray2 = null;
 
-	private int[] numOfPairsWoDh = null;
-	private int[] numOfEffectivePairsWoDh = null;
+//	private int[] numOfPairsWoDh = null;
+//	private int[] numOfEffectivePairsWoDh = null;
 
-	@Override
-	public void onPairingFound(Duty[] pairing, int fromNdxInc, int toNdxExc, int numOfDhs, int totalActiveBlockTime) {
-		for (int i = fromNdxInc; i < toNdxExc; i++) {
-			for (int j = 0; j < pairing[i].getNumOfLegs(); j++) {
-				Leg l = pairing[i].getLegs().get(j);
-				if (l.isCover()
-						&& l.hasPair(hbNdx)) {
-
-//if (l.getNdx() == 4798) {
+//	@Override
+//	public void onPairingFound(Duty[] pairing, int fromNdxInc, int toNdxExc, int numOfDhs, int totalActiveBlockTime) {
+//		for (int i = fromNdxInc; i < toNdxExc; i++) {
+//			for (int j = 0; j < pairing[i].getNumOfLegs(); j++) {
+//				Leg l = pairing[i].getLegs().get(j);
+//				if (l.isCover()
+//						&& l.hasPair(hbNdx)) {
 //
-//	pairControlArray2 = ArrayUtils.add(pairControlArray2, new int[toNdxExc - fromNdxInc]);
-//	int h = 0;
-//	for (int k = fromNdxInc; k < toNdxExc; k++) {
-//		pairControlArray2[pairControlArray2.length - 1][h] = pairing[k].getNdx();
-//		h++;
-//	}
-//
-////	logger.info("XXXXXXXXXXXXXXXXXXXX");
-////	if (toNdxExc - fromNdxInc == 1)
-////		logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx());
-////	else
-////		if (toNdxExc - fromNdxInc == 2)
-////			logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-////															pairing[fromNdxInc + 1].getNdx());
-////		else
-////			if (toNdxExc - fromNdxInc == 3)
-////				logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-////																pairing[fromNdxInc + 1].getNdx() + ", " + 
-////																pairing[fromNdxInc + 2].getNdx());
-////			else
-////				if (toNdxExc - fromNdxInc == 4)
-////					logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
-////																	pairing[fromNdxInc + 1].getNdx() + ", " +
-////																	pairing[fromNdxInc + 2].getNdx() + ", " +
-////																	pairing[fromNdxInc + 3].getNdx());
-//
-//	if (bestStateCalculator.pairControlArray != null) {
-//		for (int[] dutyNdxs: bestStateCalculator.pairControlArray) {
-//			if (dutyNdxs.length == (toNdxExc - fromNdxInc)) {
-//				boolean f = true;
-//				for (int k = 0; k < dutyNdxs.length; k++) {
-//					if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
-//							&& ((dutyNdxs[k] == 0)
-//								|| (pairing[fromNdxInc - 1] != null)
-//								|| (pairing[toNdxExc] != null)))
-//						System.out.println("Must be an unreachable line!");
-//					if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
-//						f = false;
-//						break;
-//					}
-//				}
-//				if (f)
-//					System.out.println("Must be an unreachable line!");
-//			} else
-//				if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
-//						&& ((pairing[fromNdxInc - 1] != null)
-//								|| (pairing[toNdxExc] != null)))
-//					System.out.println("Must be an unreachable line!");
-//		}
-//	}
-//
+////if (l.getNdx() == 4798) {
+////
+////	pairControlArray2 = ArrayUtils.add(pairControlArray2, new int[toNdxExc - fromNdxInc]);
+////	int h = 0;
 ////	for (int k = fromNdxInc; k < toNdxExc; k++) {
-////		logger.info(pairing[k]);
+////		pairControlArray2[pairControlArray2.length - 1][h] = pairing[k].getNdx();
+////		h++;
 ////	}
 ////
-////	logger.info((toNdxExc - fromNdxInc) + ": wasEffective: " + (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
-//}
+//////	logger.info("XXXXXXXXXXXXXXXXXXXX");
+//////	if (toNdxExc - fromNdxInc == 1)
+//////		logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx());
+//////	else
+//////		if (toNdxExc - fromNdxInc == 2)
+//////			logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//////															pairing[fromNdxInc + 1].getNdx());
+//////		else
+//////			if (toNdxExc - fromNdxInc == 3)
+//////				logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//////																pairing[fromNdxInc + 1].getNdx() + ", " + 
+//////																pairing[fromNdxInc + 2].getNdx());
+//////			else
+//////				if (toNdxExc - fromNdxInc == 4)
+//////					logger.info((toNdxExc - fromNdxInc) + ": " + pairing[fromNdxInc].getNdx() + ", " + 
+//////																	pairing[fromNdxInc + 1].getNdx() + ", " +
+//////																	pairing[fromNdxInc + 2].getNdx() + ", " +
+//////																	pairing[fromNdxInc + 3].getNdx());
+////
+////	if (bestStateCalculator.pairControlArray != null) {
+////		for (int[] dutyNdxs: bestStateCalculator.pairControlArray) {
+////			if (dutyNdxs.length == (toNdxExc - fromNdxInc)) {
+////				boolean f = true;
+////				for (int k = 0; k < dutyNdxs.length; k++) {
+////					if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+////							&& ((dutyNdxs[k] == 0)
+////								|| (pairing[fromNdxInc - 1] != null)
+////								|| (pairing[toNdxExc] != null)))
+////						System.out.println("Must be an unreachable line!");
+////					if (dutyNdxs[k] != pairing[fromNdxInc + k].getNdx()) {
+////						f = false;
+////						break;
+////					}
+////				}
+////				if (f)
+////					System.out.println("Must be an unreachable line!");
+////			} else
+////				if ((fromNdxInc > 0) && (toNdxExc < pairing.length)
+////						&& ((pairing[fromNdxInc - 1] != null)
+////								|| (pairing[toNdxExc] != null)))
+////					System.out.println("Must be an unreachable line!");
+////		}
+////	}
+////
+//////	for (int k = fromNdxInc; k < toNdxExc; k++) {
+//////		logger.info(pairing[k]);
+//////	}
+//////
+//////	logger.info((toNdxExc - fromNdxInc) + ": wasEffective: " + (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc)));
+////}
+//
+//					if (numOfDhs == 0) {
+//						numOfPairsWoDh[l.getNdx()]++;
+//						if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc))
+//							numOfEffectivePairsWoDh[l.getNdx()]++;
+//					} else
+//						System.out.println("Must be an unreachable line!");
+//
+//				}
+//			}
+//		}
+//	}
 
-					if (numOfDhs == 0) {
-						numOfPairsWoDh[l.getNdx()]++;
-						if (totalActiveBlockTime >= HeurosSystemParam.effectiveDutyBlockHourLimit * (toNdxExc - fromNdxInc))
-							numOfEffectivePairsWoDh[l.getNdx()]++;
-					} else
-						System.out.println("Must be an unreachable line!");
+	private void updateActiveLegStates(LegState[] tempLegStates) {
+		for (int i = 0; i < activeLegStates.length; i++) {
+			this.activeLegStates[i].numOfCoverings = tempLegStates[i].numOfCoverings;
 
-				}
-			}
+			this.activeLegStates[i].numOfIncludingDuties = tempLegStates[i].numOfIncludingDuties;
+			this.activeLegStates[i].numOfIncludingDutiesWoDh = tempLegStates[i].numOfIncludingDutiesWoDh;
+			this.activeLegStates[i].numOfIncludingEffectiveDuties = tempLegStates[i].numOfIncludingEffectiveDuties;
+			this.activeLegStates[i].numOfIncludingEffectiveDutiesWoDh = tempLegStates[i].numOfIncludingEffectiveDutiesWoDh;
+
+			this.activeLegStates[i].numOfIncludingPairs = tempLegStates[i].numOfIncludingPairs;
+			this.activeLegStates[i].numOfIncludingPairsWoDh = tempLegStates[i].numOfIncludingPairsWoDh;
+			this.activeLegStates[i].numOfIncludingEffectivePairs = tempLegStates[i].numOfIncludingEffectivePairs;
+			this.activeLegStates[i].numOfIncludingEffectivePairsWoDh = tempLegStates[i].numOfIncludingEffectivePairsWoDh;
+
+			this.activeLegStates[i].numOfIterations = tempLegStates[i].numOfIterations;
+			this.activeLegStates[i].heurModDh = tempLegStates[i].heurModDh;
+			this.activeLegStates[i].heurModEf = tempLegStates[i].heurModEf;
+		}
+	}
+
+	private void updateActiveDutyStates(DutyState[] tempDutyStates) {
+		for (int i = 0; i < activeDutyStates.length; i++) {
+			this.activeDutyStates[i].numOfCoverings = tempDutyStates[i].numOfCoverings;
+			this.activeDutyStates[i].numOfCoveringsActive = tempDutyStates[i].numOfCoveringsActive;
+			this.activeDutyStates[i].numOfCoveringsPassiveInt = tempDutyStates[i].numOfCoveringsPassiveInt;
+			this.activeDutyStates[i].numOfCoveringsPassiveExt = tempDutyStates[i].numOfCoveringsPassiveExt;
+			this.activeDutyStates[i].numOfDistinctCoverings = tempDutyStates[i].numOfDistinctCoverings;
+			this.activeDutyStates[i].numOfDistinctCoveringsActive = tempDutyStates[i].numOfDistinctCoveringsActive;
+			this.activeDutyStates[i].numOfDistinctCoveringsPassive = tempDutyStates[i].numOfDistinctCoveringsPassive;
+			this.activeDutyStates[i].blockTimeOfCoverings = tempDutyStates[i].blockTimeOfCoverings;
+			this.activeDutyStates[i].blockTimeOfCoveringsActive = tempDutyStates[i].blockTimeOfCoveringsActive;
+			this.activeDutyStates[i].blockTimeOfCoveringsPassiveInt = tempDutyStates[i].blockTimeOfCoveringsPassiveInt;
+			this.activeDutyStates[i].blockTimeOfCoveringsPassiveExt = tempDutyStates[i].blockTimeOfCoveringsPassiveExt;
+			this.activeDutyStates[i].blockTimeOfDistinctCoverings = tempDutyStates[i].blockTimeOfDistinctCoverings;
+			this.activeDutyStates[i].blockTimeOfDistinctCoveringsActive = tempDutyStates[i].blockTimeOfDistinctCoveringsActive;
+			this.activeDutyStates[i].blockTimeOfDistinctCoveringsPassive = tempDutyStates[i].blockTimeOfDistinctCoveringsPassive;
 		}
 	}
 
@@ -225,29 +276,24 @@ public class SolutionState implements PairListener {
 
 	private StateCalculator bestStateCalculator = null;
 
-	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[][] pqs) throws InterruptedException, ExecutionException {
+	public Pair chooseBestPairing(Leg legToCover, PairWithQuality[][] pqs) throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 //		double worstDifficutlyScore = 0.0;
 		double bestDifficutlyScore = Integer.MAX_VALUE;
 //		StateCalculator bestStateCalculator = null;
 		bestStateCalculator = null;
 
-		List<StateCalculator> stateCalculators = new ArrayList<StateCalculator>(pqs.length);
-		List<Future<Double>> stateProcessL = new ArrayList<Future<Double>>(pqs.length);
+		int k = 0;
 		for (int i = 0; i < pqs.length; i++) {
 			for (int j = 0; j < pqs[i].length; j++) {
 			PairWithQuality pwq = pqs[i][j];
 			if (pwq.pair != null) {
 				if (pwq.pair.getFirstDuty().getBriefTime(pwq.pair.getHbNdx()).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
-					StateCalculator stateCalculator = new StateCalculator(pairOptimizationContext,
-																			pricingNetwork,
-																			legToCover,
-																			activeLegStates,
-																			activeDutyStates,
-																			pwq);
-					stateCalculators.add(stateCalculator);
-					Future<Double> doubleFuture = pairingProcessExecutor.submit(stateCalculator);
-					stateProcessL.add(doubleFuture);
+
+					stateCalculators[k].setPairForEnumeration(pwq);
+					Future<Double> doubleFuture = pairingProcessExecutor.submit(stateCalculators[k]);
+					stateProcessL.set(k, doubleFuture);
+					k++;
 
 					/*
 					 * Temoporary
@@ -266,12 +312,12 @@ public class SolutionState implements PairListener {
 			}
 		}
 
-		for (int i = 0; i < stateProcessL.size(); i++) {
+		for (int i = 0; i < k; i++) {
 			double maxLegDifficultyScore = stateProcessL.get(i).get();
 			if ((bestStateCalculator == null)
-					|| (stateCalculators.get(i).getPwq().pairQ.isBetterInTermsOfDh(bestStateCalculator.getPwq().pairQ, maxLegDifficultyScore, bestDifficutlyScore))) {
+					|| (stateCalculators[i].getPwq().pairQ.isBetterInTermsOfDh(bestStateCalculator.getPwq().pairQ, maxLegDifficultyScore, bestDifficutlyScore))) {
 				bestDifficutlyScore = maxLegDifficultyScore;
-				bestStateCalculator = stateCalculators.get(i);
+				bestStateCalculator = stateCalculators[i];
 			}
 //			if (worstDifficutlyScore < maxLegDifficultyScore) {
 //				worstDifficutlyScore = maxLegDifficultyScore;
@@ -415,8 +461,11 @@ public class SolutionState implements PairListener {
 		 */
 
 //		this.prevLegToCover = legToCover;
-		this.activeLegStates = bestStateCalculator.getTempLegStates();
-		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
+
+//		this.activeLegStates = bestStateCalculator.getTempLegStates();
+//		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
+		this.updateActiveLegStates(bestStateCalculator.getTempLegStates());
+		this.updateActiveDutyStates(bestStateCalculator.getTempDutyStates());
 
 //		this.activeLegStates = lessStateCalculator.getTempLegStates();
 //		this.activeDutyStates = lessStateCalculator.getTempDutyStates();
@@ -452,9 +501,6 @@ public class SolutionState implements PairListener {
 	public double finalizeIteration(int iterationNumber, List<Pair> solution, int uncoveredLegs, 
 									boolean bestFound, int prevItrBestFound, int itrBestFound, 
 									boolean solutionIsImproved, int prevItrSolutionIsImproved, int itrSolutionIsImproved) {
-
-		double bestW = 0.33;	//	(1.0 * (itrBestFound - prevItrBestFound)) / itrBestFound;	//	+ 
-		double imprW = 0.66;	//	(1.0 * (itrSolutionIsImproved - prevItrSolutionIsImproved)) / itrSolutionIsImproved;	//	+ 
 
 //		if (numOfLegsThatCoveredDutyHas == null) {
 //			numOfLegsThatCoveredDutyHas = new int[this.legs.size()][100];
@@ -541,10 +587,10 @@ public class SolutionState implements PairListener {
 						 */
 
 						if (bestFound)
-							activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * bestW + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+							activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * HeurosSystemParam.hmResetWeightAfterBestSol + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
 						else
 							if (solutionIsImproved)
-								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * imprW + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * HeurosSystemParam.hmResetWeightAfterImprSol + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
 							else
 								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
 
@@ -561,10 +607,10 @@ public class SolutionState implements PairListener {
 						 */
 
 						if (bestFound)
-							activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * bestW + modValueEf;
+							activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * HeurosSystemParam.hmResetWeightAfterBestSol + modValueEf;
 						else
 							if (solutionIsImproved)
-								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * imprW + modValueEf;
+								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * HeurosSystemParam.hmResetWeightAfterImprSol + modValueEf;
 							else
 								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf + modValueEf;
 

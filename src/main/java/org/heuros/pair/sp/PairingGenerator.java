@@ -29,6 +29,8 @@ public class PairingGenerator {
 
 	private DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork = null;
 
+	private PairWithQuality currentPair = new PairWithQuality();
+
 	public PairingGenerator(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork) {
 		this.pairRuleContext = pairOptimizationContext.getPairRuleContext();
@@ -36,17 +38,16 @@ public class PairingGenerator {
 		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 
 		this.dutyLegOvernightConnNetwork = dutyLegOvernightConnNetwork;
+
+		currentPair.pair = Pair.newInstance(this.hbNdx);
+		currentPair.pairQ = new QualityMetric();
 	}
 
 	public PairWithQuality[][] generatePairing(Leg legToCover,
-								int heuristicNo,
-								DutyState[] dutyStates) throws CloneNotSupportedException {
+												int heuristicNo,
+												DutyState[] dutyStates) throws CloneNotSupportedException {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
-
-		PairWithQuality currentPair = new PairWithQuality();
-		currentPair.pair = Pair.newInstance(this.hbNdx);
-		currentPair.pairQ = new QualityMetric();
 
 		PairWithQuality[][] bestPairs = new PairWithQuality[HeurosSystemParam.maxNumOfPairingSetsToEval][HeurosSystemParam.maxPairingLengthInDays];
 		for (int i = 0; i < bestPairs.length; i++) {

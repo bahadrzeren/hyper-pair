@@ -34,7 +34,7 @@ public class SolutionGenerator {
 	}
 
 	public int generateSolution(List<Pair> solution,
-									SolutionState solutionState) throws InterruptedException, ExecutionException {
+									SolutionState solutionState) throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 		logger.info("Solution generation process is started!");
 

@@ -319,6 +319,8 @@ public class NetworkExplorer {
 
 		this.bwNetworkSearch(treeOfBwDuties);
 
+		treeOfBwDuties.clear();
+
 		return this;
 	}
 

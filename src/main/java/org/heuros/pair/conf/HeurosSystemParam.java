@@ -35,15 +35,20 @@ public class HeurosSystemParam {
 	 */
 	public static int effectiveDutyBlockHourLimit = 4 * 60;
 
-//	public static int maxNumOfPairingEvals = maxPairingLengthInDays;
 	public static int maxNumOfPairingSetsToEval = 1;
 
-	public static int pairEnumBuffer = 1;
+	/*
+	 * Pair enumeration params.
+	 */
+	public static int pairEnumerationDept = maxPairingLengthInDays - 2;	//	must not exceed maxPairingLengthInDays!
+	public static int pairEnumerationBuffer = 1;
 
 	/*
-	 * must not exceed maxPairingLengthInDays!
+	 * Heuristic Modifier reset weights.
 	 */
-	public static int maxSearchDeptForScoreCalculations = maxPairingLengthInDays - 2;
+	public static double hmResetWeightAfterBestSol = 0.33; 
+	public static double hmResetWeightAfterImprSol = 0.66; 
+
 
 	/*
 	 * Difficulty Score calculations.
