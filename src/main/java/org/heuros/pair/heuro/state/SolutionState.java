@@ -286,8 +286,8 @@ public class SolutionState {
 		int k = 0;
 		for (int i = 0; i < pqs.length; i++) {
 			PairWithQuality pwq = pqs[i];
-			if (pwq.pair != null) {
-				if (pwq.pair.getFirstDuty().getBriefTime(pwq.pair.getHbNdx()).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
+			if (pwq.p != null) {
+				if (pwq.p.getFirstDuty().getBriefTime(pwq.p.getHbNdx()).isBefore(HeurosDatasetParam.optPeriodEndExc)) {
 
 					stateCalculators[k].setPairForEnumeration(pwq);
 					Future<Double> doubleFuture = pairingProcessExecutor.submit(stateCalculators[k]);
@@ -313,7 +313,7 @@ public class SolutionState {
 		for (int i = 0; i < k; i++) {
 			double maxLegDifficultyScore = stateProcessL.get(i).get();
 			if ((bestStateCalculator == null)
-					|| (stateCalculators[i].getPwq().pairQ.isBetterInTermsOfDh(bestStateCalculator.getPwq().pairQ, maxLegDifficultyScore, bestDifficutlyScore))) {
+					|| (stateCalculators[i].getPwq().qm.isBetterInTermsOfDh(bestStateCalculator.getPwq().qm, maxLegDifficultyScore, bestDifficutlyScore))) {
 				bestDifficutlyScore = maxLegDifficultyScore;
 				bestStateCalculator = stateCalculators[i];
 			}
@@ -481,7 +481,7 @@ public class SolutionState {
 
 		this.calculateAndSetMaxValuesOfHeuristicsParameters();
 
-		return bestStateCalculator.getPwq().pair;
+		return bestStateCalculator.getPwq().p;
 	}
 
 //	private int[][] numOfLegsThatCoveredDutyHas = null;

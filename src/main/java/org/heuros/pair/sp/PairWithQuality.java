@@ -3,7 +3,7 @@ package org.heuros.pair.sp;
 import org.heuros.data.model.Pair;
 
 public class PairWithQuality {
-	public Pair pair = null;
-	public QualityMetric pairQ = null;
-	public NodeQualityMetric pairNq = null;
+	public Pair p = null;
+	public QualityMetric qm = null;
+	public NodeQualityMetric nqm = null;
 }

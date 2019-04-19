@@ -270,8 +270,8 @@ public class StateCalculator implements Callable<Double>, PairListener {
 		/*
 		 * First update COVERING states of the legs and duties that constitute new pairing.
 		 */
-		for (int i = 0; i < pwq.pair.getNumOfDuties(); i++) {
-			Duty duty = pwq.pair.getDuties().get(i);
+		for (int i = 0; i < pwq.p.getNumOfDuties(); i++) {
+			Duty duty = pwq.p.getDuties().get(i);
 
 //if ((duty.getNdx() == 68973)
 //		&& (pwq.pair.getNumOfDuties() == 2)) {
@@ -288,16 +288,16 @@ public class StateCalculator implements Callable<Double>, PairListener {
 		/*
 		 * Set dutyOfLeg TOTALIZERs.
 		 */
-		for (int i = 0; i < pwq.pair.getNumOfDuties(); i++) {
-			Duty duty = pwq.pair.getDuties().get(i);
+		for (int i = 0; i < pwq.p.getNumOfDuties(); i++) {
+			Duty duty = pwq.p.getDuties().get(i);
 			for (int j = 0; j < duty.getNumOfLegs(); j++) {
 				Leg leg = duty.getLegs().get(j);
 
 				Duty[] dutiesOfLeg = this.dutyIndexByLegNdx.getArray(leg.getNdx());
 				for (int di = 0; di < dutiesOfLeg.length; di++) {
 					Duty dutyOfLeg = dutiesOfLeg[di];
-					if (dutyOfLeg.hasPairing(pwq.pair.getHbNdx())
-							&& dutyOfLeg.isValid(pwq.pair.getHbNdx())) {
+					if (dutyOfLeg.hasPairing(pwq.p.getHbNdx())
+							&& dutyOfLeg.isValid(pwq.p.getHbNdx())) {
 
 //if (dutyOfLeg.getNdx() == 63888)
 //System.out.println();

@@ -30,6 +30,7 @@ public class PairingGenerator {
 	private DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork = null;
 
 	private PairWithQuality currentPair = new PairWithQuality();
+	private PairWithQuality[] bestPairs = new PairWithQuality[HeurosSystemParam.maxPairingLengthInDays];
 
 	public PairingGenerator(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork) {
@@ -39,8 +40,13 @@ public class PairingGenerator {
 
 		this.dutyLegOvernightConnNetwork = dutyLegOvernightConnNetwork;
 
-		currentPair.pair = Pair.newInstance(this.hbNdx);
-		currentPair.pairQ = new QualityMetric();
+		currentPair.p = Pair.newInstance(this.hbNdx);
+		currentPair.qm = new QualityMetric();
+		for (int i = 0; i < bestPairs.length; i++) {
+			PairWithQuality pairWithQuality = new PairWithQuality();
+			pairWithQuality.qm = new QualityMetric();
+			bestPairs[i] = pairWithQuality;
+		}
 	}
 
 	public PairWithQuality[] generatePairing(Leg legToCover,
@@ -49,11 +55,9 @@ public class PairingGenerator {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
-		PairWithQuality[] bestPairs = new PairWithQuality[HeurosSystemParam.maxPairingLengthInDays];
 		for (int i = 0; i < bestPairs.length; i++) {
-			PairWithQuality pairWithQuality = new PairWithQuality();
-			pairWithQuality.pairQ = new QualityMetric();
-			bestPairs[i] = pairWithQuality;
+			bestPairs[i].p = null;
+			bestPairs[i].qm.reset();
 		}
 
 		if ((coveringDuties != null)
@@ -264,16 +268,16 @@ public class PairingGenerator {
 
 	    		if (this.pairRuleContext.getStarterCheckerProxy().canBeStarter(this.hbNdx, d)) {
 
-	    			currentPair.pairQ.addToQualityMetricFw(d, dutyStates[d.getNdx()]);
-	    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, d);
+	    			currentPair.qm.addToQualityMetricFw(d, dutyStates[d.getNdx()]);
+	    			this.pairRuleContext.getAggregatorProxy().appendFw(currentPair.p, d);
 
 					if (d.isHbArr(this.hbNdx)) {
-		    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
-		    				if (currentPair.pair.isComplete(this.hbNdx)) {
-		    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[ndxOfCand].pairQ)) {
-		    						bestPairs[ndxOfCand].pair = (Pair) currentPair.pair.clone();
-		    						bestPairs[ndxOfCand].pairQ.injectValues(currentPair.pairQ);
-		    						bestPairs[ndxOfCand].pairNq = sourceDutyNodes[i];
+		    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.p)) {
+		    				if (currentPair.p.isComplete(this.hbNdx)) {
+		    					if (currentPair.qm.isBetterThan(heuristicNo, bestPairs[ndxOfCand].qm)) {
+		    						bestPairs[ndxOfCand].p = (Pair) currentPair.p.clone();
+		    						bestPairs[ndxOfCand].qm.injectValues(currentPair.qm);
+		    						bestPairs[ndxOfCand].nqm = sourceDutyNodes[i];
 		    						pairingGenerationNodeNdx = i;
 		    					}
 		    				} else
@@ -283,33 +287,33 @@ public class PairingGenerator {
 						/*
 						 * Basic cumulative quality info which is calculated during the sub network generation is checked!
 						 */
-						if (this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair)) {
+						if (this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.p)) {
 
 							int dept = HeurosSystemParam.maxPairingLengthInDays - 1;
 							while (nqm.getNextNodeMetric() != null) {
 								nqm = nqm.getNextNodeMetric();
 								Duty nd = nqm.getParent().getNodeOwner();
 
-								if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.pair, nd, true)) {
-									currentPair.pairQ.addToQualityMetricFw(nd, dutyStates[nd.getNdx()]);
-									pairRuleContext.getAggregatorProxy().appendFw(currentPair.pair, nd);
+								if (this.pairRuleContext.getAppendabilityCheckerProxy().isAppendable(this.hbNdx, currentPair.p, nd, true)) {
+									currentPair.qm.addToQualityMetricFw(nd, dutyStates[nd.getNdx()]);
+									pairRuleContext.getAggregatorProxy().appendFw(currentPair.p, nd);
 									if (nd.isHbArr(this.hbNdx)) {
-										if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.pair)) {
-						    				if (currentPair.pair.isComplete(this.hbNdx)) {
-						    					if (currentPair.pairQ.isBetterThan(heuristicNo, bestPairs[ndxOfCand].pairQ)) {
-						    						bestPairs[ndxOfCand].pair = (Pair) currentPair.pair.clone();
-						    						bestPairs[ndxOfCand].pairQ.injectValues(currentPair.pairQ);
-						    						bestPairs[ndxOfCand].pairNq = sourceDutyNodes[i];
+										if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.p)) {
+						    				if (currentPair.p.isComplete(this.hbNdx)) {
+						    					if (currentPair.qm.isBetterThan(heuristicNo, bestPairs[ndxOfCand].qm)) {
+						    						bestPairs[ndxOfCand].p = (Pair) currentPair.p.clone();
+						    						bestPairs[ndxOfCand].qm.injectValues(currentPair.qm);
+						    						bestPairs[ndxOfCand].nqm = sourceDutyNodes[i];
 						    						pairingGenerationNodeNdx = i;
 						    						break;
 						    					}
 						    				} else
-						    					logger.error("Pairing " + currentPair.pair + " must be complete!");
+						    					logger.error("Pairing " + currentPair.p + " must be complete!");
 										}
 									} else
 										if (!(nd.isNonHbArr(this.hbNdx)
 												&& (dept > 1)
-												&& this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.pair))) {
+												&& this.pairRuleContext.getExtensibilityCheckerProxy().isExtensible(this.hbNdx, currentPair.p))) {
 											break;
 										}
 								}
@@ -317,11 +321,11 @@ public class PairingGenerator {
 						}
 					}
 
-//	    				if (!currentPair.pair.isComplete(this.hbNdx))
-//	    					logger.error("Pairing " + currentPair.pair + " must be complete!");
+//	    				if (!currentPair.p.isComplete(this.hbNdx))
+//	    					logger.error("Pairing " + currentPair.p + " must be complete!");
 
-					currentPair.pairQ.reset();
-					this.pairRuleContext.getAggregatorProxy().removeAll(currentPair.pair);
+					currentPair.qm.reset();
+					this.pairRuleContext.getAggregatorProxy().removeAll(currentPair.p);
 	    		}
 			}
 
