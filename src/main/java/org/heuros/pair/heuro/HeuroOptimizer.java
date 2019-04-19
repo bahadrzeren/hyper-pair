@@ -10,7 +10,6 @@ import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.conf.HeurosGaParameters;
 import org.heuros.pair.heuro.state.SolutionState;
-import org.heuros.pair.sp.PairingGenerator;
 
 public class HeuroOptimizer {
 
@@ -32,19 +31,16 @@ public class HeuroOptimizer {
 //	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 
 	private DutyLegOvernightConnNetwork pricingNetwork = null;
-	private PairingGenerator pairingGenerator = null;
 
 	private SolutionState solutionState = null;
 
 	public HeuroOptimizer(PairOptimizationContext pairOptimizationContext,
-							DutyLegOvernightConnNetwork pricingNetwork,
-							PairingGenerator pairingGenerator) {
+							DutyLegOvernightConnNetwork pricingNetwork) {
 		this.pairOptimizationContext = pairOptimizationContext;
 //		this.legs = pairOptimizationContext.getLegRepository().getModels();
 //		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 //		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
 		this.pricingNetwork = pricingNetwork;
-		this.pairingGenerator = pairingGenerator;
 	}
 
 	public List<Pair> doMinimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
@@ -73,7 +69,7 @@ public class HeuroOptimizer {
 
 			this.solutionState.initializeForNewIteration();
 
-			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pairingGenerator);
+			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pricingNetwork);
 			int uncoveredLegs = solGen.generateSolution(solution, this.solutionState);
 
 			/**

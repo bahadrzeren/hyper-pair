@@ -58,7 +58,6 @@ import org.heuros.pair.rule.PairIntDuties;
 import org.heuros.pair.rule.PairLayoverCheck;
 import org.heuros.pair.rule.PairNumOfPassiveLegsLimit;
 import org.heuros.pair.rule.PairPeriodLength;
-import org.heuros.pair.sp.PairingGenerator;
 
 /**
  * The main class that is used to start process.
@@ -235,11 +234,8 @@ public class HeuroPair {
 
 			executorService.shutdown();
 
-			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork);
-
 			HeuroOptimizer pairOptimizer = new HeuroOptimizer(pairOptimizationContext,
-																pricingNetwork,
-																pairingGenerator);
+																pricingNetwork);
 
 //			List<Pair> solution = 
 					pairOptimizer.doMinimize();

@@ -437,7 +437,7 @@ public class QualityMetric {
 			return false;
 	}
 
-	public boolean isBetterThan(int heuristicNo, QualityMetric qm) {
+	public boolean isBetterThan(QualityMetric qm) {
 
 //if ((!theLast) && (this.numOfDuties != qm.numOfDuties))
 //System.out.println();

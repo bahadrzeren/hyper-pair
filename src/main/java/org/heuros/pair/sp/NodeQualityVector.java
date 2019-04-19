@@ -27,7 +27,7 @@ public class NodeQualityVector {
 	/*
 	 * Only for non HB arrival duty nodes!
 	 */
-	public NodeQualityVector(int heuristicNo, int maxPairingLengthInDays, Duty nonHbArrDuty, DutyState dp, NodeQualityVector nextNodeQv) {
+	public NodeQualityVector(int maxPairingLengthInDays, Duty nonHbArrDuty, DutyState dp, NodeQualityVector nextNodeQv) {
 		this.nodeOwner = nonHbArrDuty;
 		this.nodeOwnerQm = new QualityMetric(this.nodeOwner, dp);
 		this.nodeQuals = new NodeQualityMetric[maxPairingLengthInDays];
@@ -65,7 +65,7 @@ public class NodeQualityVector {
 	/*
 	 * Compare quality and modify the vector if necessary!
 	 */
-	public boolean checkAndMerge(int heuristicNo, NodeQualityVector nextNodeQv) {
+	public boolean checkAndMerge(NodeQualityVector nextNodeQv) {
 		boolean res = false;
 		for (int i = 1; i < this.nodeQuals.length; i++) {
 			if ((this.nodeQuals[i] != null) || (nextNodeQv.nodeQuals[i - 1] != null)) {
@@ -77,13 +77,13 @@ public class NodeQualityVector {
 					if (nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric() == null)
 						nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
 					else
-						if (this.nodeQuals[i].getQual().isBetterThan(heuristicNo, nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric().getQual())) {
+						if (this.nodeQuals[i].getQual().isBetterThan(nextNodeQv.nodeQuals[i - 1].getPrevNodeMetric().getQual())) {
 							nextNodeQv.nodeQuals[i - 1].setPrevNodeMetric(this.nodeQuals[i]);
 						}
 				} else
 					if (nextNodeQv.nodeQuals[i - 1] != null) {
 						nextNodeQv.nodeQuals[i - 1].getQual().addLeadingDutyQualityMetric(this.nodeOwnerQm);
-						if (nextNodeQv.nodeQuals[i - 1].getQual().isBetterThan(heuristicNo, this.nodeQuals[i].getQual())) {
+						if (nextNodeQv.nodeQuals[i - 1].getQual().isBetterThan(this.nodeQuals[i].getQual())) {
 							this.nodeQuals[i].getQual().injectValues(nextNodeQv.nodeQuals[i - 1].getQual());
 							this.nodeQuals[i].setNextNodeMetric(nextNodeQv.nodeQuals[i - 1]);
 

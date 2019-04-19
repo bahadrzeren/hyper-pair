@@ -1,6 +1,7 @@
 package org.heuros.pair.sp;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
@@ -13,7 +14,7 @@ import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.DutyState;
 import org.heuros.rule.PairRuleContext;
 
-public class PairingGenerator {
+public class PairingGenerator implements Callable<PairWithQuality[]> {
 
 	private static Logger logger = Logger.getLogger(PairingGenerator.class);
 
@@ -49,13 +50,21 @@ public class PairingGenerator {
 		}
 	}
 
-	public PairWithQuality[] generatePairing(Leg legToCover,
-												int heuristicNo,
-												DutyState[] dutyStates) throws CloneNotSupportedException {
+	private Leg legToCover = null;
+	private DutyState[] dutyStates = null;
+
+	public void setLegForPairGeneration(Leg legToCover, DutyState[] dutyStates) {
+		this.legToCover = legToCover;
+		this.dutyStates = dutyStates;
+	}
+
+	@Override
+	public PairWithQuality[] call() throws Exception, CloneNotSupportedException {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 
 		for (int i = 0; i < bestPairs.length; i++) {
+			bestPairs[i].legToCover = this.legToCover;
 			bestPairs[i].p = null;
 			bestPairs[i].qm.reset();
 		}
@@ -69,10 +78,9 @@ public class PairingGenerator {
 //System.out.println();
 
 			NetworkExplorer networkExplorer = new NetworkExplorer(this.duties, this.dutyLegOvernightConnNetwork)
-													.build(legToCover, 
-															coveringDuties, 
-															heuristicNo, 
-															dutyStates);
+																.build(legToCover, 
+																		coveringDuties, 
+																		dutyStates);
 
 //			long subNetworkBuiltTime = System.nanoTime();
 
@@ -274,7 +282,7 @@ public class PairingGenerator {
 					if (d.isHbArr(this.hbNdx)) {
 		    			if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.p)) {
 		    				if (currentPair.p.isComplete(this.hbNdx)) {
-		    					if (currentPair.qm.isBetterThan(heuristicNo, bestPairs[ndxOfCand].qm)) {
+		    					if (currentPair.qm.isBetterThan(bestPairs[ndxOfCand].qm)) {
 		    						bestPairs[ndxOfCand].p = (Pair) currentPair.p.clone();
 		    						bestPairs[ndxOfCand].qm.injectValues(currentPair.qm);
 		    						bestPairs[ndxOfCand].nqm = sourceDutyNodes[i];
@@ -300,7 +308,7 @@ public class PairingGenerator {
 									if (nd.isHbArr(this.hbNdx)) {
 										if (this.pairRuleContext.getFinalCheckerProxy().acceptable(this.hbNdx, currentPair.p)) {
 						    				if (currentPair.p.isComplete(this.hbNdx)) {
-						    					if (currentPair.qm.isBetterThan(heuristicNo, bestPairs[ndxOfCand].qm)) {
+						    					if (currentPair.qm.isBetterThan(bestPairs[ndxOfCand].qm)) {
 						    						bestPairs[ndxOfCand].p = (Pair) currentPair.p.clone();
 						    						bestPairs[ndxOfCand].qm.injectValues(currentPair.qm);
 						    						bestPairs[ndxOfCand].nqm = sourceDutyNodes[i];

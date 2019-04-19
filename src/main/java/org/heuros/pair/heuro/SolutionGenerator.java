@@ -1,12 +1,19 @@
 package org.heuros.pair.heuro;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
+import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
+import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairWithQuality;
 import org.heuros.pair.sp.PairingGenerator;
@@ -23,14 +30,22 @@ public class SolutionGenerator {
 	private List<Leg> legs = null;
 //	private List<Duty> duties = null;
 //	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
-	private PairingGenerator pairingGenerator = null;
+
+	private ExecutorService pairingGensExecutor = Executors.newFixedThreadPool(HeurosSystemParam.numOfLegsToBeChoosen);
+	private PairingGenerator[] pairingGenerators = new PairingGenerator[HeurosSystemParam.numOfLegsToBeChoosen];
+	private List<Future<PairWithQuality[]>> pairGenProcessL = new ArrayList<Future<PairWithQuality[]>>();
+	private int[] legNdxsToCover = new int[HeurosSystemParam.numOfLegsToBeChoosen];
 
 	public SolutionGenerator(PairOptimizationContext pairOptimizationContext,
-								PairingGenerator pairingGenerator) {
+								DutyLegOvernightConnNetwork pricingNetwork) {
 		this.legs = pairOptimizationContext.getLegRepository().getModels();
 //		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 //		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
-		this.pairingGenerator = pairingGenerator;
+		for (int i = 0; i < this.pairingGenerators.length; i++) {
+			this.pairingGenerators[i] = new PairingGenerator(pairOptimizationContext, pricingNetwork);
+			this.pairGenProcessL.add(null);
+			this.legNdxsToCover[i] = -1;
+		}
 	}
 
 	public int generateSolution(List<Pair> solution,
@@ -40,31 +55,36 @@ public class SolutionGenerator {
 
 		int uncoveredLegs = 0;
 
-		int legNdxToCover = -1;
-
 		while (true) {
-			legNdxToCover = solutionState.getNextLegNdxToCover(this.hbNdx);
-			if (legNdxToCover < 0)
-				break;
-			Leg legToCover = this.legs.get(legNdxToCover);
 
-			int heuristicNo = 1;
+			PairWithQuality[] pqs = new PairWithQuality[0];
+//			try {
+				if (solutionState.setNextLegNdxsToCover(this.hbNdx, legNdxsToCover)) {
+					for (int i = 0; i < this.legNdxsToCover.length; i++) {
+						if (this.legNdxsToCover[i] >= 0) {
+							Leg legToCover = this.legs.get(this.legNdxsToCover[i]);
+							this.pairingGenerators[i].setLegForPairGeneration(legToCover, solutionState.getActiveDutyStates());
+							this.pairGenProcessL.set(i, pairingGensExecutor.submit(this.pairingGenerators[i]));
+						} else
+							this.pairGenProcessL.set(i, null);
+					}
+				} else
+					break;
+//			} catch (CloneNotSupportedException ex) {
+//				logger.error(ex);
+//			}
 
-			PairWithQuality[] pqs = null;
-			try {
-				pqs = this.pairingGenerator.generatePairing(legToCover, 
-															heuristicNo,
-															solutionState.getActiveDutyStates());
-			} catch (CloneNotSupportedException ex) {
-				logger.error(ex);
+			for (int i = 0; i < this.pairGenProcessL.size(); i++) {
+				if (this.pairGenProcessL.get(i) != null) {
+					PairWithQuality[] pwqs = this.pairGenProcessL.get(i).get();
+					pqs = ArrayUtils.addAll(pqs, pwqs);
+				}
 			}
+			PairWithQuality pwq = solutionState.chooseBestPairing(pqs);
 
-			Pair p = solutionState.chooseBestPairing(legToCover, pqs);
+			if (pwq != null) {
 
-			if (p != null) {
-				
-					solution.add(p);
-
+					solution.add(pwq.p);
 
 					/**
 					 * TEST BLOCK BEGIN
@@ -306,7 +326,7 @@ public class SolutionGenerator {
 					 */
 
 			} else {
-				logger.error("Pairing could not be found for " + legToCover);
+				logger.error("Pairing could not be found for " + ArrayUtils.toString(legNdxsToCover));
 				uncoveredLegs++;
 			}
 		}

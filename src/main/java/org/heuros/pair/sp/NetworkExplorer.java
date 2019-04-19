@@ -137,14 +137,13 @@ public class NetworkExplorer {
 		return maxBwDeptReached;
 	}
 
-	private int heuristicNo = 0;
 	private DutyState[] dps = null;
 
 	private int[] maxSearchNumDept = null;
 	private LocalDate[] maxSearchDayDept = null;
 	private boolean[] hbArrFound = null;
 
-	private boolean addSourceDuty(int heuristicNo, Duty d, boolean hasImprovement) {
+	private boolean addSourceDuty(Duty d, boolean hasImprovement) {
 		if (!this.sourceDuties[d.getNdx()]) {
 			this.sourceDuties[d.getNdx()] = true;
 			/*
@@ -155,7 +154,7 @@ public class NetworkExplorer {
 				NodeQualityMetric nqm = nqv.getQuals()[i];
 				if (nqm != null) {
 					for (int j = 0; j < this.sourceNodeQmArray.length; j++) {
-						if (nqm.getQual().isBetterThan(heuristicNo, this.sourceNodeQmArray[j].getQual())) {
+						if (nqm.getQual().isBetterThan(this.sourceNodeQmArray[j].getQual())) {
 							NodeQualityMetric hnqm = this.sourceNodeQmArray[j];
 							this.sourceNodeQmArray[j] = nqm;
 							nqm = hnqm;
@@ -197,9 +196,7 @@ public class NetworkExplorer {
 	 */
 	public NetworkExplorer build(Leg legToCover,
 									Duty[] rootDuties,
-									int heuristicNo,
-									DutyState[] dps) throws CloneNotSupportedException {
-		this.heuristicNo = heuristicNo;
+									DutyState[] dps) {
 		this.dps = dps;
 
 		/*
@@ -278,18 +275,16 @@ public class NetworkExplorer {
 						 * Because of having no connection duties we must add qualityMetric here for 1day pairings.
 						 */
 						this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(HeurosSystemParam.maxPairingLengthInDays, duty, cumulativeQual);
-						this.addSourceDuty(heuristicNo, duty, false);
+						this.addSourceDuty(duty, false);
 						hbArrFound[duty.getNdx()] = true;
-					} else 
-						if (heuristicNo > 0) {
+					} else {
 							maxMinDateDept = duty.getBriefDay(this.hbNdx).plusDays(HeurosSystemParam.maxPairingLengthInDays);
 							if (this.fwNetworkSearch(duty, cumulativeQual, true, maxMinDateDept, HeurosSystemParam.maxPairingLengthInDays - 1)) {
-								this.addSourceDuty(heuristicNo, duty, false);
+								this.addSourceDuty(duty, false);
 								hbArrFound[duty.getNdx()] = true;
 							}
 						}
-				} else
-					if (heuristicNo > 0) {
+				} else {
 						if (duty.isHbArr(this.hbNdx)) {
 							maxMinDateDept = duty.getDebriefDay(this.hbNdx).minusDays(HeurosSystemParam.maxPairingLengthInDays - 1);
 							this.bestNodeQuality[duty.getNdx()] = new NodeQualityVector(HeurosSystemParam.maxPairingLengthInDays, duty, cumulativeQual);
@@ -367,10 +362,10 @@ public class NetworkExplorer {
 		 * Non HB arr duty
 		 */
 		if (pQv == null) {
-			pQv = new NodeQualityVector(this.heuristicNo, HeurosSystemParam.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
+			pQv = new NodeQualityVector(HeurosSystemParam.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
 			this.bestNodeQuality[pd.getNdx()] = pQv;
 		} else {
-			pQv.checkAndMerge(this.heuristicNo, nQv);
+			pQv.checkAndMerge(nQv);
 		}
 
 		hbArrFound[nd.getNdx()] = true;
@@ -378,7 +373,7 @@ public class NetworkExplorer {
 		numOfFwNodesAdded++;
 	}
 
-	private boolean fwNetworkSearch(Duty pd, QualityMetric fwCumulative, boolean hbDep, LocalDate maxMinDateDept, int dept) throws CloneNotSupportedException {
+	private boolean fwNetworkSearch(Duty pd, QualityMetric fwCumulative, boolean hbDep, LocalDate maxMinDateDept, int dept) {
 
 		if (dept < maxFwDeptReached)
 			maxFwDeptReached = dept;
@@ -474,10 +469,10 @@ public class NetworkExplorer {
 		NodeQualityVector nQv = this.bestNodeQuality[nd.getNdx()];
 		NodeQualityVector pQv = this.bestNodeQuality[pd.getNdx()];
 		if (pQv == null) {
-			pQv = new NodeQualityVector(this.heuristicNo, HeurosSystemParam.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
+			pQv = new NodeQualityVector(HeurosSystemParam.maxPairingLengthInDays, pd, dps[pd.getNdx()], nQv);
 			this.bestNodeQuality[pd.getNdx()] = pQv;
 		} else {
-			res = pQv.checkAndMerge(this.heuristicNo, nQv);
+			res = pQv.checkAndMerge(nQv);
 		}
 
 		numOfNodesAdded++;
@@ -510,7 +505,7 @@ public class NetworkExplorer {
 		}
 	}
 
-	private boolean bwNetworkSearch(LinkedList<BwRootNodeInfo> treeOfDuties) throws CloneNotSupportedException {
+	private boolean bwNetworkSearch(LinkedList<BwRootNodeInfo> treeOfDuties) {
 		boolean res = false;
 
 
@@ -547,7 +542,7 @@ public class NetworkExplorer {
 							) {
 
 						if (pd.isHbDep(this.hbNdx)) {
-							this.addSourceDuty(heuristicNo, pd, this.bwRegister(pd, ndInfo.duty));
+							this.addSourceDuty(pd, this.bwRegister(pd, ndInfo.duty));
 							this.setNodeVisitedBw(pd, dept, ndInfo.maxMinDateDept);
 							res = true;
 						} else
@@ -561,7 +556,7 @@ public class NetworkExplorer {
 
 									if ((bestNodeQuality[pd.getNdx()] == null)
 											|| (bestNodeQuality[pd.getNdx()].getQuals()[HeurosSystemParam.maxPairingLengthInDays - dept] == null)
-											|| bwCumulative.isBetterThan(this.heuristicNo, bestNodeQuality[pd.getNdx()].getQuals()[HeurosSystemParam.maxPairingLengthInDays - dept].getQual())
+											|| bwCumulative.isBetterThan(bestNodeQuality[pd.getNdx()].getQuals()[HeurosSystemParam.maxPairingLengthInDays - dept].getQual())
 											) {
 
 										if ((sourceNodeQmArray.length == 0)
