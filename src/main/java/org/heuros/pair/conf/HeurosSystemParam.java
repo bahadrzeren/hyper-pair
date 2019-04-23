@@ -44,13 +44,13 @@ public class HeurosSystemParam {
 	 * Pair enumeration params.
 	 */
 	public static int pairEnumerationDept = maxPairingLengthInDays - 2;	//	must not exceed maxPairingLengthInDays!
-	public static int pairEnumerationBuffer = 1;
+	public static int pairEnumIdleDayBuffer = 1;
 
 	/*
 	 * Heuristic Modifier reset weights.
 	 */
-	public static double hmResetWeightAfterBestSol = 0.33; 
-	public static double hmResetWeightAfterImprSol = 0.66; 
+	public static double hmResetWeightAfterBestSol = 0.33;
+	public static double hmResetWeightAfterImprSol = 0.66;
 
 
 	/*

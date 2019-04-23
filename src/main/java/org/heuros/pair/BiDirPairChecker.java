@@ -1,4 +1,4 @@
-package org.heuros.pair.heuro;
+package org.heuros.pair;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
