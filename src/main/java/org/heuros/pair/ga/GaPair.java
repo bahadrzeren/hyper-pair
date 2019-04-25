@@ -10,12 +10,11 @@ import org.heuros.core.ga.selection.BinaryTournamentSelector;
 import org.heuros.exception.RuleAnnotationIsMissing;
 import org.heuros.exception.RuleRegistrationMatchingException;
 import org.heuros.pair.AbsPairingOptimizer;
-import org.heuros.pair.conf.HeurosGaParameters;
+import org.heuros.pair.conf.HeurosAlgParameters;
 import org.heuros.pair.ga.ga.CycleCrossover;
 import org.heuros.pair.ga.ga.PairChromosomeDecoder;
 import org.heuros.pair.ga.ga.PairChromosomeFactory;
 import org.heuros.pair.ga.ga.PairOptimizer;
-import org.heuros.pair.sp.PairingGenerator;
 
 /**
  * The main class that is used to start process.
@@ -34,21 +33,16 @@ public class GaPair extends AbsPairingOptimizer {
 	@Override
 	public void doOptimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
-		PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork);
+		PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder(pairOptimizationContext, pricingNetwork);
 
-		PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder().setLegRepository(pairOptimizationContext.getLegRepository())
-																					.setDutyRepository(pairOptimizationContext.getDutyRepository())
-																					.setDutyIndexByLegNdx(pairOptimizationContext.getDutyIndexByLegNdx())
-																					.setPairingGenerator(pairingGenerator);
-
-		PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosGaParameters.allowDublicateChromosomes)
-																			.setMaxElapsedTimeInNanoSecs(HeurosGaParameters.maxElapsedTimeInNanoSecs)
-																			.setMaxNumOfIterations(HeurosGaParameters.maxNumOfIterations)
-																			.setMaxNumOfIterationsWOProgress(HeurosGaParameters.maxNumOfIterationsWOProgress)
-																			.setMinNumOfChildren(HeurosGaParameters.minNumOfChildren)
-																			.setMutationRate(HeurosGaParameters.mutationRate)
-																			.setNumOfEliteChromosomes(HeurosGaParameters.numOfEliteChromosomes)
-																			.setPopulationSize(HeurosGaParameters.populationSize)
+		PairOptimizer pairOptimizer = (PairOptimizer) new PairOptimizer().setAllowDublicateChromosomes(HeurosAlgParameters.allowDublicateChromosomes)
+																			.setMaxElapsedTimeInNanoSecs(HeurosAlgParameters.maxElapsedTimeInNanoSecs)
+																			.setMaxNumOfIterations(HeurosAlgParameters.maxNumOfIterations)
+																			.setMaxNumOfIterationsWOProgress(HeurosAlgParameters.maxNumOfIterationsWOProgress)
+																			.setMinNumOfChildren(HeurosAlgParameters.minNumOfChildren)
+																			.setMutationRate(HeurosAlgParameters.mutationRate)
+																			.setNumOfEliteChromosomes(HeurosAlgParameters.numOfEliteChromosomes)
+																			.setPopulationSize(HeurosAlgParameters.populationSize)
 																			.setSelector(new BinaryTournamentSelector<Integer>())
 																			.setCrossoverOperator(new CycleCrossover<Integer>())
 																			.setRunParallel(true)

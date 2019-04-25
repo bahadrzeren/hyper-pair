@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.heuros.context.PairOptimizationContext;
 import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.core.ga.chromosome.Chromosome;
 import org.heuros.core.ga.decoder.Decoder;
+import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
@@ -14,6 +16,7 @@ import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
 import org.heuros.data.repo.DutyRepository;
 import org.heuros.data.repo.LegRepository;
+import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairingGenerator;
 
 public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
@@ -25,56 +28,8 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	 */
 	private int hbNdx = 0;
 
-	private LegRepository legRepository = null;
-	private DutyRepository dutyRepository = null;
-
-	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
-
-	private PairingGenerator pairingGenerator = null;
-
-	private List<Leg> legs = null;
-
-	public PairChromosomeDecoder setLegRepository(LegRepository legRepository) {
-		this.legRepository = legRepository;
-		this.legs = this.legRepository.getModels();
-		return this;
-	}
-
-	public PairChromosomeDecoder setDutyRepository(DutyRepository dutyRepository) {
-		this.dutyRepository = dutyRepository;
-		return this;
-	}
-
-	public PairChromosomeDecoder setDutyIndexByLegNdx(OneDimIndexInt<Duty> dutyIndexByLegNdx) {
-		this.dutyIndexByLegNdx = dutyIndexByLegNdx;
-		return this;
-	}
-
-	public PairChromosomeDecoder setPairingGenerator(PairingGenerator pairingGenerator) {
-		this.pairingGenerator = pairingGenerator;
-		return this;
-	}
-
-	private void udpateStateVectors(Pair p,
-									int[] numOfLegCoverings,
-									int[] numOfCoveringsInDuties,
-									int[] numOfDistinctCoveringsInDuties,
-									int[] blockTimeOfCoveringsInDuties) {
-		for (int i = 0; i < p.getNumOfDuties(); i++) {
-			DutyView duty = p.getDuties().get(i);
-			for (int j = 0; j < duty.getNumOfLegs(); j++) {
-				LegView leg = duty.getLegs().get(j);
-				numOfLegCoverings[leg.getNdx()]++;
-				DutyView[] dutiesOfLeg = this.dutyIndexByLegNdx.getArray(leg.getNdx());
-				for (int di = 0; di < dutiesOfLeg.length; di++) {
-					DutyView dutyOfLeg = dutiesOfLeg[di];
-					numOfCoveringsInDuties[dutyOfLeg.getNdx()]++;
-					if (numOfLegCoverings[leg.getNdx()] == 1)
-						numOfDistinctCoveringsInDuties[dutyOfLeg.getNdx()]++;
-					blockTimeOfCoveringsInDuties[dutyOfLeg.getNdx()] += leg.getBlockTimeInMins();
-				}
-			}
-		}
+	public PairChromosomeDecoder(PairOptimizationContext pairOptimizationContext,
+									DutyLegOvernightConnNetwork pricingNetwork) {
 	}
 
 	@Override
@@ -87,22 +42,6 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 		List<Pair> solution = new ArrayList<Pair>();
 
 		int geneNdx = 0;
-		int uncoveredLegs = 0;
-		int[] numOfLegCoverings = new int[this.legRepository.getModels().size()];
-		int[] numOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-		int[] numOfDistinctCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-		int[] blockTimeOfCoveringsInDuties = new int[this.dutyRepository.getModels().size()];
-
-int[] dutyPriorityCumulative = new int[this.dutyRepository.getModels().size()];
-for (int i = 0; i < this.legs.size(); i++) {
-	LegView l = this.legs.get(i);
-	int lOrder = pC.getPosValue(l.getNdx());
-	DutyView[] lDuties = this.dutyIndexByLegNdx.getArray(l.getNdx());
-	for (DutyView dutyView : lDuties) {
-		dutyPriorityCumulative[dutyView.getNdx()] += lOrder;
-	}
-}
-
 		while (true) {
 
 			int legToCoverNdx = -1;
@@ -110,103 +49,19 @@ for (int i = 0; i < this.legs.size(); i++) {
 			while (geneNdx < chromosome.getChromosomeLength()) {
 				int hNdx = chromosome.getGeneValue(geneNdx);
 				geneNdx++;
-				if (this.legs.get(hNdx).isCover()
-						&& (this.legs.get(hNdx).hasPair(hbNdx))
-						&& (numOfLegCoverings[this.legs.get(hNdx).getNdx()] == 0)) {
-					legToCoverNdx = hNdx;
-					break;
-				}
 			}
 			if (legToCoverNdx < 0)
 				break;
 
-			Leg legToCover = this.legs.get(legToCoverNdx);
-
-
-//			int heuristicNo = chromosome.getGeneValue(geneNdx);
-//			if (heuristicNo == 0)
-//				if (!legToCover.hasHbDepArrDutyPair(this.hbNdx))
-//					heuristicNo = 1;
-			int heuristicNo = 1;
-
-///*
-// * TODO Remove the lines after test!
-// */
-//heuristicNo = 0;
-//if (legToCover.hasHbDepDutyPair(this.hbNdx)
-//		|| legToCover.hasHbArrDutyPair(this.hbNdx)
-//		|| legToCover.hasNonHbDutyPair(this.hbNdx))
-//heuristicNo = 2;
-
-			Pair p = null;
-//			try {
-//				p = this.pairingGenerator.generatePairing(legToCover, 
-//															heuristicNo, 
-//															numOfCoveringsInDuties,
-//															numOfDistinctCoveringsInDuties,
-//															blockTimeOfCoveringsInDuties,
-//															dutyPriorityCumulative);
-//			} catch (CloneNotSupportedException ex) {
-//				PairChromosomeDecoder.logger.error(ex);
-//			}
-
-//if (legToCover.getNdx() == 1768)
-//System.out.println(p);
-			if (p != null) {
-				this.udpateStateVectors(p, numOfLegCoverings, numOfCoveringsInDuties, numOfDistinctCoveringsInDuties, blockTimeOfCoveringsInDuties);
-				solution.add(p);
-			} else {
-				PairChromosomeDecoder.logger.error("Pairing could not be found for " + legToCover);
-				uncoveredLegs++;
-			}
 		}
 
-		double fitness = 0.0;
-		int numOfDuties = 0;
-		int numOfPairDays = 0;
-		int numOfPairs = 0;
-
-		for (int i = 0; i < solution.size(); i++) {
-//			fitness += getPairCost(2, solution.get(i));
-//			fitness += solution.get(i).getNumOfDaysTouched();
-			numOfDuties += solution.get(i).getNumOfDuties();
-			numOfPairDays += solution.get(i).getNumOfDaysTouched();
-			numOfPairs++;
-		}
-
-		int numOfDeadheads = 0;
-
-		for (int i = 0; i < this.legRepository.getModels().size(); i++) {
-			if (this.legRepository.getModels().get(i).isCover()) {
-				if (numOfLegCoverings[i] > 1) {
-//					fitness += (2.0 * (numOfLegCoverings[i] - 1) * (this.legRepository.getModels().get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
-					fitness += (numOfLegCoverings[i] - 1) * 100;
-					numOfDeadheads += (numOfLegCoverings[i] - 1);
-				}
-			} else {
-				if (numOfLegCoverings[i] > 0) {
-//					fitness += (2.0 * numOfLegCoverings[i] * (this.legRepository.getModels().get(i).getBlockTimeInMins() / 60.0) * dhPenalty);
-					fitness += numOfLegCoverings[i] * 100;
-					numOfDeadheads += numOfLegCoverings[i];
-				}
-			}
-		}
-		chromosome.setFitness(fitness + uncoveredLegs * 100000000);
-		chromosome.setInfo("numOfPairs:" + numOfPairs + 
-							", numOfDuties:" + numOfDuties +
-							", numOfPairDays:" + numOfPairDays + 
-							", uncoveredLegs: " + uncoveredLegs + 
-							", numOfDeadheads: " + numOfDeadheads + 
-							", fitness: " + fitness);
-
-		logger.info("numOfPairs: " + numOfPairs + 
-					", numOfDuties: " + numOfDuties +
-					", numOfDutyDays:" + numOfPairDays + 
-					", uncoveredLegs: " + uncoveredLegs + 
-					", numOfDeadheads: " + numOfDeadheads + 
-					", fitness: " + fitness);
-		logger.info(chromosome);
-		logger.info("Decoding process is ended!");
+//		chromosome.setFitness(fitness + uncoveredLegs * 100000000);
+//		chromosome.setInfo("numOfPairs:" + numOfPairs + 
+//							", numOfDuties:" + numOfDuties +
+//							", numOfPairDays:" + numOfPairDays + 
+//							", uncoveredLegs: " + uncoveredLegs + 
+//							", numOfDeadheads: " + numOfDeadheads + 
+//							", fitness: " + fitness);
 		return solution;
 	}
 

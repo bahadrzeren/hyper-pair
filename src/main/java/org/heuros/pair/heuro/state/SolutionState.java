@@ -1,5 +1,6 @@
 package org.heuros.pair.heuro.state;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -517,37 +518,10 @@ public class SolutionState {
 	return null;
 	}
 
-//	private int[][] numOfLegsThatCoveredDutyHas = null;
-//	private int[][] numOfLegsThatCoveredPairHas = null;
-//	private int[][] numOfDutiesThatCoveredPairHas = null;
-//	private int[][] numOfDh = null;
-//	private int[][] numOfDhThatCoveredDutyHas = null;
-//	private int[][] numOfDhThatCoveredPairHas = null;
-//	private int[][] nextLeg = null;
-//	private int[][] prevLeg = null;
-//	private int[][] dutyCovers = null;
-//	private int[][] nextDuty = null;
-//	private int[][] prevDuty = null;
-
 	public double finalizeIteration(int iterationNumber, List<Pair> solution, int uncoveredLegs, 
 									boolean bestFound, int prevItrBestFound, int itrBestFound, 
 									boolean solutionIsImproved, int prevItrSolutionIsImproved, int itrSolutionIsImproved) {
 
-//		if (numOfLegsThatCoveredDutyHas == null) {
-//			numOfLegsThatCoveredDutyHas = new int[this.legs.size()][100];
-//			numOfLegsThatCoveredPairHas = new int[this.legs.size()][100];
-//			numOfDutiesThatCoveredPairHas = new int[this.legs.size()][100];
-//			numOfDh = new int[this.legs.size()][100];
-//			numOfDhThatCoveredDutyHas = new int[this.legs.size()][100];
-//			numOfDhThatCoveredPairHas = new int[this.legs.size()][100];
-//			nextLeg = new int[this.legs.size()][100];
-//			prevLeg = new int[this.legs.size()][100];
-//			dutyCovers = new int[this.legs.size()][100];
-//			nextDuty = new int[this.legs.size()][100];
-//			prevDuty = new int[this.legs.size()][100];
-//		}
-
-//		double fitness = 0.0;
 		int numOfPairs = 0;
 		int numOfPairDays = 0;
 		int numOfDuties = 0;
@@ -561,23 +535,11 @@ public class SolutionState {
 		 */
 		for (int i = 0; i < solution.size(); i++) {
 			Pair p = solution.get(i);
-//			fitness += getPairCost(2, p);
 			numOfDuties += p.getNumOfDuties();
 			numOfPairDays += p.getNumOfDaysTouched();
 			numOfPairs++;
 
-//			/*
-//			 * Effectiveness cost!
-//			 */
-//			double totalActiveTime = 0.0;
-//			for (int j = 0; j < p.getNumOfDuties(); j++) {
-//				Duty d = p.getDuties().get(j);
-//				totalActiveTime += this.activeDutyStates[d.getNdx()].blockTimeOfCoveringsActive;
-//			}
-//			double modValueEf = 0.0;
-//			if (totalActiveTime < HeurosSystemParam.effectiveDutyBlockHourLimit * p.getNumOfDuties()) {
-//				modValueEf = (HeurosSystemParam.effectiveDutyBlockHourLimit - totalActiveTime / p.getNumOfDuties());
-//			}
+			boolean[] days = new boolean[p.getNumOfDaysTouched()];
 
 			/*
 			 * Set Heuristic Modifiers!
@@ -585,7 +547,11 @@ public class SolutionState {
 			for (int j = 0; j < p.getNumOfDuties(); j++) {
 				Duty d = p.getDuties().get(j);
 
-				numOfDutyDays += d.getNumOfDaysTouched(this.hbNdx);
+//				numOfDutyDays += d.getNumOfDaysTouched(this.hbNdx);
+				int startingDayNdx = (int) ChronoUnit.DAYS.between(p.getFirstDuty().getBriefDay(hbNdx), d.getBriefDay(hbNdx));
+				int endingDayNdx = (int) ChronoUnit.DAYS.between(p.getFirstDuty().getBriefDay(hbNdx), d.getDebriefDay(hbNdx));
+				days[startingDayNdx] = true;
+				days[endingDayNdx] = true;
 
 				/*
 				 * Effectiveness!
@@ -595,7 +561,6 @@ public class SolutionState {
 					modValueEf = (HeurosSystemParam.effectiveDutyBlockHourLimit - this.activeDutyStates[d.getNdx()].blockTimeOfCoveringsActive);
 				}
 
-//				double modValueDh = activeDutyStates[d.getNdx()].numOfCoveringsPassiveExt + activeDutyStates[d.getNdx()].numOfCoveringsPassiveInt;
 				double modValueDhExt = activeDutyStates[d.getNdx()].numOfCoveringsPassiveExt;
 				double modValueDhInt = 0.0;
 				for (int k = 0; k < d.getNumOfLegs(); k++) {
@@ -605,10 +570,10 @@ public class SolutionState {
 					}
 				}
 				double modValueDh = modValueDhExt + modValueDhInt;
-//				modValueDh = modValueDh / (1.0 + d.getNumOfLegsActive());
-//				modValueEf = modValueEf / (1.0 + d.getNumOfLegsActive());
+
 				totalHeurModDh += modValueDhExt + modValueDhInt / 2.0;
 				totalHeurModEf += modValueEf;
+
 				for (int k = 0; k < d.getNumOfLegs(); k++) {
 					Leg l = d.getLegs().get(k);
 					if (l.isCover()) {
@@ -616,27 +581,17 @@ public class SolutionState {
 						/*
 						 * Set dh related heuristicModifier.
 						 */
-
 						if (bestFound)
-							activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * HeurosSystemParam.hmResetWeightAfterBestSol + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+							activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * HeurosSystemParam.hmResetWeightAfterBestSol + modValueDh;
 						else
 							if (solutionIsImproved)
-								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * HeurosSystemParam.hmResetWeightAfterImprSol + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * HeurosSystemParam.hmResetWeightAfterImprSol + modValueDh;
 							else
-								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh;	// + (activeLegStates[l.getNdx()].numOfCoverings - 1);
-
-//						if (!solutionIsImproved)
-//							activeLegStates[l.getNdx()].heurModDh = modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
-//						else
-//							if (!bestFound)
-//								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * 0.5 + modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
-//							else
-//								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh + (activeLegStates[l.getNdx()].numOfCoverings - 1);
+								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh;
 
 						/*
 						 * Set ef related heuristicModifier.
 						 */
-
 						if (bestFound)
 							activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * HeurosSystemParam.hmResetWeightAfterBestSol + modValueEf;
 						else
@@ -644,16 +599,12 @@ public class SolutionState {
 								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * HeurosSystemParam.hmResetWeightAfterImprSol + modValueEf;
 							else
 								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf + modValueEf;
-
-//						if (!solutionIsImproved)
-//							activeLegStates[l.getNdx()].heurModEf = modValueEf;
-//						else
-//							if (!bestFound)
-//								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * 0.5 + modValueEf;
-//							else
-//								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf + modValueEf;
 					}
 				}
+			}
+			for (boolean b : days) {
+				if (b)
+					numOfDutyDays++;
 			}
 		}
 

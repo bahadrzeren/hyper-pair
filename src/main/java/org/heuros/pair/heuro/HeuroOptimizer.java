@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Pair;
-import org.heuros.pair.conf.HeurosGaParameters;
+import org.heuros.pair.conf.HeurosAlgParameters;
 import org.heuros.pair.heuro.state.SolutionState;
 
 public class HeuroOptimizer {
@@ -63,14 +63,14 @@ public class HeuroOptimizer {
 		int prevItrSolutionIsImproved = 0;
 		int itrSolutionIsImproved = 1;
 
-		for (int i = 0; i < HeurosGaParameters.maxNumOfIterations; i++) {
+		for (int i = 0; i < HeurosAlgParameters.maxNumOfIterations; i++) {
 
 			List<Pair> solution = new ArrayList<Pair>();
 
 			this.solutionState.initializeForNewIteration();
 
-			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pricingNetwork);
-			int uncoveredLegs = solGen.generateSolution(solution, this.solutionState);
+			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pricingNetwork, this.solutionState);
+			int uncoveredLegs = solGen.generateSolution(solution);
 
 			/**
 			 * TEST BLOCK BEGIN
@@ -170,8 +170,8 @@ public class HeuroOptimizer {
 //				}
 //			});
 
-			if ((numOfIterationsWOProgress >= HeurosGaParameters.maxNumOfIterationsWOProgress)
-                    || ((System.nanoTime() - optStartTime) >= HeurosGaParameters.maxElapsedTimeInNanoSecs))
+			if ((numOfIterationsWOProgress >= HeurosAlgParameters.maxNumOfIterationsWOProgress)
+                    || ((System.nanoTime() - optStartTime) >= HeurosAlgParameters.maxElapsedTimeInNanoSecs))
 				break;
         }
 

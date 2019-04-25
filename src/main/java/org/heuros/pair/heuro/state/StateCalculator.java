@@ -263,7 +263,7 @@ public class StateCalculator implements Callable<Double>, PairListener {
 		this.resetTempLegStates();
 		this.resetTempDutyStates();
 
-		double maxDifficultyScoreObtained = 0.0;
+//		double maxDifficultyScoreObtained = 0.0;
 
 //pairControlArray = null;
 

@@ -12,6 +12,7 @@ import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
 import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.DutyState;
+import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.rule.PairRuleContext;
 
 public class PairingGenerator implements Callable<PairWithQuality[]> {
@@ -30,16 +31,21 @@ public class PairingGenerator implements Callable<PairWithQuality[]> {
 
 	private DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork = null;
 
+	private DutyState[] dutyStates = null;
+
 	private PairWithQuality currentPair = new PairWithQuality();
 	private PairWithQuality[] bestPairs = new PairWithQuality[HeurosSystemParam.maxPairingLengthInDays];
 
 	public PairingGenerator(PairOptimizationContext pairOptimizationContext,
-							DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork) {
+							DutyLegOvernightConnNetwork dutyLegOvernightConnNetwork,
+							SolutionState solutionState) {
 		this.pairRuleContext = pairOptimizationContext.getPairRuleContext();
 		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
 		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 
 		this.dutyLegOvernightConnNetwork = dutyLegOvernightConnNetwork;
+
+		this.dutyStates = solutionState.getActiveDutyStates();
 
 		currentPair.p = Pair.newInstance(this.hbNdx);
 		currentPair.qm = new QualityMetric();
@@ -51,11 +57,9 @@ public class PairingGenerator implements Callable<PairWithQuality[]> {
 	}
 
 	private Leg legToCover = null;
-	private DutyState[] dutyStates = null;
 
-	public void setLegForPairGeneration(Leg legToCover, DutyState[] dutyStates) {
+	public void setLegForPairGeneration(Leg legToCover) {
 		this.legToCover = legToCover;
-		this.dutyStates = dutyStates;
 	}
 
 	@Override

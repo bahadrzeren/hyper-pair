@@ -30,6 +30,7 @@ public class SolutionGenerator {
 	private List<Leg> legs = null;
 //	private List<Duty> duties = null;
 //	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
+	private SolutionState solutionState = null;
 
 	private ExecutorService pairingGensExecutor = Executors.newFixedThreadPool(HeurosSystemParam.numOfLegsToBeChoosen);
 	private PairingGenerator[] pairingGenerators = new PairingGenerator[HeurosSystemParam.numOfLegsToBeChoosen];
@@ -37,19 +38,20 @@ public class SolutionGenerator {
 	private int[] legNdxsToCover = new int[HeurosSystemParam.numOfLegsToBeChoosen];
 
 	public SolutionGenerator(PairOptimizationContext pairOptimizationContext,
-								DutyLegOvernightConnNetwork pricingNetwork) {
+								DutyLegOvernightConnNetwork pricingNetwork,
+								SolutionState solutionState) {
 		this.legs = pairOptimizationContext.getLegRepository().getModels();
 //		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 //		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
+		this.solutionState = solutionState;
 		for (int i = 0; i < this.pairingGenerators.length; i++) {
-			this.pairingGenerators[i] = new PairingGenerator(pairOptimizationContext, pricingNetwork);
+			this.pairingGenerators[i] = new PairingGenerator(pairOptimizationContext, pricingNetwork, solutionState);
 			this.pairGenProcessL.add(null);
 			this.legNdxsToCover[i] = -1;
 		}
 	}
 
-	public int generateSolution(List<Pair> solution,
-									SolutionState solutionState) throws InterruptedException, ExecutionException, CloneNotSupportedException {
+	public int generateSolution(List<Pair> solution) throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 		logger.info("Solution generation process is started!");
 
@@ -63,7 +65,7 @@ public class SolutionGenerator {
 					for (int i = 0; i < this.legNdxsToCover.length; i++) {
 						if (this.legNdxsToCover[i] >= 0) {
 							Leg legToCover = this.legs.get(this.legNdxsToCover[i]);
-							this.pairingGenerators[i].setLegForPairGeneration(legToCover, solutionState.getActiveDutyStates());
+							this.pairingGenerators[i].setLegForPairGeneration(legToCover);
 							this.pairGenProcessL.set(i, pairingGensExecutor.submit(this.pairingGenerators[i]));
 						} else
 							this.pairGenProcessL.set(i, null);
