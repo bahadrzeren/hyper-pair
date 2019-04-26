@@ -32,8 +32,6 @@ public class HeuroOptimizer {
 
 	private DutyLegOvernightConnNetwork pricingNetwork = null;
 
-	private SolutionState solutionState = null;
-
 	public HeuroOptimizer(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork pricingNetwork) {
 		this.pairOptimizationContext = pairOptimizationContext;
@@ -53,24 +51,17 @@ public class HeuroOptimizer {
 		int numOfIterationsWOProgress = 0;
 		long optStartTime = System.nanoTime();
 
-		this.solutionState = new SolutionState(this.pairOptimizationContext,
-												this.pricingNetwork);
-
 		boolean bestFound = true;
-		int prevItrBestFound = 0;
-		int itrBestFound = 1;
 		boolean solutionIsImproved = true;
-		int prevItrSolutionIsImproved = 0;
-		int itrSolutionIsImproved = 1;
+
+		SolutionState solutionState = null;
 
 		for (int i = 0; i < HeurosAlgParameters.maxNumOfIterations; i++) {
 
 			List<Pair> solution = new ArrayList<Pair>();
 
-			this.solutionState.initializeForNewIteration();
-
-			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pricingNetwork, this.solutionState);
-			int uncoveredLegs = solGen.generateSolution(solution);
+			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pricingNetwork, solutionState);
+			solutionState = solGen.generateSolution(i + 1, bestFound, solutionIsImproved, solution);
 
 			/**
 			 * TEST BLOCK BEGIN
@@ -109,31 +100,34 @@ public class HeuroOptimizer {
 			 * TEST BLOCK END
 			 */
 
-			double cost = solutionState.finalizeIteration(i + 1, solution, uncoveredLegs, 
-															bestFound, prevItrBestFound, itrBestFound, 
-															solutionIsImproved, prevItrSolutionIsImproved, itrSolutionIsImproved);
+			logger.info("#Pairs: " + solutionState.getNumOfPairs() +
+						" #Duties: " + solutionState.getNumOfDuties() +
+						" #PairDays: " + solutionState.getNumOfPairDays() +
+						" #DutyDays: " + solutionState.getNumOfDutyDays() +
+						" #Dh: " + solutionState.getNumOfDeadheads() +
+						" #LegsInt: " + solutionState.getNumOfDistinctLegsFromTheFleet() +
+						" #LegsIntDh: " + solutionState.getNumOfDistinctDeadheadLegsFromTheFleet() +
+						" #LegsFltExt: " + solutionState.getNumOfDistinctLegsOutsideOfTheFleet() +
+						" TotHM_Dh: " + solutionState.getTotalHeurModDh() +
+						" TotHM_Ef: " + solutionState.getTotalHeurModEf() +
+						" FinalCost: " + solutionState.getFinalCost());
 
 			/*
 			 * Improvement test.
 			 */
-			if (cost < bestCost) {
-				prevItrBestFound = itrBestFound;
-				itrBestFound = i + 1;
-				bestCost = cost;
+			if (solutionState.getFinalCost() < bestCost) {
+				bestCost = solutionState.getFinalCost();
 				bestSolution = solution;
 				bestFound = true;
 				logger.info("Best found!!!");
 			} else
 				bestFound = false;
-			if (cost < prevCost) {
-				prevItrSolutionIsImproved = itrSolutionIsImproved;
-				itrSolutionIsImproved = i + 1;
+			if (solutionState.getFinalCost() < prevCost) {
 				solutionIsImproved = true;
 				logger.info("Solution is improved!!!");
 			} else
 				solutionIsImproved = false;
-			prevCost = cost;
-
+			prevCost = solutionState.getFinalCost();
 
 			/*
 			 * DH HEURISTIC SEARCH ORDER

@@ -39,29 +39,32 @@ public class SolutionGenerator {
 
 	public SolutionGenerator(PairOptimizationContext pairOptimizationContext,
 								DutyLegOvernightConnNetwork pricingNetwork,
-								SolutionState solutionState) {
+								SolutionState solutionState) throws CloneNotSupportedException {
 		this.legs = pairOptimizationContext.getLegRepository().getModels();
 //		this.duties = pairOptimizationContext.getDutyRepository().getModels();
 //		this.dutyIndexByLegNdx = pairOptimizationContext.getDutyIndexByLegNdx();
-		this.solutionState = solutionState;
+		if (solutionState == null)
+			this.solutionState = new SolutionState(pairOptimizationContext, pricingNetwork);
+		else {
+			this.solutionState = solutionState;
+			this.solutionState.initializeForNewIteration();
+		}
 		for (int i = 0; i < this.pairingGenerators.length; i++) {
-			this.pairingGenerators[i] = new PairingGenerator(pairOptimizationContext, pricingNetwork, solutionState);
+			this.pairingGenerators[i] = new PairingGenerator(pairOptimizationContext, pricingNetwork, this.solutionState);
 			this.pairGenProcessL.add(null);
 			this.legNdxsToCover[i] = -1;
 		}
 	}
 
-	public int generateSolution(List<Pair> solution) throws InterruptedException, ExecutionException, CloneNotSupportedException {
+	public SolutionState generateSolution(int itr, boolean bestFound, boolean solutionIsImproved, List<Pair> solution) throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 		logger.info("Solution generation process is started!");
-
-		int uncoveredLegs = 0;
 
 		while (true) {
 
 			PairWithQuality[] pqs = new PairWithQuality[0];
 //			try {
-				if (solutionState.setNextLegNdxsToCover(this.hbNdx, legNdxsToCover)) {
+				if (this.solutionState.setNextLegNdxsToCover(this.hbNdx, legNdxsToCover)) {
 					for (int i = 0; i < this.legNdxsToCover.length; i++) {
 						if (this.legNdxsToCover[i] >= 0) {
 							Leg legToCover = this.legs.get(this.legNdxsToCover[i]);
@@ -82,7 +85,7 @@ public class SolutionGenerator {
 					pqs = ArrayUtils.addAll(pqs, pwqs);
 				}
 			}
-			PairWithQuality pwq = solutionState.chooseBestPairing(pqs);
+			PairWithQuality pwq = this.solutionState.chooseBestPairing(pqs);
 
 			if (pwq != null) {
 
@@ -329,10 +332,11 @@ public class SolutionGenerator {
 
 			} else {
 				logger.error("Pairing could not be found for " + ArrayUtils.toString(legNdxsToCover));
-				uncoveredLegs++;
 			}
 		}
 
-		return uncoveredLegs;
+		this.solutionState.finalizeIteration(itr, bestFound, solutionIsImproved, solution);
+
+		return this.solutionState;
 	}
 }

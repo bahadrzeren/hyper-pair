@@ -114,7 +114,6 @@ public class StateCalculator implements Callable<Double>, PairListener {
 			this.tempLegStates[i].numOfIncludingEffectivePairs = this.activeLegStates[i].numOfIncludingEffectivePairs;
 			this.tempLegStates[i].numOfIncludingEffectivePairsWoDh = this.activeLegStates[i].numOfIncludingEffectivePairsWoDh;
 
-			this.tempLegStates[i].numOfIterations = this.activeLegStates[i].numOfIterations;
 			this.tempLegStates[i].heurModDh = this.activeLegStates[i].heurModDh;
 			this.tempLegStates[i].heurModEf = this.activeLegStates[i].heurModEf;
 		}
@@ -262,8 +261,6 @@ public class StateCalculator implements Callable<Double>, PairListener {
 
 		this.resetTempLegStates();
 		this.resetTempDutyStates();
-
-//		double maxDifficultyScoreObtained = 0.0;
 
 //pairControlArray = null;
 

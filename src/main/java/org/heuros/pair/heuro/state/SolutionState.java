@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
@@ -20,7 +19,7 @@ import org.heuros.pair.sp.PairWithQuality;
 
 public class SolutionState {
 
-	private static Logger logger = Logger.getLogger(SolutionState.class);
+//	private static Logger logger = Logger.getLogger(SolutionState.class);
 
 	/*
 	 * TODO Single base assumption!!!
@@ -53,10 +52,15 @@ public class SolutionState {
 		this.activeLegStates = new LegState[this.legs.size()];
 		this.activeDutyStates = new DutyState[this.duties.size()];
 
-		for (int i = 0; i < this.activeLegStates.length; i++)
+		for (int i = 0; i < this.activeLegStates.length; i++) {
 			this.activeLegStates[i] = new LegState(this.legs.get(i));
-		for (int i = 0; i < this.activeDutyStates.length; i++)
+			this.activeLegStates[i].initializeForNewIteration(this.legs.get(i));
+		}
+		for (int i = 0; i < this.activeDutyStates.length; i++) {
 			this.activeDutyStates[i] = new DutyState();	//	this.duties.get(j));
+			this.activeDutyStates[i].initializeForNewIteration(this.duties.get(i));
+		}
+		this.calculateAndSetMaxValuesOfHeuristicsParameters();
 
 //		pairEnumerator = new PairEnumeratorWoRuleCheck(pairOptimizationContext,
 //														pricingNetwork,
@@ -277,7 +281,6 @@ public class SolutionState {
 			this.activeLegStates[i].numOfIncludingEffectivePairs = tempLegStates[i].numOfIncludingEffectivePairs;
 			this.activeLegStates[i].numOfIncludingEffectivePairsWoDh = tempLegStates[i].numOfIncludingEffectivePairsWoDh;
 
-			this.activeLegStates[i].numOfIterations = tempLegStates[i].numOfIterations;
 			this.activeLegStates[i].heurModDh = tempLegStates[i].heurModDh;
 			this.activeLegStates[i].heurModEf = tempLegStates[i].heurModEf;
 		}
@@ -335,58 +338,58 @@ public class SolutionState {
 			}
 		}
 
-	if (k > 0) {
+		if (k > 0) {
 
-//		double worstDifficutlyScore = 0.0;
-		double bestDifficutlyScore = Integer.MAX_VALUE;
-//		StateCalculator bestStateCalculator = null;
-		bestStateCalculator = null;
+//			double worstDifficutlyScore = 0.0;
+			double bestDifficutlyScore = Integer.MAX_VALUE;
+//			StateCalculator bestStateCalculator = null;
+			bestStateCalculator = null;
 
-		for (int i = 0; i < k; i++) {
-			double maxLegDifficultyScore = stateProcessL.get(i).get();
-			if ((bestStateCalculator == null)
-					|| (stateCalculators[i].getPwq().qm.isBetterInTermsOfDh(bestStateCalculator.getPwq().qm, maxLegDifficultyScore, bestDifficutlyScore))) {
-				bestDifficutlyScore = maxLegDifficultyScore;
-				bestStateCalculator = stateCalculators[i];
+			for (int i = 0; i < k; i++) {
+				double maxLegDifficultyScore = stateProcessL.get(i).get();
+				if ((bestStateCalculator == null)
+						|| (stateCalculators[i].getPwq().qm.isBetterInTermsOfDh(bestStateCalculator.getPwq().qm, maxLegDifficultyScore, bestDifficutlyScore))) {
+					bestDifficutlyScore = maxLegDifficultyScore;
+					bestStateCalculator = stateCalculators[i];
+				}
+//				if (worstDifficutlyScore < maxLegDifficultyScore) {
+//					worstDifficutlyScore = maxLegDifficultyScore;
+//				}
 			}
-//			if (worstDifficutlyScore < maxLegDifficultyScore) {
-//				worstDifficutlyScore = maxLegDifficultyScore;
-//			}
-		}
 
-//		StateCalculator lessStateCalculator = stateCalculators.get(0);
-//		double lessDifficutlyScore = lessStateCalculator.getMaxDifficultyScoreObtained();
-//		for (int i = 1; i < stateProcessL.size(); i++) {
-//			if (stateCalculators.get(i).getPwq().pairQ.isBetterWithLessDuties(lessStateCalculator.getPwq().pairQ)) {
-//				lessStateCalculator = stateCalculators.get(i);
-//				lessDifficutlyScore = lessStateCalculator.getMaxDifficultyScoreObtained();
+//			StateCalculator lessStateCalculator = stateCalculators.get(0);
+//			double lessDifficutlyScore = lessStateCalculator.getMaxDifficultyScoreObtained();
+//			for (int i = 1; i < stateProcessL.size(); i++) {
+//				if (stateCalculators.get(i).getPwq().pairQ.isBetterWithLessDuties(lessStateCalculator.getPwq().pairQ)) {
+//					lessStateCalculator = stateCalculators.get(i);
+//					lessDifficutlyScore = lessStateCalculator.getMaxDifficultyScoreObtained();
+//				}
 //			}
-//		}
 
-		/**
-		 * TEST BLOCK BEGIN
-		 * 
-		 * Checks probable pairing numbers of Legs.
-		 * 
-		 */
+			/**
+			 * TEST BLOCK BEGIN
+			 * 
+			 * Checks probable pairing numbers of Legs.
+			 * 
+			 */
 ////		if (
-////				(legToCover.getNdx() == 7019) || 
-////				(legToCover.getNdx() == 7810)) {
-//		if (true) {
+////			(legToCover.getNdx() == 7019) || 
+////			(legToCover.getNdx() == 7810)) {
+//			if (true) {
 //
-//			numOfPairsWoDh = new int[this.legs.size()];
-//			numOfEffectivePairsWoDh = new int[this.legs.size()];
+//				numOfPairsWoDh = new int[this.legs.size()];
+//				numOfEffectivePairsWoDh = new int[this.legs.size()];
 //
 ////			pairControlArray1 = pairControlArray2;
 ////			pairControlArray2 = new int[0][0];
 //
-//			logger.info("------------------------------------------------------------------");
-//			logger.info(legToCover);
-//			logger.info(bestStateCalculator.getMaxDifficultyScoreObtained());
-//			logger.info(legToCover.getNumOfIncludingPairsWoDh() + "/" + legToCover.getNumOfIncludingEffectivePairsWoDh());
-//			logger.info(bestStateCalculator.getPwq().pair);
-//			this.pairEnumerator.enumerateAllPairings(bestStateCalculator.getTempDutyStates());
-//			logger.info("------------------------------------------------------------------");
+//				logger.info("------------------------------------------------------------------");
+//				logger.info(legToCover);
+//				logger.info(bestStateCalculator.getMaxDifficultyScoreObtained());
+//				logger.info(legToCover.getNumOfIncludingPairsWoDh() + "/" + legToCover.getNumOfIncludingEffectivePairsWoDh());
+//				logger.info(bestStateCalculator.getPwq().pair);
+//				this.pairEnumerator.enumerateAllPairings(bestStateCalculator.getTempDutyStates());
+//				logger.info("------------------------------------------------------------------");
 //
 ////			if (pairControlArray1 != null) {
 ////				for (int i = 0; i < pairControlArray1.length; i++) {
@@ -436,69 +439,69 @@ public class SolutionState {
 ////				}
 ////			}
 //
-////		if (pairControlArray1 != null) {
-////			for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
-////				int[] pairT = bestStateCalculator.pairControlArray[j];
-////				boolean found = false;
-////				for (int i = 0; i < pairControlArray1.length; i++) {
-////					int[] pair1 = pairControlArray1[i];
-////					if (pair1.length == pairT.length) {
-////						boolean f = true; 
-////						for (int k = 0; k < pair1.length; k++) {
-////							if (pair1[k] != pairT[k]) {
-////								f = false;
+////			if (pairControlArray1 != null) {
+////				for (int j = 0; j < bestStateCalculator.pairControlArray.length; j++) {
+////					int[] pairT = bestStateCalculator.pairControlArray[j];
+////					boolean found = false;
+////					for (int i = 0; i < pairControlArray1.length; i++) {
+////						int[] pair1 = pairControlArray1[i];
+////						if (pair1.length == pairT.length) {
+////							boolean f = true; 
+////							for (int k = 0; k < pair1.length; k++) {
+////								if (pair1[k] != pairT[k]) {
+////									f = false;
+////									break;
+////								}
+////							}
+////							if (f) {
+////								found = true;
 ////								break;
 ////							}
 ////						}
-////						if (f) {
-////							found = true;
-////							break;
+////					}
+////					if (!found) {
+////						System.out.println("Pairing could not be reproduced!");
+////						System.out.println("Pair2 :" + ArrayUtils.toString(pairT));
+////						for (int i : pairT) {
+////							System.out.println(this.duties.get(i));
 ////						}
 ////					}
 ////				}
-////				if (!found) {
-////					System.out.println("Pairing could not be reproduced!");
-////					System.out.println("Pair2 :" + ArrayUtils.toString(pairT));
-////					for (int i : pairT) {
-////						System.out.println(this.duties.get(i));
-////					}
-////				}
 ////			}
-////		}
 //
-//			for (int i = 0; i < this.legs.size(); i++) {
-//				Leg l = this.legs.get(i);
-//				if (l.isCover()
-//					&& l.hasPair(hbNdx)) {
-//					LegState ls = bestStateCalculator.getTempLegStates()[l.getNdx()];
-//					if (!ls.arePairTotalizersOk(0,
-//												0,
-//												numOfPairsWoDh[l.getNdx()],
-//												numOfEffectivePairsWoDh[l.getNdx()])) {
-//						logger.error("LegToCover: " + legToCover);
-//						logger.error("Leg pair totalizers are not set correctly! " + l);
-//						ls.arePairTotalizersOk(0,
-//												0,
-//												numOfPairsWoDh[l.getNdx()],
-//												numOfEffectivePairsWoDh[l.getNdx()]);
+//				for (int i = 0; i < this.legs.size(); i++) {
+//					Leg l = this.legs.get(i);
+//					if (l.isCover()
+//						&& l.hasPair(hbNdx)) {
+//						LegState ls = bestStateCalculator.getTempLegStates()[l.getNdx()];
+//						if (!ls.arePairTotalizersOk(0,
+//													0,
+//													numOfPairsWoDh[l.getNdx()],
+//													numOfEffectivePairsWoDh[l.getNdx()])) {
+//							logger.error("LegToCover: " + legToCover);
+//							logger.error("Leg pair totalizers are not set correctly! " + l);
+//							ls.arePairTotalizersOk(0,
+//													0,
+//													numOfPairsWoDh[l.getNdx()],
+//													numOfEffectivePairsWoDh[l.getNdx()]);
+//						}
 //					}
 //				}
 //			}
-//		}
-		/**
-		 * TEST BLOCK END
-		 * 
-		 */
+			/**
+			 * TEST BLOCK END
+			 * 
+			 */
 
-//		this.prevLegToCover = legToCover;
+//			this.prevLegToCover = legToCover;
 
-//		this.activeLegStates = bestStateCalculator.getTempLegStates();
-//		this.activeDutyStates = bestStateCalculator.getTempDutyStates();
-		this.updateActiveLegStates(bestStateCalculator.getTempLegStates());
-		this.updateActiveDutyStates(bestStateCalculator.getTempDutyStates());
+//			this.activeLegStates = bestStateCalculator.getTempLegStates();
+//			this.activeDutyStates = bestStateCalculator.getTempDutyStates();
+			this.updateActiveLegStates(bestStateCalculator.getTempLegStates());
+			this.updateActiveDutyStates(bestStateCalculator.getTempDutyStates());
 
-//		this.activeLegStates = lessStateCalculator.getTempLegStates();
-//		this.activeDutyStates = lessStateCalculator.getTempDutyStates();
+//			this.activeLegStates = lessStateCalculator.getTempLegStates();
+//			this.activeDutyStates = lessStateCalculator.getTempDutyStates();
 
 //logger.info("--- " + legToCover);
 ////logger.info("bestScore: " + bestDifficutlyScore + ", lessScore: " + lessDifficutlyScore + ", worstScore: " + worstDifficutlyScore);
@@ -511,24 +514,81 @@ public class SolutionState {
 ////logger.info("LessDifficulty: " + lessStateCalculator.getPwq().pair.getNumOfDuties() + " - " + lessDifficutlyScore);
 //logger.info("BestDifficulty: " + bestStateCalculator.getPwq().pair.getNumOfDuties() + " - " + bestDifficutlyScore);
 
-		this.calculateAndSetMaxValuesOfHeuristicsParameters();
+			this.calculateAndSetMaxValuesOfHeuristicsParameters();
 
-		return bestStateCalculator.getPwq();
+			return bestStateCalculator.getPwq();
+		}
+		return null;
 	}
-	return null;
+
+	private int numOfPairs = 0;
+	private int numOfDuties = 0;
+	private int numOfPairDays = 0;
+	private int numOfDutyDays = 0;
+
+	private int numOfDeadheads = 0;
+	private int numOfDistinctLegsFromTheFleet = 0;
+	private int numOfDistinctDeadheadLegsFromTheFleet = 0;
+	private int numOfDistinctLegsOutsideOfTheFleet = 0;
+
+	private double totalHeurModDh = 0.0;
+	private double totalHeurModEf = 0.0;
+
+	private double finalCost = 0.0;
+
+	public int getNumOfPairs() {
+		return numOfPairs;
 	}
 
-	public double finalizeIteration(int iterationNumber, List<Pair> solution, int uncoveredLegs, 
-									boolean bestFound, int prevItrBestFound, int itrBestFound, 
-									boolean solutionIsImproved, int prevItrSolutionIsImproved, int itrSolutionIsImproved) {
+	public int getNumOfDuties() {
+		return numOfDuties;
+	}
 
-		int numOfPairs = 0;
-		int numOfPairDays = 0;
-		int numOfDuties = 0;
-		int numOfDutyDays = 0;
+	public int getNumOfPairDays() {
+		return numOfPairDays;
+	}
 
-		double totalHeurModDh = 0.0;
-		double totalHeurModEf = 0.0;
+	public int getNumOfDutyDays() {
+		return numOfDutyDays;
+	}
+
+	public int getNumOfDeadheads() {
+		return numOfDeadheads;
+	}
+
+	public int getNumOfDistinctLegsFromTheFleet() {
+		return numOfDistinctLegsFromTheFleet;
+	}
+
+	public int getNumOfDistinctDeadheadLegsFromTheFleet() {
+		return numOfDistinctDeadheadLegsFromTheFleet;
+	}
+
+	public int getNumOfDistinctLegsOutsideOfTheFleet() {
+		return numOfDistinctLegsOutsideOfTheFleet;
+	}
+
+	public double getTotalHeurModDh() {
+		return totalHeurModDh;
+	}
+
+	public double getTotalHeurModEf() {
+		return totalHeurModEf;
+	}
+
+	public double getFinalCost() {
+		return finalCost;
+	}
+
+	public double finalizeIteration(int itr, boolean bestFound, boolean solutionIsImproved, List<Pair> solution) {
+
+		numOfPairs = 0;
+		numOfPairDays = 0;
+		numOfDuties = 0;
+		numOfDutyDays = 0;
+
+		totalHeurModDh = 0.0;
+		totalHeurModEf = 0.0;
 
 		/*
 		 * Calculate standard fitness and heuristic cost to be able to calculate value of Heuristic Modifiers.
@@ -577,7 +637,6 @@ public class SolutionState {
 				for (int k = 0; k < d.getNumOfLegs(); k++) {
 					Leg l = d.getLegs().get(k);
 					if (l.isCover()) {
-						activeLegStates[l.getNdx()].numOfIterations = iterationNumber;
 						/*
 						 * Set dh related heuristicModifier.
 						 */
@@ -611,10 +670,10 @@ public class SolutionState {
 		/*
 		 * Calculate solution statistics and add standard DH cost to the fitness.
 		 */
-		int numOfDistinctLegsFromTheFleet = 0;
-		int numOfDistinctDeadheadLegsFromTheFleet = 0;
-		int numOfDistinctLegsOutsideOfTheFleet = 0;
-		int numOfDeadheads = 0;
+		numOfDistinctLegsFromTheFleet = 0;
+		numOfDistinctDeadheadLegsFromTheFleet = 0;
+		numOfDistinctLegsOutsideOfTheFleet = 0;
+		numOfDeadheads = 0;
 
 		for (int i = 0; i < this.legs.size(); i++) {
 			if (this.legs.get(i).isCover()) {
@@ -634,20 +693,9 @@ public class SolutionState {
 			}
 		}
 
-		logger.info("#Pairs: " + numOfPairs +
-					" #Duties: " + numOfDuties +
-					" #PairDays: " + numOfPairDays +
-					" #DutyDays: " + numOfDutyDays +
-					" #Dh: " + numOfDeadheads +
-					" #LegsInt: " + numOfDistinctLegsFromTheFleet +
-					" #LegsIntDh: " + numOfDistinctDeadheadLegsFromTheFleet +
-					" #LegsFltExt: " + numOfDistinctLegsOutsideOfTheFleet +
-					" #UncvrLegs: " + uncoveredLegs +
-					" TotHM_Dh: " + totalHeurModDh +
-					" TotHM_Ef: " + totalHeurModEf +
-					" FinalCost: " + (totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf));
+		finalCost = (totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf);
 
-		return totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf;
+		return finalCost;
 	}
 
 //	/*

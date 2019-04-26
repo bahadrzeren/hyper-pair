@@ -70,7 +70,6 @@ public class LegState implements Cloneable {
 	/*
 	 * Cumulative values that do not reset during optimization.
 	 */
-	public int numOfIterations = 0;
 	public double heurModDh= 0.0;
 	public double heurModEf= 0.0;
 
@@ -138,25 +137,26 @@ public class LegState implements Cloneable {
 //		}
 //	}
 
-	public double getWeightedDifficultyScoreWithoutHeurMods() {
-		if (this.associatedLeg.isCover()
-				&& (this.numOfCoverings == 0)) {
-			return HeurosSystemParam.weightDutyInclusionScore * this.getDutyInclusionScore()
-					+ HeurosSystemParam.weightDutyInclusionScoreWoDh * this.getDutyInclusionScoreWoDh()
-					+ HeurosSystemParam.weightDutyEffectiveInclusionScore * this.getDutyEffectiveInclusionScore()
-					+ HeurosSystemParam.weightDutyEffectiveInclusionScoreWoDh * this.getDutyEffectiveInclusionScoreWoDh()
-					+ HeurosSystemParam.weightPairInclusionScore * this.getPairInclusionScore()
-					+ HeurosSystemParam.weightPairInclusionScoreWoDh * this.getPairInclusionScoreWoDh()
-					+ HeurosSystemParam.weightPairEffectiveInclusionScore * this.getPairEffectiveInclusionScore()
-					+ HeurosSystemParam.weightPairEffectiveInclusionScoreWoDh * this.getPairEffectiveInclusionScoreWoDh();
-		} else {
-			return 0.0;
-		}
-	}
+//	public double getWeightedDifficultyScoreWithoutHeurMods() {
+//		if (this.associatedLeg.isCover()
+//				&& (this.numOfCoverings == 0)) {
+//			return HeurosSystemParam.weightDutyInclusionScore * this.getDutyInclusionScore()
+//					+ HeurosSystemParam.weightDutyInclusionScoreWoDh * this.getDutyInclusionScoreWoDh()
+//					+ HeurosSystemParam.weightDutyEffectiveInclusionScore * this.getDutyEffectiveInclusionScore()
+//					+ HeurosSystemParam.weightDutyEffectiveInclusionScoreWoDh * this.getDutyEffectiveInclusionScoreWoDh()
+//					+ HeurosSystemParam.weightPairInclusionScore * this.getPairInclusionScore()
+//					+ HeurosSystemParam.weightPairInclusionScoreWoDh * this.getPairInclusionScoreWoDh()
+//					+ HeurosSystemParam.weightPairEffectiveInclusionScore * this.getPairEffectiveInclusionScore()
+//					+ HeurosSystemParam.weightPairEffectiveInclusionScoreWoDh * this.getPairEffectiveInclusionScoreWoDh();
+//		} else {
+//			return 0.0;
+//		}
+//	}
 
 	public double getWeightedDifficultyScore() {
 		if (this.associatedLeg.isCover()
-				&& (this.numOfCoverings == 0)) {
+//				&& (this.numOfCoverings == 0)
+				) {
 //			double v1 = this.getDutyInclusionScore();
 //			double v2 = this.getDutyInclusionScoreWoDh();
 //			double v3 = this.getDutyEffectiveInclusionScore();
@@ -217,7 +217,6 @@ public class LegState implements Cloneable {
 				", numOfIncludingPairsWoDh: " + numOfIncludingPairsWoDh + 
 				", numOfIncludingEffectivePairs: " + numOfIncludingEffectivePairs + 
 				", numOfIncludingEffectivePairsWoDh: " + numOfIncludingEffectivePairsWoDh + 
-				", numOfIterations: " + numOfIterations + 
 				", heurModDh: " + heurModDh +
 				", heurModEf: " + heurModEf;
 		
