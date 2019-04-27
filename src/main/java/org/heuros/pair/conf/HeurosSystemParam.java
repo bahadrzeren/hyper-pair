@@ -36,11 +36,6 @@ public class HeurosSystemParam {
 	public static int effectiveDutyBlockHourLimit = 4 * 60;
 
 	/*
-	 * Num of concurrent legs that pairing search is going to be done for. 
-	 */
-	public static int numOfLegsToBeChoosen = 3;
-
-	/*
 	 * Pair enumeration params.
 	 */
 	public static int pairEnumerationDept = maxPairingLengthInDays - 2;	//	must not exceed maxPairingLengthInDays!

@@ -141,11 +141,9 @@ public abstract class AbsPairingOptimizer {
 			 * Additional parameters for genetic optimizer.
 			 */
 			if (args.length > 14) {
-				HeurosSystemParam.numOfLegsToBeChoosen = Integer.parseInt(args[14]);	//	3;
-				HeurosSystemParam.hmResetWeightAfterBestSol = Double.parseDouble(args[15]);	//	0.33;
-				HeurosSystemParam.hmResetWeightAfterImprSol = Double.parseDouble(args[16]);	//	0.66;
+				HeurosSystemParam.hmResetWeightAfterBestSol = Double.parseDouble(args[14]);	//	0.33;
+				HeurosSystemParam.hmResetWeightAfterImprSol = Double.parseDouble(args[15]);	//	0.66;
 			} else {
-				HeurosSystemParam.numOfLegsToBeChoosen = 1;
 				HeurosSystemParam.hmResetWeightAfterBestSol = 0.0;
 				HeurosSystemParam.hmResetWeightAfterImprSol = 0.0;
 			}
@@ -174,7 +172,6 @@ public abstract class AbsPairingOptimizer {
 			logger.info("weightPairEffectiveInclusionScoreWoDh: " + HeurosSystemParam.weightPairEffectiveInclusionScoreWoDh);
 			logger.info("weightHeurModDh: " + HeurosSystemParam.weightHeurModDh);
 			logger.info("weightHeurModEf: " + HeurosSystemParam.weightHeurModEf);
-			logger.info("numOfLegsToBeChoosen: " + HeurosSystemParam.numOfLegsToBeChoosen);
 			logger.info("hmResetWeightAfterBestSol: " + HeurosSystemParam.hmResetWeightAfterBestSol);
 			logger.info("hmResetWeightAfterImprSol: " + HeurosSystemParam.hmResetWeightAfterImprSol);
 	

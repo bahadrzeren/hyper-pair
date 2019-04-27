@@ -1,7 +1,6 @@
 package org.heuros.pair.sp;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
@@ -15,7 +14,7 @@ import org.heuros.pair.heuro.state.DutyState;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.rule.PairRuleContext;
 
-public class PairingGenerator implements Callable<PairWithQuality[]> {
+public class PairingGenerator {
 
 	private static Logger logger = Logger.getLogger(PairingGenerator.class);
 
@@ -62,8 +61,7 @@ public class PairingGenerator implements Callable<PairWithQuality[]> {
 		this.legToCover = legToCover;
 	}
 
-	@Override
-	public PairWithQuality[] call() throws Exception, CloneNotSupportedException {
+	public PairWithQuality[] generatePairings() throws CloneNotSupportedException {
 
 		Duty[] coveringDuties = this.dutyIndexByLegNdx.getArray(legToCover.getNdx());
 

@@ -1,19 +1,12 @@
 package org.heuros.pair.heuro;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
-import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairWithQuality;
 import org.heuros.pair.sp.PairingGenerator;
@@ -32,10 +25,7 @@ public class SolutionGenerator {
 //	private OneDimIndexInt<Duty> dutyIndexByLegNdx = null;
 	private SolutionState solutionState = null;
 
-	private ExecutorService pairingGensExecutor = Executors.newFixedThreadPool(HeurosSystemParam.numOfLegsToBeChoosen);
-	private PairingGenerator[] pairingGenerators = new PairingGenerator[HeurosSystemParam.numOfLegsToBeChoosen];
-	private List<Future<PairWithQuality[]>> pairGenProcessL = new ArrayList<Future<PairWithQuality[]>>();
-	private int[] legNdxsToCover = new int[HeurosSystemParam.numOfLegsToBeChoosen];
+	private PairingGenerator pairingGenerator = null;
 
 	public SolutionGenerator(PairOptimizationContext pairOptimizationContext,
 								DutyLegOvernightConnNetwork pricingNetwork,
@@ -49,43 +39,23 @@ public class SolutionGenerator {
 			this.solutionState = solutionState;
 			this.solutionState.initializeForNewIteration();
 		}
-		for (int i = 0; i < this.pairingGenerators.length; i++) {
-			this.pairingGenerators[i] = new PairingGenerator(pairOptimizationContext, pricingNetwork, this.solutionState);
-			this.pairGenProcessL.add(null);
-			this.legNdxsToCover[i] = -1;
-		}
+		this.pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork, this.solutionState);
 	}
 
 	public SolutionState generateSolution(int itr, boolean bestFound, boolean solutionIsImproved, List<Pair> solution) throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 		logger.info("Solution generation process is started!");
 
+		int legNdxToCover;
+
 		while (true) {
 
-//			try {
-				if (this.solutionState.setNextLegNdxsToCover(this.hbNdx, legNdxsToCover)) {
-logger.info(ArrayUtils.toString(this.legNdxsToCover));
-					for (int i = 0; i < this.legNdxsToCover.length; i++) {
-						if (this.legNdxsToCover[i] >= 0) {
-							Leg legToCover = this.legs.get(this.legNdxsToCover[i]);
-							this.pairingGenerators[i].setLegForPairGeneration(legToCover);
-							this.pairGenProcessL.set(i, pairingGensExecutor.submit(this.pairingGenerators[i]));
-						} else
-							this.pairGenProcessL.set(i, null);
-					}
-				} else
-					break;
-//			} catch (CloneNotSupportedException ex) {
-//				logger.error(ex);
-//			}
-
-			PairWithQuality[] pqs = new PairWithQuality[0];
-			for (int i = 0; i < this.pairGenProcessL.size(); i++) {
-				if (this.pairGenProcessL.get(i) != null) {
-					PairWithQuality[] pwqs = this.pairGenProcessL.get(i).get();
-					pqs = ArrayUtils.addAll(pqs, pwqs);
-				}
-			}
+			legNdxToCover = solutionState.getNextLegNdxToCover(this.hbNdx);
+			if (legNdxToCover < 0)
+				break;
+			Leg legToCover = this.legs.get(legNdxToCover);
+			this.pairingGenerator.setLegForPairGeneration(legToCover);
+			PairWithQuality[] pqs = this.pairingGenerator.generatePairings();
 			PairWithQuality pwq = this.solutionState.chooseBestPairing(pqs);
 //logger.info(pwq.p.getNumOfDuties() + ", " + pwq.p.getFirstDuty().getNdx() + ", " + pwq.legToCover.getNdx());
 			if (pwq != null) {
@@ -332,7 +302,7 @@ logger.info(ArrayUtils.toString(this.legNdxsToCover));
 					 */
 
 			} else {
-				logger.error("Pairing could not be found for " + ArrayUtils.toString(legNdxsToCover));
+				logger.error("Pairing could not be found for " + legNdxToCover);
 			}
 		}
 

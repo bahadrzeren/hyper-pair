@@ -66,8 +66,8 @@ public class SolutionState {
 //														pricingNetwork,
 //														this);
 
-		this.stateCalculators = new StateCalculator[HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.numOfLegsToBeChoosen];
-		this.stateProcessL = new ArrayList<Future<Double>>(HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.numOfLegsToBeChoosen);
+		this.stateCalculators = new StateCalculator[HeurosSystemParam.maxPairingLengthInDays];
+		this.stateProcessL = new ArrayList<Future<Double>>(HeurosSystemParam.maxPairingLengthInDays);
 		for (int i = 0; i < this.stateCalculators.length; i++) {
 			this.stateCalculators[i] = new StateCalculator(pairOptimizationContext,
 															pricingNetwork,
@@ -133,52 +133,51 @@ public class SolutionState {
 		}
 	}
 
-//	public int getNextLegNdxToCover(int hbNdx, int[] activeLegNdxs) {
-//		int res = -1;
-//		double highestScore = 0.0;
-//		for (int i = 0; i < this.legs.size(); i++) {
-//			if (this.legs.get(i).isCover()
-//					&& this.legs.get(i).hasPair(hbNdx)
-//					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
-//					&& (activeLegStates[i].numOfCoverings == 0)
-//					&& (ArrayUtils.indexOf(activeLegNdxs, i) >= 0)) {
-//				if (highestScore < activeLegStates[i].getWeightedDifficultyScore()) {
-//					highestScore = activeLegStates[i].getWeightedDifficultyScore();
-//					res = i;
-//				}
-//			}
-//		}
-//		return res;
-//	}
-
-	public boolean setNextLegNdxsToCover(int hbNdx, int[] activeLegNdxs) {
-		boolean atLeastOneLegExists = false;
-		boolean[] addedLegNdxs = new boolean[this.legs.size()];
-		for (int ndx = 0; ndx < activeLegNdxs.length; ndx++) {
-//			if (activeLegNdxs[ndx] < 0) {
-				boolean legExists = false;
-				double highestScore = 0.0;
-				for (int i = 0; i < this.legs.size(); i++) {
-					if (this.legs.get(i).isCover()
-							&& this.legs.get(i).hasPair(hbNdx)
-							&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
-							&& (activeLegStates[i].numOfCoverings == 0)
-							&& (!addedLegNdxs[i])) {
-						if (highestScore < activeLegStates[i].getWeightedDifficultyScore()) {
-							highestScore = activeLegStates[i].getWeightedDifficultyScore();
-							addedLegNdxs[i] = true;
-							activeLegNdxs[ndx] = i;
-							atLeastOneLegExists = true;
-							legExists = true;
-						}
-					}
+	public int getNextLegNdxToCover(int hbNdx) {
+		int res = -1;
+		double highestScore = 0.0;
+		for (int i = 0; i < this.legs.size(); i++) {
+			if (this.legs.get(i).isCover()
+					&& this.legs.get(i).hasPair(hbNdx)
+					&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
+					&& (activeLegStates[i].numOfCoverings == 0)) {
+				if (highestScore < activeLegStates[i].getWeightedDifficultyScore()) {
+					highestScore = activeLegStates[i].getWeightedDifficultyScore();
+					res = i;
 				}
-				if (!legExists)
-					break;
-//			}
+			}
 		}
-		return atLeastOneLegExists;
+		return res;
 	}
+
+//	public boolean setNextLegNdxsToCover(int hbNdx, int[] activeLegNdxs) {
+//		boolean atLeastOneLegExists = false;
+//		boolean[] addedLegNdxs = new boolean[this.legs.size()];
+//		for (int ndx = 0; ndx < activeLegNdxs.length; ndx++) {
+////			if (activeLegNdxs[ndx] < 0) {
+//				boolean legExists = false;
+//				double highestScore = 0.0;
+//				for (int i = 0; i < this.legs.size(); i++) {
+//					if (this.legs.get(i).isCover()
+//							&& this.legs.get(i).hasPair(hbNdx)
+//							&& this.legs.get(i).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
+//							&& (activeLegStates[i].numOfCoverings == 0)
+//							&& (!addedLegNdxs[i])) {
+//						if (highestScore < activeLegStates[i].getWeightedDifficultyScore()) {
+//							highestScore = activeLegStates[i].getWeightedDifficultyScore();
+//							addedLegNdxs[i] = true;
+//							activeLegNdxs[ndx] = i;
+//							atLeastOneLegExists = true;
+//							legExists = true;
+//						}
+//					}
+//				}
+//				if (!legExists)
+//					break;
+////			}
+//		}
+//		return atLeastOneLegExists;
+//	}
 
 //	private Leg prevLegToCover = null;
 //	private int[][] pairControlArray1 = null;
@@ -305,7 +304,7 @@ public class SolutionState {
 		}
 	}
 
-	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays * HeurosSystemParam.numOfLegsToBeChoosen);
+	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays);
 
 	private StateCalculator bestStateCalculator = null;
 
