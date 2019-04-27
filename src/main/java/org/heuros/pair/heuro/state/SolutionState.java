@@ -347,6 +347,12 @@ public class SolutionState {
 
 			for (int i = 0; i < k; i++) {
 				double maxLegDifficultyScore = stateProcessL.get(i).get();
+//logger.info(
+//stateCalculators[i].getPwq().p.getNumOfDuties() + ", " + 
+//stateCalculators[i].getPwq().p.getFirstDuty().getNdx() + ", " +
+//stateCalculators[i].getPwq().legToCover.getNdx() + ", " +
+//String.valueOf(maxLegDifficultyScore) + ", " +
+//stateCalculators[i].getPwq().qm);
 				if ((bestStateCalculator == null)
 						|| (stateCalculators[i].getPwq().qm.isBetterInTermsOfDh(bestStateCalculator.getPwq().qm, maxLegDifficultyScore, bestDifficutlyScore))) {
 					bestDifficutlyScore = maxLegDifficultyScore;

@@ -62,9 +62,9 @@ public class SolutionGenerator {
 
 		while (true) {
 
-			PairWithQuality[] pqs = new PairWithQuality[0];
 //			try {
 				if (this.solutionState.setNextLegNdxsToCover(this.hbNdx, legNdxsToCover)) {
+logger.info(ArrayUtils.toString(this.legNdxsToCover));
 					for (int i = 0; i < this.legNdxsToCover.length; i++) {
 						if (this.legNdxsToCover[i] >= 0) {
 							Leg legToCover = this.legs.get(this.legNdxsToCover[i]);
@@ -79,6 +79,7 @@ public class SolutionGenerator {
 //				logger.error(ex);
 //			}
 
+			PairWithQuality[] pqs = new PairWithQuality[0];
 			for (int i = 0; i < this.pairGenProcessL.size(); i++) {
 				if (this.pairGenProcessL.get(i) != null) {
 					PairWithQuality[] pwqs = this.pairGenProcessL.get(i).get();
@@ -86,7 +87,7 @@ public class SolutionGenerator {
 				}
 			}
 			PairWithQuality pwq = this.solutionState.chooseBestPairing(pqs);
-
+//logger.info(pwq.p.getNumOfDuties() + ", " + pwq.p.getFirstDuty().getNdx() + ", " + pwq.legToCover.getNdx());
 			if (pwq != null) {
 
 					solution.add(pwq.p);
