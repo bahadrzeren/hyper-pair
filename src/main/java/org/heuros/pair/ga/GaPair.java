@@ -68,7 +68,7 @@ public class GaPair extends AbsPairingOptimizer {
 																			/*
 																			 * TODO Chromosome length = 10000 must be parametric.
 																			 */
-																			.setChromosomeFactory(new PairChromosomeFactory().
+																			.setChromosomeFactory(new PairChromosomeFactory(pairOptimizationContext).
 																										setChromosomeLength(pairOptimizationContext.getLegRepository().getModels().size()));
 		pairOptimizer.proceed();
 		logger.info("Optimization run is completed!");

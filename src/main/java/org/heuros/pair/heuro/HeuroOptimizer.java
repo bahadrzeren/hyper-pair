@@ -61,7 +61,7 @@ public class HeuroOptimizer {
 			List<Pair> solution = new ArrayList<Pair>();
 
 			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pricingNetwork, solutionState);
-			solutionState = solGen.generateSolution(i + 1, bestFound, solutionIsImproved, solution);
+			solutionState = solGen.generateSolution(bestFound, solutionIsImproved, solution);
 
 			/**
 			 * TEST BLOCK BEGIN

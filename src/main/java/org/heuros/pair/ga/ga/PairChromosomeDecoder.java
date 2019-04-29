@@ -5,18 +5,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
-import org.heuros.core.data.ndx.OneDimIndexInt;
 import org.heuros.core.ga.chromosome.Chromosome;
 import org.heuros.core.ga.decoder.Decoder;
 import org.heuros.data.DutyLegOvernightConnNetwork;
-import org.heuros.data.model.Duty;
-import org.heuros.data.model.DutyView;
 import org.heuros.data.model.Leg;
-import org.heuros.data.model.LegView;
 import org.heuros.data.model.Pair;
-import org.heuros.data.repo.DutyRepository;
-import org.heuros.data.repo.LegRepository;
+import org.heuros.pair.conf.HeurosDatasetParam;
 import org.heuros.pair.heuro.state.SolutionState;
+import org.heuros.pair.sp.PairWithQuality;
 import org.heuros.pair.sp.PairingGenerator;
 
 public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
@@ -27,9 +23,28 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 	 * TODO Single base assumption!!!
 	 */
 	private int hbNdx = 0;
+	private PairOptimizationContext pairOptimizationContext = null;
+	private DutyLegOvernightConnNetwork pricingNetwork = null;
+	private List<Leg> legs = null;
 
 	public PairChromosomeDecoder(PairOptimizationContext pairOptimizationContext,
 									DutyLegOvernightConnNetwork pricingNetwork) {
+		this.pairOptimizationContext = pairOptimizationContext;
+		this.pricingNetwork = pricingNetwork;
+		this.legs = this.pairOptimizationContext.getLegRepository().getModels();
+	}
+
+	public int getNextLegNdxToCover(int lastGenNdx, PairChromosome pC, SolutionState solutionState) {
+		for (int i = lastGenNdx; i < this.legs.size(); i++) {
+			int legNdx = pC.getGeneValue(i);
+			if (this.legs.get(legNdx).isCover()
+					&& this.legs.get(legNdx).hasPair(hbNdx)
+					&& this.legs.get(legNdx).getSobt().isBefore(HeurosDatasetParam.optPeriodEndExc)
+					&& (solutionState.getActiveLegStates()[legNdx].numOfCoverings == 0)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	@Override
@@ -41,27 +56,48 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 
 		List<Pair> solution = new ArrayList<Pair>();
 
-		int geneNdx = 0;
-		while (true) {
+		try {
+			SolutionState solutionState = new SolutionState(pairOptimizationContext, pricingNetwork);
+			PairingGenerator pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork, solutionState);
 
-			int legToCoverNdx = -1;
+			int geneNdx = -1;
+			while (true) {
+	
+				geneNdx = this.getNextLegNdxToCover(geneNdx + 1, pC, solutionState);
+	
+				if (geneNdx < 0)
+					break;
 
-			while (geneNdx < chromosome.getChromosomeLength()) {
-				int hNdx = chromosome.getGeneValue(geneNdx);
-				geneNdx++;
+				int legNdxToCover = pC.getGeneValue(geneNdx);
+				Leg legToCover = this.legs.get(legNdxToCover);
+				pairingGenerator.setLegForPairGeneration(legToCover);
+				PairWithQuality[] pqs = pairingGenerator.generatePairings();
+				PairWithQuality pwq = solutionState.chooseBestPairing(pqs);
+				if (pwq != null) {
+					solution.add(pwq.p);
+				} else {
+					logger.error("Pairing could not be found for " + legToCover);
+				}
 			}
-			if (legToCoverNdx < 0)
-				break;
 
+			solutionState.finalizeIteration(false, false, solution);
+
+			chromosome.setFitness(solutionState.getFinalCost());
+			chromosome.setInfo("#Pairs: " + solutionState.getNumOfPairs() +
+								" #Duties: " + solutionState.getNumOfDuties() +
+								" #PairDays: " + solutionState.getNumOfPairDays() +
+								" #DutyDays: " + solutionState.getNumOfDutyDays() +
+								" #Dh: " + solutionState.getNumOfDeadheads() +
+								" #LegsInt: " + solutionState.getNumOfDistinctLegsFromTheFleet() +
+								" #LegsIntDh: " + solutionState.getNumOfDistinctDeadheadLegsFromTheFleet() +
+								" #LegsFltExt: " + solutionState.getNumOfDistinctLegsOutsideOfTheFleet() +
+								" TotHM_Dh: " + solutionState.getTotalHeurModDh() +
+								" TotHM_Ef: " + solutionState.getTotalHeurModEf() +
+								" FinalCost: " + solutionState.getFinalCost());
+
+		} catch (Exception ex) {
+			logger.error(ex);
 		}
-
-//		chromosome.setFitness(fitness + uncoveredLegs * 100000000);
-//		chromosome.setInfo("numOfPairs:" + numOfPairs + 
-//							", numOfDuties:" + numOfDuties +
-//							", numOfPairDays:" + numOfPairDays + 
-//							", uncoveredLegs: " + uncoveredLegs + 
-//							", numOfDeadheads: " + numOfDeadheads + 
-//							", fitness: " + fitness);
 		return solution;
 	}
 

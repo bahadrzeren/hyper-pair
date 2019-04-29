@@ -42,7 +42,7 @@ public class SolutionGenerator {
 		this.pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork, this.solutionState);
 	}
 
-	public SolutionState generateSolution(int itr, boolean bestFound, boolean solutionIsImproved, List<Pair> solution) throws InterruptedException, ExecutionException, CloneNotSupportedException {
+	public SolutionState generateSolution(boolean bestFound, boolean solutionIsImproved, List<Pair> solution) throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 		logger.info("Solution generation process is started!");
 
@@ -306,7 +306,7 @@ public class SolutionGenerator {
 			}
 		}
 
-		this.solutionState.finalizeIteration(itr, bestFound, solutionIsImproved, solution);
+		this.solutionState.finalizeIteration(bestFound, solutionIsImproved, solution);
 
 		return this.solutionState;
 	}

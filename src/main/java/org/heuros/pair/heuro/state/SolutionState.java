@@ -585,7 +585,7 @@ public class SolutionState {
 		return finalCost;
 	}
 
-	public double finalizeIteration(int itr, boolean bestFound, boolean solutionIsImproved, List<Pair> solution) {
+	public double finalizeIteration(boolean bestFound, boolean solutionIsImproved, List<Pair> solution) {
 
 		numOfPairs = 0;
 		numOfPairDays = 0;
