@@ -114,8 +114,8 @@ public class StateCalculator implements Callable<Double>, PairListener {
 			this.tempLegStates[i].numOfIncludingEffectivePairs = this.activeLegStates[i].numOfIncludingEffectivePairs;
 			this.tempLegStates[i].numOfIncludingEffectivePairsWoDh = this.activeLegStates[i].numOfIncludingEffectivePairsWoDh;
 
-			this.tempLegStates[i].heurModDh = this.activeLegStates[i].heurModDh;
-			this.tempLegStates[i].heurModEf = this.activeLegStates[i].heurModEf;
+			this.tempLegStates[i].actHeurModDh = this.activeLegStates[i].actHeurModDh;
+			this.tempLegStates[i].actHeurModEf = this.activeLegStates[i].actHeurModEf;
 		}
 	}
 

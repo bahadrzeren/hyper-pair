@@ -80,7 +80,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				}
 			}
 
-			solutionState.finalizeIteration(false, false, solution);
+			solutionState.finalizeIteration(0.0, 0.0, solution);
 
 			chromosome.setFitness(solutionState.getFinalCost());
 			chromosome.setInfo("#Pairs: " + solutionState.getNumOfPairs() +

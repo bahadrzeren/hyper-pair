@@ -126,10 +126,10 @@ public class SolutionState {
 			if (LegState.maxNumOfIncludingEffectivePairsWoDh < this.activeLegStates[j].numOfIncludingEffectivePairsWoDh)
 				LegState.maxNumOfIncludingEffectivePairsWoDh = this.activeLegStates[j].numOfIncludingEffectivePairsWoDh;
 
-			if (LegState.maxHeurModDh < this.activeLegStates[j].heurModDh)
-				LegState.maxHeurModDh = this.activeLegStates[j].heurModDh;
-			if (LegState.maxHeurModEf < this.activeLegStates[j].heurModEf)
-				LegState.maxHeurModEf = this.activeLegStates[j].heurModEf;
+			if (LegState.maxHeurModDh < this.activeLegStates[j].actHeurModDh)
+				LegState.maxHeurModDh = this.activeLegStates[j].actHeurModDh;
+			if (LegState.maxHeurModEf < this.activeLegStates[j].actHeurModEf)
+				LegState.maxHeurModEf = this.activeLegStates[j].actHeurModEf;
 		}
 	}
 
@@ -280,8 +280,8 @@ public class SolutionState {
 			this.activeLegStates[i].numOfIncludingEffectivePairs = tempLegStates[i].numOfIncludingEffectivePairs;
 			this.activeLegStates[i].numOfIncludingEffectivePairsWoDh = tempLegStates[i].numOfIncludingEffectivePairsWoDh;
 
-			this.activeLegStates[i].heurModDh = tempLegStates[i].heurModDh;
-			this.activeLegStates[i].heurModEf = tempLegStates[i].heurModEf;
+			this.activeLegStates[i].actHeurModDh = tempLegStates[i].actHeurModDh;
+			this.activeLegStates[i].actHeurModEf = tempLegStates[i].actHeurModEf;
 		}
 	}
 
@@ -585,7 +585,7 @@ public class SolutionState {
 		return finalCost;
 	}
 
-	public double finalizeIteration(boolean bestFound, boolean solutionIsImproved, List<Pair> solution) {
+	public double finalizeIteration(double bestSoFar, double prevCost, List<Pair> solution) {
 
 		numOfPairs = 0;
 		numOfPairDays = 0;
@@ -596,7 +596,7 @@ public class SolutionState {
 		totalHeurModEf = 0.0;
 
 		/*
-		 * Calculate standard fitness and heuristic cost to be able to calculate value of Heuristic Modifiers.
+		 * Calculate standard fitness.
 		 */
 		for (int i = 0; i < solution.size(); i++) {
 			Pair p = solution.get(i);
@@ -634,37 +634,9 @@ public class SolutionState {
 						modValueDhInt += (activeLegStates[l.getNdx()].numOfCoverings - 1);
 					}
 				}
-				double modValueDh = modValueDhExt + modValueDhInt;
 
 				totalHeurModDh += modValueDhExt + modValueDhInt / 2.0;
 				totalHeurModEf += modValueEf;
-
-				for (int k = 0; k < d.getNumOfLegs(); k++) {
-					Leg l = d.getLegs().get(k);
-					if (l.isCover()) {
-						/*
-						 * Set dh related heuristicModifier.
-						 */
-						if (bestFound)
-							activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * HeurosSystemParam.hmResetWeightAfterBestSol + modValueDh;
-						else
-							if (solutionIsImproved)
-								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh * HeurosSystemParam.hmResetWeightAfterImprSol + modValueDh;
-							else
-								activeLegStates[l.getNdx()].heurModDh = activeLegStates[l.getNdx()].heurModDh + modValueDh;
-
-						/*
-						 * Set ef related heuristicModifier.
-						 */
-						if (bestFound)
-							activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * HeurosSystemParam.hmResetWeightAfterBestSol + modValueEf;
-						else
-							if (solutionIsImproved)
-								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf * HeurosSystemParam.hmResetWeightAfterImprSol + modValueEf;
-							else
-								activeLegStates[l.getNdx()].heurModEf = activeLegStates[l.getNdx()].heurModEf + modValueEf;
-					}
-				}
 			}
 			for (boolean b : days) {
 				if (b)
@@ -699,6 +671,68 @@ public class SolutionState {
 		}
 
 		finalCost = (totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf);
+
+		boolean bestFound = finalCost < bestSoFar;
+		boolean solutionIsImproved = finalCost < prevCost;
+
+		/*
+		 * Calculate standard fitness and heuristic cost to be able to calculate value of Heuristic Modifiers.
+		 */
+		for (int i = 0; i < solution.size(); i++) {
+			Pair p = solution.get(i);
+			/*
+			 * Set Heuristic Modifiers!
+			 */
+			for (int j = 0; j < p.getNumOfDuties(); j++) {
+				Duty d = p.getDuties().get(j);
+				/*
+				 * Effectiveness!
+				 */
+				double modValueEf = 0.0;
+				if (this.activeDutyStates[d.getNdx()].blockTimeOfCoveringsActive < HeurosSystemParam.effectiveDutyBlockHourLimit) {
+					modValueEf = (HeurosSystemParam.effectiveDutyBlockHourLimit - this.activeDutyStates[d.getNdx()].blockTimeOfCoveringsActive);
+				}
+
+				double modValueDhExt = activeDutyStates[d.getNdx()].numOfCoveringsPassiveExt;
+				double modValueDhInt = 0.0;
+				for (int k = 0; k < d.getNumOfLegs(); k++) {
+					Leg l = d.getLegs().get(k);
+					if (l.isCover()) {
+						modValueDhInt += (activeLegStates[l.getNdx()].numOfCoverings - 1);
+					}
+				}
+				double modValueDh = modValueDhExt + modValueDhInt;
+
+				for (int k = 0; k < d.getNumOfLegs(); k++) {
+					Leg l = d.getLegs().get(k);
+					if (l.isCover()) {
+						/*
+						 * Set dh related heuristicModifier.
+						 */
+						if (bestFound) {
+							activeLegStates[l.getNdx()].bestHeurModDh = activeLegStates[l.getNdx()].actHeurModDh;
+							activeLegStates[l.getNdx()].actHeurModDh = modValueDh + activeLegStates[l.getNdx()].actHeurModDh * HeurosSystemParam.hmResetWeightAfterBestSol;
+						} else
+							if (solutionIsImproved)
+								activeLegStates[l.getNdx()].actHeurModDh = modValueDh + activeLegStates[l.getNdx()].actHeurModDh * HeurosSystemParam.hmResetWeightAfterImprSol;
+							else
+								activeLegStates[l.getNdx()].actHeurModDh += modValueDh;
+
+						/*
+						 * Set ef related heuristicModifier.
+						 */
+						if (bestFound) {
+							activeLegStates[l.getNdx()].bestHeurModEf = activeLegStates[l.getNdx()].actHeurModEf;
+							activeLegStates[l.getNdx()].actHeurModEf = modValueEf + activeLegStates[l.getNdx()].actHeurModEf * HeurosSystemParam.hmResetWeightAfterBestSol;
+						} else
+							if (solutionIsImproved)
+								activeLegStates[l.getNdx()].actHeurModEf = modValueEf + activeLegStates[l.getNdx()].actHeurModEf * HeurosSystemParam.hmResetWeightAfterImprSol;
+							else
+								activeLegStates[l.getNdx()].actHeurModEf += modValueEf;
+					}
+				}
+			}
+		}
 
 		return finalCost;
 	}

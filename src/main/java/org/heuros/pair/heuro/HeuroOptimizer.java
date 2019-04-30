@@ -51,9 +51,6 @@ public class HeuroOptimizer {
 		int numOfIterationsWOProgress = 0;
 		long optStartTime = System.nanoTime();
 
-		boolean bestFound = true;
-		boolean solutionIsImproved = true;
-
 		SolutionState solutionState = null;
 
 		for (int i = 0; i < HeurosAlgParameters.maxNumOfIterations; i++) {
@@ -61,7 +58,7 @@ public class HeuroOptimizer {
 			List<Pair> solution = new ArrayList<Pair>();
 
 			SolutionGenerator solGen = new SolutionGenerator(this.pairOptimizationContext, this.pricingNetwork, solutionState);
-			solutionState = solGen.generateSolution(bestFound, solutionIsImproved, solution);
+			solutionState = solGen.generateSolution(bestCost, prevCost, solution);
 
 			/**
 			 * TEST BLOCK BEGIN
@@ -118,15 +115,11 @@ public class HeuroOptimizer {
 			if (solutionState.getFinalCost() < bestCost) {
 				bestCost = solutionState.getFinalCost();
 				bestSolution = solution;
-				bestFound = true;
 				logger.info("Best found!!!");
-			} else
-				bestFound = false;
+			}
 			if (solutionState.getFinalCost() < prevCost) {
-				solutionIsImproved = true;
 				logger.info("Solution is improved!!!");
-			} else
-				solutionIsImproved = false;
+			}
 			prevCost = solutionState.getFinalCost();
 
 			/*

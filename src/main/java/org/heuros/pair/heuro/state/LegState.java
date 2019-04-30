@@ -70,8 +70,10 @@ public class LegState implements Cloneable {
 	/*
 	 * Cumulative values that do not reset during optimization.
 	 */
-	public double heurModDh= 0.0;
-	public double heurModEf= 0.0;
+	public double bestHeurModDh= 0.0;
+	public double bestHeurModEf= 0.0;
+	public double actHeurModDh= 0.0;
+	public double actHeurModEf= 0.0;
 
 	private double getDutyInclusionScore() {
 		return (1.0 - (1.0 * this.numOfIncludingDuties) / LegState.maxNumOfIncludingDuties);
@@ -107,7 +109,7 @@ public class LegState implements Cloneable {
 
 	private double getHeurModDhScore() {
 		if (LegState.maxHeurModDh > 0.0) {
-			return this.heurModDh / LegState.maxHeurModDh;
+			return this.actHeurModDh / LegState.maxHeurModDh;
 		} else {
 			return 0.0;
 		}
@@ -115,7 +117,7 @@ public class LegState implements Cloneable {
 
 	private double getHeurModEfScore() {
 		if (LegState.maxHeurModEf > 0.0) {
-			return this.heurModEf / LegState.maxHeurModEf;
+			return this.actHeurModEf / LegState.maxHeurModEf;
 		} else {
 			return 0.0;
 		}
@@ -217,8 +219,8 @@ public class LegState implements Cloneable {
 				", numOfIncludingPairsWoDh: " + numOfIncludingPairsWoDh + 
 				", numOfIncludingEffectivePairs: " + numOfIncludingEffectivePairs + 
 				", numOfIncludingEffectivePairsWoDh: " + numOfIncludingEffectivePairsWoDh + 
-				", heurModDh: " + heurModDh +
-				", heurModEf: " + heurModEf;
+				", heurModDh: " + actHeurModDh +
+				", heurModEf: " + actHeurModEf;
 		
 	}
 }
