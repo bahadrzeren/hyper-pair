@@ -97,7 +97,8 @@ public class HeuroOptimizer {
 			 * TEST BLOCK END
 			 */
 
-			logger.info("#Pairs: " + solutionState.getNumOfPairs() +
+			logger.info(i + ".th itr" +
+						" #Pairs: " + solutionState.getNumOfPairs() +
 						" #Duties: " + solutionState.getNumOfDuties() +
 						" #PairDays: " + solutionState.getNumOfPairDays() +
 						" #DutyDays: " + solutionState.getNumOfDutyDays() +

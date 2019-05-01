@@ -24,6 +24,7 @@ import org.heuros.data.processor.DutyGenerator;
 import org.heuros.exception.RuleAnnotationIsMissing;
 import org.heuros.exception.RuleRegistrationMatchingException;
 import org.heuros.loader.legs.LegsLoader;
+import org.heuros.pair.conf.HeurosAlgParameters;
 import org.heuros.pair.conf.HeurosConf;
 import org.heuros.pair.conf.HeurosDatasetParam;
 import org.heuros.pair.conf.HeurosSystemParam;
@@ -119,30 +120,32 @@ public abstract class AbsPairingOptimizer {
 
 			inputDataFile = args[0];
 
-			HeurosSystemParam.effectiveDutyBlockHourLimit = Integer.parseInt(args[1]);	//	4 * 60;
+			HeurosAlgParameters.maxNumOfIterations = Integer.parseInt(args[1]);	//	4 * 60;
+			HeurosAlgParameters.maxNumOfIterationsWOProgress = Integer.parseInt(args[1]);	//	4 * 60;
+			HeurosSystemParam.effectiveDutyBlockHourLimit = Integer.parseInt(args[2]);	//	4 * 60;
 
-			HeurosSystemParam.pairEnumerationDept = Integer.parseInt(args[2]);	//	2;
-			HeurosSystemParam.pairEnumIdleDayBuffer = Integer.parseInt(args[3]);	//	1;
+			HeurosSystemParam.pairEnumerationDept = Integer.parseInt(args[3]);	//	2;
+			HeurosSystemParam.pairEnumIdleDayBuffer = Integer.parseInt(args[4]);	//	1;
 
-			HeurosSystemParam.weightDutyInclusionScore = Double.parseDouble(args[4]);	//	0.0;
-			HeurosSystemParam.weightDutyInclusionScoreWoDh = Double.parseDouble(args[5]);	//	0.0;
-			HeurosSystemParam.weightDutyEffectiveInclusionScore = Double.parseDouble(args[6]);	//	0.0;
-			HeurosSystemParam.weightDutyEffectiveInclusionScoreWoDh = Double.parseDouble(args[7]);	//	0.0;
+			HeurosSystemParam.weightDutyInclusionScore = Double.parseDouble(args[5]);	//	0.0;
+			HeurosSystemParam.weightDutyInclusionScoreWoDh = Double.parseDouble(args[6]);	//	0.0;
+			HeurosSystemParam.weightDutyEffectiveInclusionScore = Double.parseDouble(args[7]);	//	0.0;
+			HeurosSystemParam.weightDutyEffectiveInclusionScoreWoDh = Double.parseDouble(args[8]);	//	0.0;
 
-			HeurosSystemParam.weightPairInclusionScore = Double.parseDouble(args[8]);	//	0.0;
-			HeurosSystemParam.weightPairInclusionScoreWoDh = Double.parseDouble(args[9]);	//	0.95;
-			HeurosSystemParam.weightPairEffectiveInclusionScore = Double.parseDouble(args[10]);	//	0.0;
-			HeurosSystemParam.weightPairEffectiveInclusionScoreWoDh = Double.parseDouble(args[11]);	//	0.0;
+			HeurosSystemParam.weightPairInclusionScore = Double.parseDouble(args[9]);	//	0.0;
+			HeurosSystemParam.weightPairInclusionScoreWoDh = Double.parseDouble(args[10]);	//	0.95;
+			HeurosSystemParam.weightPairEffectiveInclusionScore = Double.parseDouble(args[11]);	//	0.0;
+			HeurosSystemParam.weightPairEffectiveInclusionScoreWoDh = Double.parseDouble(args[12]);	//	0.0;
 
-			HeurosSystemParam.weightHeurModDh = Double.parseDouble(args[12]);	//	0.05;
-			HeurosSystemParam.weightHeurModEf = Double.parseDouble(args[13]);	//	0.0;
+			HeurosSystemParam.weightHeurModDh = Double.parseDouble(args[13]);	//	0.05;
+			HeurosSystemParam.weightHeurModEf = Double.parseDouble(args[14]);	//	0.0;
 
 			/*
 			 * Additional parameters for genetic optimizer.
 			 */
 			if (args.length > 14) {
-				HeurosSystemParam.hmResetWeightAfterBestSol = Double.parseDouble(args[14]);	//	0.33;
-				HeurosSystemParam.hmResetWeightAfterImprSol = Double.parseDouble(args[15]);	//	0.66;
+				HeurosSystemParam.hmResetWeightAfterBestSol = Double.parseDouble(args[15]);	//	0.33;
+				HeurosSystemParam.hmResetWeightAfterImprSol = Double.parseDouble(args[16]);	//	0.66;
 			} else {
 				HeurosSystemParam.hmResetWeightAfterBestSol = 0.0;
 				HeurosSystemParam.hmResetWeightAfterImprSol = 0.0;

@@ -28,6 +28,7 @@ public class GaPair extends AbsPairingOptimizer {
 	public static void main(String[] args) throws RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException {
 		GaPair optimizer = new GaPair();
 		optimizer.runTheOptimizer(args);
+		logger.info("EXIT!");
 	}
 
 	@Override
@@ -49,12 +50,12 @@ public class GaPair extends AbsPairingOptimizer {
 																			.setGeneticIterationListener(new GeneticIterationListener<Integer>() {
 																				@Override
 																				public void onProgress(int iteration, double elapsedTime, Chromosome<Integer> best) {
-																					GaPair.logger.info("Progress!!! at " + iteration + ".th iteration, elapsedTime: " +
+																					GaPair.logger.info("Progress!!! at " + iteration + ".th itr, elapsedTime: " +
 																											elapsedTime + ", best: " + String.valueOf(best.getInfo()));
 																				}
 																				@Override
 																				public void onIterate(int iteration, double elapsedTime, Chromosome<Integer> best) {
-																					GaPair.logger.info(iteration + ".th itearation, elapsedTime: " +
+																					GaPair.logger.info(iteration + ".th itr, elapsedTime: " +
 																											elapsedTime + ", best: " + String.valueOf(best.getInfo()));
 																				}
 																				@Override

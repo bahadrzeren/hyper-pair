@@ -41,6 +41,8 @@ public class SolutionState {
 	private StateCalculator[] stateCalculators = null;
 	private List<Future<Double>> stateProcessL = null;
 
+	private ExecutorService pairingProcessExecutor = null;
+
 	public SolutionState(PairOptimizationContext pairOptimizationContext,
 							DutyLegOvernightConnNetwork pricingNetwork) throws CloneNotSupportedException {
 //		this.pairOptimizationContext = pairOptimizationContext;
@@ -61,6 +63,7 @@ public class SolutionState {
 			this.activeDutyStates[i].initializeForNewIteration(this.duties.get(i));
 		}
 		this.calculateAndSetMaxValuesOfHeuristicsParameters();
+		this.pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays);
 
 //		pairEnumerator = new PairEnumeratorWoRuleCheck(pairOptimizationContext,
 //														pricingNetwork,
@@ -93,6 +96,7 @@ public class SolutionState {
 			this.activeDutyStates[j].initializeForNewIteration(this.duties.get(j));
 		}
 		this.calculateAndSetMaxValuesOfHeuristicsParameters();
+		this.pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays);
 	}
 
 	private void calculateAndSetMaxValuesOfHeuristicsParameters() {
@@ -303,8 +307,6 @@ public class SolutionState {
 			this.activeDutyStates[i].blockTimeOfDistinctCoveringsPassive = tempDutyStates[i].blockTimeOfDistinctCoveringsPassive;
 		}
 	}
-
-	private ExecutorService pairingProcessExecutor = Executors.newFixedThreadPool(HeurosSystemParam.maxPairingLengthInDays);
 
 	private StateCalculator bestStateCalculator = null;
 
@@ -586,6 +588,8 @@ public class SolutionState {
 	}
 
 	public double finalizeIteration(double bestSoFar, double prevCost, List<Pair> solution) {
+
+		this.pairingProcessExecutor.shutdown();
 
 		numOfPairs = 0;
 		numOfPairDays = 0;

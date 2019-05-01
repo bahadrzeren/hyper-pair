@@ -19,6 +19,7 @@ public class HeuroPair extends AbsPairingOptimizer {
 	public static void main(String[] args) throws RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException {
 		HeuroPair optimizer = new HeuroPair();
 		optimizer.runTheOptimizer(args);
+		logger.info("EXIT!");
 	}
 
 	@Override
