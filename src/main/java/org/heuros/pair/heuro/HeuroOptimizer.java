@@ -41,12 +41,12 @@ public class HeuroOptimizer {
 		this.pricingNetwork = pricingNetwork;
 	}
 
-	public List<Pair> doMinimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
+	public String doMinimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
 		logger.info("Optimization process is started!");
 
 		double prevCost = Double.MAX_VALUE;
 		double bestCost = Double.MAX_VALUE;
-		List<Pair> bestSolution = null;
+		String bestStr = null;
 
 		int numOfIterationsWOProgress = 0;
 		long optStartTime = System.nanoTime();
@@ -96,7 +96,9 @@ public class HeuroOptimizer {
 			/**
 			 * TEST BLOCK END
 			 */
-
+			
+			if (bestStr != null)
+				logger.info(bestStr);
 			logger.info(i + ".th itr" +
 						" #Pairs: " + solutionState.getNumOfPairs() +
 						" #Duties: " + solutionState.getNumOfDuties() +
@@ -115,7 +117,18 @@ public class HeuroOptimizer {
 			 */
 			if (solutionState.getFinalCost() < bestCost) {
 				bestCost = solutionState.getFinalCost();
-				bestSolution = solution;
+				bestStr = i + ".th itr" +
+							" #Pairs: " + solutionState.getNumOfPairs() +
+							" #Duties: " + solutionState.getNumOfDuties() +
+							" #PairDays: " + solutionState.getNumOfPairDays() +
+							" #DutyDays: " + solutionState.getNumOfDutyDays() +
+							" #Dh: " + solutionState.getNumOfDeadheads() +
+							" #LegsInt: " + solutionState.getNumOfDistinctLegsFromTheFleet() +
+							" #LegsIntDh: " + solutionState.getNumOfDistinctDeadheadLegsFromTheFleet() +
+							" #LegsFltExt: " + solutionState.getNumOfDistinctLegsOutsideOfTheFleet() +
+							" TotHM_Dh: " + solutionState.getTotalHeurModDh() +
+							" TotHM_Ef: " + solutionState.getTotalHeurModEf() +
+							" FinalCost: " + solutionState.getFinalCost();
 				logger.info("Best found!!!");
 			}
 			if (solutionState.getFinalCost() < prevCost) {
@@ -190,6 +203,6 @@ public class HeuroOptimizer {
 //				logger.info(sb.toString());
 //		}			
 
-		return bestSolution;
+		return bestStr;
 	}
 }

@@ -1,5 +1,6 @@
 package org.heuros.pair.heuro;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
@@ -16,16 +17,17 @@ public class HeuroPair extends AbsPairingOptimizer {
 
 	private static Logger logger = Logger.getLogger(HeuroPair.class);
 
-	public static void main(String[] args) throws RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException {
+	public static void main(String[] args) throws RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException, IOException {
 		HeuroPair optimizer = new HeuroPair();
 		optimizer.runTheOptimizer(args);
 		logger.info("EXIT!");
 	}
 
 	@Override
-	public void doOptimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
+	public String doOptimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
 		HeuroOptimizer pairOptimizer = new HeuroOptimizer(pairOptimizationContext, pricingNetwork);
-		pairOptimizer.doMinimize();
+		String res = pairOptimizer.doMinimize();
 		logger.info("Optimization run is completed!");
+		return res;
     }
 }

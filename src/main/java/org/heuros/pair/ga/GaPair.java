@@ -1,5 +1,6 @@
 package org.heuros.pair.ga;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
@@ -25,14 +26,14 @@ public class GaPair extends AbsPairingOptimizer {
 
 	private static Logger logger = Logger.getLogger(GaPair.class);
 
-	public static void main(String[] args) throws RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException {
+	public static void main(String[] args) throws RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException, IOException {
 		GaPair optimizer = new GaPair();
 		optimizer.runTheOptimizer(args);
 		logger.info("EXIT!");
 	}
 
 	@Override
-	public void doOptimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
+	public String doOptimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 		PairChromosomeDecoder pairChromosomeDecoder = new PairChromosomeDecoder(pairOptimizationContext, pricingNetwork);
 
@@ -73,5 +74,6 @@ public class GaPair extends AbsPairingOptimizer {
 																										setChromosomeLength(pairOptimizationContext.getLegRepository().getModels().size()));
 		pairOptimizer.proceed();
 		logger.info("Optimization run is completed!");
+		return pairOptimizer.getBest().getInfo();
     }
 }

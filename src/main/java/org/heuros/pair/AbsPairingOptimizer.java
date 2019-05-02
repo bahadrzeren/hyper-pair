@@ -1,5 +1,8 @@
 package org.heuros.pair;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -106,15 +109,16 @@ public abstract class AbsPairingOptimizer {
 
 	private static Logger logger = Logger.getLogger(AbsPairingOptimizer.class);
 
-	public abstract void doOptimize() throws InterruptedException, ExecutionException, CloneNotSupportedException;
+	public abstract String doOptimize() throws InterruptedException, ExecutionException, CloneNotSupportedException;
 
 	protected PairOptimizationContext pairOptimizationContext = null;
 	protected DutyLegOvernightConnNetwork pricingNetwork = null;
 
-	public void runTheOptimizer(String[] args) throws RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException {
+	public void runTheOptimizer(String[] args) throws RuleAnnotationIsMissing, RuleRegistrationMatchingException, InterruptedException, ExecutionException, CloneNotSupportedException, IOException {
     	/*
     	 * Load configuration file.
     	 */
+		String consolidatedOutput = null;
 		String inputDataFile = null;
 		if ((args != null) && (args.length > 1)) {
 
@@ -143,12 +147,14 @@ public abstract class AbsPairingOptimizer {
 			/*
 			 * Additional parameters for genetic optimizer.
 			 */
-			if (args.length > 14) {
+			if (args.length > 17) {
 				HeurosSystemParam.hmResetWeightAfterBestSol = Double.parseDouble(args[15]);	//	0.33;
 				HeurosSystemParam.hmResetWeightAfterImprSol = Double.parseDouble(args[16]);	//	0.66;
+				consolidatedOutput = args[17];
 			} else {
 				HeurosSystemParam.hmResetWeightAfterBestSol = 0.0;
 				HeurosSystemParam.hmResetWeightAfterImprSol = 0.0;
+				consolidatedOutput = args[15];
 			}
 		} else {
 			String confFileName = null;
@@ -289,7 +295,17 @@ public abstract class AbsPairingOptimizer {
 
 			executorService.shutdown();
 
-			this.doOptimize();
+			String res = this.doOptimize();
+
+			FileWriter fw = new FileWriter(consolidatedOutput.trim(), true);
+			PrintWriter bw = new PrintWriter(fw);
+			try {
+				bw.append(res).append("\n");
+				bw.flush();
+			} finally {
+			    bw.close();
+			    fw.close();
+			}
 		}
     }
 }
