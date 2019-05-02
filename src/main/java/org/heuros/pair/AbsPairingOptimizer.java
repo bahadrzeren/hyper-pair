@@ -300,7 +300,7 @@ public abstract class AbsPairingOptimizer {
 			FileWriter fw = new FileWriter(consolidatedOutput.trim(), true);
 			PrintWriter bw = new PrintWriter(fw);
 			try {
-				bw.append(res).append("\n");
+				bw.append(res).append(System.getProperty("line.separator"));
 				bw.flush();
 			} finally {
 			    bw.close();
