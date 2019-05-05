@@ -19,9 +19,9 @@ public class DutyFlightConnectionTime implements ConnectionChecker<LegView> {
 	private int minLegConnTime60 = 60;
 	private int minLegConnTime70 = 70;
 
-	private int minLegConnTimeForIST = 90;
-	private int minLegConnTimeForSAW = 60;
-	private int minLegConnTimeForISTESB = 90;
+	public static int minLegConnTimeForIST = 90;
+	public static int minLegConnTimeForSAW = 60;
+	public static int minLegConnTimeForISTESB = 90;
 
 	private int getMinConnTime(int hbNdx, LegView pl, boolean isPlActive, LegView nl, boolean isNlActive) {
 		if (pl.getFlightNo() == 845)
