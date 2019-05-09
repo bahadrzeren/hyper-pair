@@ -124,42 +124,43 @@ public abstract class AbsPairingOptimizer {
 
 			inputDataFile = args[0];
 
-			HeurosAlgParameters.maxNumOfIterations = Integer.parseInt(args[1]);	//	4 * 60;
-			HeurosAlgParameters.maxNumOfIterationsWOProgress = Integer.parseInt(args[1]);	//	4 * 60;
+			HeurosAlgParameters.maxElapsedTimeInNanoSecs = Integer.parseInt(args[1]) * 60 * 60 * 1000000000l;	//	hr * min * sec * ns.
+			HeurosAlgParameters.maxNumOfIterations = Integer.parseInt(args[2]);	//	4 * 60;
+			HeurosAlgParameters.maxNumOfIterationsWOProgress = Integer.parseInt(args[2]);	//	4 * 60;
 
-			DutyFlightConnectionTime.minLegConnTimeForIST = Integer.parseInt(args[2]);
-			DutyFlightConnectionTime.minLegConnTimeForSAW = Integer.parseInt(args[3]);
-			DutyFlightConnectionTime.minLegConnTimeForISTESB = Integer.parseInt(args[4]);
+			DutyFlightConnectionTime.minLegConnTimeForIST = Integer.parseInt(args[3]);
+			DutyFlightConnectionTime.minLegConnTimeForSAW = Integer.parseInt(args[4]);
+			DutyFlightConnectionTime.minLegConnTimeForISTESB = Integer.parseInt(args[5]);
 
-			HeurosSystemParam.effectiveDutyBlockHourLimit = Integer.parseInt(args[5]);	//	4 * 60;
+			HeurosSystemParam.effectiveDutyBlockHourLimit = Integer.parseInt(args[6]);	//	4 * 60;
 
-			HeurosSystemParam.pairEnumerationDept = Integer.parseInt(args[6]);	//	2;
-			HeurosSystemParam.pairEnumIdleDayBuffer = Integer.parseInt(args[7]);	//	1;
+			HeurosSystemParam.pairEnumerationDept = Integer.parseInt(args[7]);	//	2;
+			HeurosSystemParam.pairEnumIdleDayBuffer = Integer.parseInt(args[8]);	//	1;
 
-			HeurosSystemParam.weightDutyInclusionScore = Double.parseDouble(args[8]);	//	0.0;
-			HeurosSystemParam.weightDutyInclusionScoreWoDh = Double.parseDouble(args[9]);	//	0.0;
-			HeurosSystemParam.weightDutyEffectiveInclusionScore = Double.parseDouble(args[10]);	//	0.0;
-			HeurosSystemParam.weightDutyEffectiveInclusionScoreWoDh = Double.parseDouble(args[11]);	//	0.0;
+			HeurosSystemParam.weightDutyInclusionScore = Double.parseDouble(args[9]);	//	0.0;
+			HeurosSystemParam.weightDutyInclusionScoreWoDh = Double.parseDouble(args[10]);	//	0.0;
+			HeurosSystemParam.weightDutyEffectiveInclusionScore = Double.parseDouble(args[11]);	//	0.0;
+			HeurosSystemParam.weightDutyEffectiveInclusionScoreWoDh = Double.parseDouble(args[12]);	//	0.0;
 
-			HeurosSystemParam.weightPairInclusionScore = Double.parseDouble(args[12]);	//	0.0;
-			HeurosSystemParam.weightPairInclusionScoreWoDh = Double.parseDouble(args[13]);	//	0.95;
-			HeurosSystemParam.weightPairEffectiveInclusionScore = Double.parseDouble(args[14]);	//	0.0;
-			HeurosSystemParam.weightPairEffectiveInclusionScoreWoDh = Double.parseDouble(args[15]);	//	0.0;
+			HeurosSystemParam.weightPairInclusionScore = Double.parseDouble(args[13]);	//	0.0;
+			HeurosSystemParam.weightPairInclusionScoreWoDh = Double.parseDouble(args[14]);	//	0.95;
+			HeurosSystemParam.weightPairEffectiveInclusionScore = Double.parseDouble(args[15]);	//	0.0;
+			HeurosSystemParam.weightPairEffectiveInclusionScoreWoDh = Double.parseDouble(args[16]);	//	0.0;
 
-			HeurosSystemParam.weightHeurModDh = Double.parseDouble(args[16]);	//	0.05;
-			HeurosSystemParam.weightHeurModEf = Double.parseDouble(args[17]);	//	0.0;
+			HeurosSystemParam.weightHeurModDh = Double.parseDouble(args[17]);	//	0.05;
+			HeurosSystemParam.weightHeurModEf = Double.parseDouble(args[18]);	//	0.0;
 
 			/*
 			 * Additional parameters for genetic optimizer.
 			 */
-			if (args.length > 20) {
-				HeurosSystemParam.hmResetWeightAfterBestSol = Double.parseDouble(args[18]);	//	0.33;
-				HeurosSystemParam.hmResetWeightAfterImprSol = Double.parseDouble(args[19]);	//	0.66;
-				consolidatedOutput = args[20];
+			if (args.length > 21) {
+				HeurosSystemParam.hmResetWeightAfterBestSol = Double.parseDouble(args[19]);	//	0.33;
+				HeurosSystemParam.hmResetWeightAfterImprSol = Double.parseDouble(args[20]);	//	0.66;
+				consolidatedOutput = args[21];
 			} else {
 				HeurosSystemParam.hmResetWeightAfterBestSol = 0.0;
 				HeurosSystemParam.hmResetWeightAfterImprSol = 0.0;
-				consolidatedOutput = args[20];
+				consolidatedOutput = args[21];
 			}
 		} else {
 			String confFileName = null;
