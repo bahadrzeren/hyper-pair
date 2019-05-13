@@ -7,6 +7,7 @@ import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
+import org.heuros.pair.SolutionCost;
 import org.heuros.pair.heuro.state.SolutionState;
 import org.heuros.pair.sp.PairWithQuality;
 import org.heuros.pair.sp.PairingGenerator;
@@ -42,7 +43,7 @@ public class SolutionGenerator {
 		this.pairingGenerator = new PairingGenerator(pairOptimizationContext, pricingNetwork, this.solutionState);
 	}
 
-	public SolutionState generateSolution(double bestSoFar, double prevCost, List<Pair> solution) throws InterruptedException, ExecutionException, CloneNotSupportedException {
+	public SolutionState generateSolution(SolutionCost bestSoFar, SolutionCost prevCost, List<Pair> solution) throws InterruptedException, ExecutionException, CloneNotSupportedException {
 
 		logger.info("Solution generation process is started!");
 

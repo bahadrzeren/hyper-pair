@@ -1,5 +1,6 @@
 package org.heuros.pair.ga.ga;
 
+import org.heuros.core.ga.ISolutionCost;
 import org.heuros.core.ga.chromosome.Chromosome;
 import org.heuros.core.ga.crossover.Crossover;
 
@@ -18,7 +19,7 @@ public class CycleCrossover<T> implements Crossover<T> {
                             int startingChildIndex,
                             Chromosome<T> mother,
                             Chromosome<T> father,
-                            double worstFitness) throws CloneNotSupportedException {
+                            ISolutionCost worstFitness) throws CloneNotSupportedException {
         int res = startingChildIndex;
 
         PairChromosome motherC = (PairChromosome) mother;

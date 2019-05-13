@@ -13,6 +13,7 @@ import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Duty;
 import org.heuros.data.model.Leg;
 import org.heuros.data.model.Pair;
+import org.heuros.pair.SolutionCost;
 import org.heuros.pair.conf.HeurosDatasetParam;
 import org.heuros.pair.conf.HeurosSystemParam;
 import org.heuros.pair.sp.PairWithQuality;
@@ -538,10 +539,12 @@ public class SolutionState {
 	private int numOfDistinctDeadheadLegsFromTheFleet = 0;
 	private int numOfDistinctLegsOutsideOfTheFleet = 0;
 
-	private double totalHeurModDh = 0.0;
-	private double totalHeurModEf = 0.0;
+//	private double totalHeurModDh = 0.0;
+//	private double totalHeurModEf = 0.0;
 
-	private double finalCost = 0.0;
+//	private double finalCost = 0.0;
+
+	private SolutionCost finalCost = null;
 
 	public int getNumOfPairs() {
 		return numOfPairs;
@@ -575,19 +578,23 @@ public class SolutionState {
 		return numOfDistinctLegsOutsideOfTheFleet;
 	}
 
-	public double getTotalHeurModDh() {
-		return totalHeurModDh;
-	}
+//	public double getTotalHeurModDh() {
+//		return totalHeurModDh;
+//	}
+//
+//	public double getTotalHeurModEf() {
+//		return totalHeurModEf;
+//	}
 
-	public double getTotalHeurModEf() {
-		return totalHeurModEf;
-	}
+//	public double getFinalCost() {
+//		return finalCost;
+//	}
 
-	public double getFinalCost() {
+	public SolutionCost getFinalCost() {
 		return finalCost;
 	}
 
-	public double finalizeIteration(double bestSoFar, double prevCost, List<Pair> solution) {
+	public SolutionCost finalizeIteration(SolutionCost bestSoFar, SolutionCost prevCost, List<Pair> solution) {
 
 		this.pairingProcessExecutor.shutdown();
 
@@ -596,8 +603,8 @@ public class SolutionState {
 		numOfDuties = 0;
 		numOfDutyDays = 0;
 
-		totalHeurModDh = 0.0;
-		totalHeurModEf = 0.0;
+		double totalHeurModDh = 0.0;
+		double totalHeurModEf = 0.0;
 
 		/*
 		 * Calculate standard fitness.
@@ -674,10 +681,12 @@ public class SolutionState {
 			}
 		}
 
-		finalCost = (totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf);
+//		finalCost = (totalHeurModDh * HeurosSystemParam.weightHeurModDh + totalHeurModEf * HeurosSystemParam.weightHeurModEf / HeurosSystemParam.effectiveDutyBlockHourLimit);
+		finalCost = new SolutionCost(totalHeurModDh, totalHeurModEf);
+				
 
-		boolean bestFound = finalCost < bestSoFar;
-		boolean solutionIsImproved = finalCost < prevCost;
+		boolean bestFound = finalCost.doesPerformBetterThan(bestSoFar);
+		boolean solutionIsImproved = finalCost.doesPerformBetterThan(prevCost);
 
 		/*
 		 * Calculate standard fitness and heuristic cost to be able to calculate value of Heuristic Modifiers.

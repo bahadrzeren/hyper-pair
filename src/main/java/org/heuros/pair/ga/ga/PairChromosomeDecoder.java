@@ -80,7 +80,7 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 				}
 			}
 
-			solutionState.finalizeIteration(0.0, 0.0, solution);
+			solutionState.finalizeIteration(null, null, solution);
 
 			chromosome.setFitness(solutionState.getFinalCost());
 			chromosome.setInfo("#Pairs: " + solutionState.getNumOfPairs() +
@@ -91,8 +91,8 @@ public class PairChromosomeDecoder implements Decoder<Integer, Pair> {
 								" #LegsInt: " + solutionState.getNumOfDistinctLegsFromTheFleet() +
 								" #LegsIntDh: " + solutionState.getNumOfDistinctDeadheadLegsFromTheFleet() +
 								" #LegsFltExt: " + solutionState.getNumOfDistinctLegsOutsideOfTheFleet() +
-								" TotHM_Dh: " + solutionState.getTotalHeurModDh() +
-								" TotHM_Ef: " + solutionState.getTotalHeurModEf() +
+								" TotHM_Dh: " + solutionState.getFinalCost().getTotalHeurModDh() +
+								" TotHM_Ef: " + solutionState.getFinalCost().getTotalHeurModEf() +
 								" FinalCost: " + solutionState.getFinalCost());
 
 		} catch (Exception ex) {

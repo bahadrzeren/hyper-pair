@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.heuros.context.PairOptimizationContext;
 import org.heuros.data.DutyLegOvernightConnNetwork;
 import org.heuros.data.model.Pair;
+import org.heuros.pair.SolutionCost;
 import org.heuros.pair.conf.HeurosAlgParameters;
 import org.heuros.pair.heuro.state.SolutionState;
 
@@ -44,8 +45,8 @@ public class HeuroOptimizer {
 	public String doMinimize() throws InterruptedException, ExecutionException, CloneNotSupportedException {
 		logger.info("Optimization process is started!");
 
-		double prevCost = Double.MAX_VALUE;
-		double bestCost = Double.MAX_VALUE;
+		SolutionCost prevCost = null;
+		SolutionCost bestCost = null;
 		String bestStr = null;
 
 		int numOfIterationsWOProgress = 0;
@@ -108,14 +109,14 @@ public class HeuroOptimizer {
 						" #LegsInt: " + solutionState.getNumOfDistinctLegsFromTheFleet() +
 						" #LegsIntDh: " + solutionState.getNumOfDistinctDeadheadLegsFromTheFleet() +
 						" #LegsFltExt: " + solutionState.getNumOfDistinctLegsOutsideOfTheFleet() +
-						" TotHM_Dh: " + solutionState.getTotalHeurModDh() +
-						" TotHM_Ef: " + solutionState.getTotalHeurModEf() +
+						" TotHM_Dh: " + solutionState.getFinalCost().getTotalHeurModDh() +
+						" TotHM_Ef: " + solutionState.getFinalCost().getTotalHeurModEf() +
 						" FinalCost: " + solutionState.getFinalCost());
 
 			/*
 			 * Improvement test.
 			 */
-			if (solutionState.getFinalCost() < bestCost) {
+			if (solutionState.getFinalCost().doesPerformBetterThan(bestCost)) {
 				bestCost = solutionState.getFinalCost();
 				bestStr = i + ".th itr" +
 							" #Pairs: " + solutionState.getNumOfPairs() +
@@ -126,12 +127,12 @@ public class HeuroOptimizer {
 							" #LegsInt: " + solutionState.getNumOfDistinctLegsFromTheFleet() +
 							" #LegsIntDh: " + solutionState.getNumOfDistinctDeadheadLegsFromTheFleet() +
 							" #LegsFltExt: " + solutionState.getNumOfDistinctLegsOutsideOfTheFleet() +
-							" TotHM_Dh: " + solutionState.getTotalHeurModDh() +
-							" TotHM_Ef: " + solutionState.getTotalHeurModEf() +
+							" TotHM_Dh: " + solutionState.getFinalCost().getTotalHeurModDh() +
+							" TotHM_Ef: " + solutionState.getFinalCost().getTotalHeurModEf() +
 							" FinalCost: " + solutionState.getFinalCost();
 				logger.info("Best found!!!");
 			}
-			if (solutionState.getFinalCost() < prevCost) {
+			if (solutionState.getFinalCost().doesPerformBetterThan(prevCost)) {
 				logger.info("Solution is improved!!!");
 			}
 			prevCost = solutionState.getFinalCost();

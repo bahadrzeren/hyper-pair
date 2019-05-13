@@ -1,12 +1,13 @@
 package org.heuros.pair.ga.ga;
 
+import org.heuros.core.ga.ISolutionCost;
 import org.heuros.core.ga.chromosome.Chromosome;
 
 public class PairChromosome implements Chromosome<Integer>, Cloneable {
 
 	private int[] genes = null;
 	private int[] pos = null;
-	private double fitness = Double.MAX_VALUE;
+	private ISolutionCost fitness = null;
 	private String info = null;
 
 	@Override
@@ -27,12 +28,12 @@ public class PairChromosome implements Chromosome<Integer>, Cloneable {
 	}
 
 	@Override
-	public void setFitness(double value) {
+	public void setFitness(ISolutionCost value) {
 		this.fitness = value;
 	}
 
 	@Override
-	public double getFitness() {
+	public ISolutionCost getFitness() {
 		return this.fitness;
 	}
 
