@@ -255,6 +255,14 @@ public abstract class AbsPairingOptimizer {
 			ExecutorService executorService = Executors.newFixedThreadPool(HeurosSystemParam.homebases.length * 2);
 //			List<Future<Boolean>> pairInitCalls = new ArrayList<Future<Boolean>>(HeurosSystemParam.homebases.length);
 
+//			UniDirDutyPairingChecker uniDirDutyPairChecker = new UniDirDutyPairingChecker(HeurosSystemParam.maxPreDutySearchDeptInHours,
+//																							HeurosSystemParam.maxPairingLengthInDays * 24,
+//																							pairOptimizationContext);
+//			//pairInitCalls.add(executorService.submit(dutyPairChecker));
+//			Future<Boolean> uniDirDutyPairCheckCall = executorService.submit(uniDirDutyPairChecker);
+//			if (uniDirDutyPairCheckCall.get())
+//				logger.info("uniDirDutyPairCheck job is completed!");
+
 			for (int hbNdx = 0; hbNdx < HeurosSystemParam.homebases.length; hbNdx++) {
 
 				BiDirDutyPairingChecker dutyPairChecker = new BiDirDutyPairingChecker(hbNdx,

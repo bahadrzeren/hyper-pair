@@ -239,8 +239,8 @@ public class StateCalculator implements Callable<Double>, PairListener {
 //}
 
 					if (this.tempLegStates[l.getNdx()].numOfCoverings == 0) {
-						double newDifficultyScore = this.tempLegStates[l.getNdx()].getWeightedDifficultyScore();
-//						double newDifficultyScore = (1.0 * (LegState.maxNumOfIncludingPairsWoDh - this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh)) / LegState.maxNumOfIncludingPairsWoDh;
+//						double newDifficultyScore = this.tempLegStates[l.getNdx()].getWeightedDifficultyScore();
+						double newDifficultyScore = (1.0 * (LegState.maxNumOfIncludingPairsWoDh - this.tempLegStates[l.getNdx()].numOfIncludingPairsWoDh)) / LegState.maxNumOfIncludingPairsWoDh;
 						if (newDifficultyScore > maxDifficultyScoreObtained)
 							maxDifficultyScoreObtained = newDifficultyScore;
 					}
